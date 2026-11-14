@@ -74,8 +74,10 @@
 ### 2.4. Yêu cầu Phi chức năng (Non-functional Requirements)
 - Đưa vào bảng chuẩn `NFR-01` đến `NFR-06` (Performance < 3s, Security NĐ 13/2023, Anti-Fraud 3DS/Rate Limit/S/N, Responsive, Maintainability, Availability).
 
-### 2.5. Chiến lược Kỹ thuật, Chi phí sở hữu (TCO) & Tuân thủ Pháp lý Việt Nam
+### 2.5. Chiến lược Kỹ thuật, Phân tích Fit-Gap (Buy/Customize), TCO & Pháp lý Việt Nam
 - **Quyết định Buy/Customize trên WooCommerce vs Build from Scratch:** Lý giải hiệu quả chi phí và khả năng mở rộng bằng Custom Plugin PHP/MySQL.
+- **Phân tích Khoảng trống (Fit-Gap Analysis Matrix – theo chuẩn `gap-analysis.md`):**
+  - Tách bạch rõ **70%–80% tính năng Out-of-the-box (Black-box)** của WooCommerce (Catalog, Cart, Coupon, User cơ bản) và **20%–30% GAPs cần Customize** gồm: *Functional Gap* (Compare Specs, Trả góp SV + mã hóa AES-256), *Integration Gap* (VNPay/MoMo/Fundiin Sandbox 3DS, Schema T-VAN), *Process Gap* (Duyệt 2 lớp, Gắn S/N xuất kho).
 - **Bảng tính TCO 3 năm:** Năm 1 (36 triệu VNĐ) → Năm 2 (66 triệu VNĐ) → Năm 3 (100 triệu VNĐ), tách bạch phí MDR 1.5%–2.5%.
 - **Pháp lý & Chống gian lận tại VN:** Thông báo BCT, chuẩn dữ liệu VAT 8%–10% sẵn sàng kết nối T-VAN, Consent Banner & mã hóa ảnh CCCD/Thẻ SV theo **Nghị định 13/2023/NĐ-CP**, duyệt 2 lớp, 3D-Secure, Rate Limiting/Blacklist và quản lý S/N.
 
@@ -94,22 +96,22 @@
 - 3.3.2. Biểu đồ trạng thái Hồ sơ trả góp sinh viên (`InstallmentApplicationStatus`: `DRAFT` → `ACTIVE_INSTALLMENT` → `CLOSED` / `REJECTED` / `BLACKLISTED`).
 
 ### 3.4. Phân tích & Mô hình hóa Phân hệ 1: Tìm kiếm, Lọc & So sánh cấu hình *(Role 1 – PO/BA)*
-- **Bảng Đặc tả Use Case `UC-02`: So sánh cấu hình 2–3 Laptop/PC** *(Use Case ID, Actors, Pre/Post-conditions, Main Flow, Alternate Flow, Exception Flow)*.
+- **Bảng Đặc tả Custom Use Case `UC-02`: So sánh cấu hình 2–3 Laptop/PC** *(Trình bày đủ 6 mục chuẩn `gap-analysis.md`: Metadata, Pre/Post-conditions, Main Flow, Alternate/Exception Flows, Business Rules & Schema, BDD Acceptance Criteria `Given/When/Then`)*.
 - **Activity Diagram** cho `UC-01` & `UC-02`.
 - **Sequence Diagram** cho `UC-02` (`StudentCustomer` ↔ `UI` ↔ `ComparisonService` ↔ `ProductSpecAttribute` ↔ `InstallmentCalculatorService`).
 
 ### 3.5. Phân tích & Mô hình hóa Phân hệ 2: Xác thực, RBAC, Bảo mật NĐ 13/2023 & Chống gian lận *(Role 2 – SM)*
-- **Bảng Đặc tả Use Case `UC-05`: Phân quyền RBAC, Mã hóa NĐ 13/2023 & Kiểm soát Blacklist/Rate Limit**.
+- **Bảng Đặc tả Custom Use Case `UC-05`: Phân quyền RBAC, Mã hóa NĐ 13/2023 & Kiểm soát Blacklist/Rate Limit** *(đủ 6 mục chuẩn + BDD `Given/When/Then`)*.
 - **Activity Diagram** quy trình kiểm tra Rate Limit, Blacklist và phân quyền truy cập hồ sơ nhạy cảm.
 - **Sequence Diagram** cho `UC-05`.
 
 ### 3.6. Phân tích & Mô hình hóa Phân hệ 3: Giỏ hàng, Checkout & Theo dõi đơn hàng (OMS) *(Role 3 – Dev 1)*
-- **Bảng Đặc tả Use Case `UC-08`: Đặt hàng trực tuyến & Theo dõi trạng thái đơn hàng (OMS)**.
+- **Bảng Đặc tả Custom Use Case `UC-08`: Đặt hàng trực tuyến & Theo dõi trạng thái đơn hàng (OMS)** *(đủ 6 mục chuẩn + BDD `Given/When/Then`)*.
 - **Activity Diagram** cho luồng Checkout (nhánh thanh toán thẳng vs nhánh trả góp kèm Consent NĐ 13/2023).
 - **Sequence Diagram** cho `UC-08`.
 
 ### 3.7. Phân tích & Mô hình hóa Phân hệ 4: Trả góp Sinh viên, Duyệt 2 lớp & Thanh toán Sandbox *(Role 4 – Dev 2)*
-- **Bảng Đặc tả Use Case `UC-10`: Tính toán gói trả góp & Nộp hồ sơ trả góp sinh viên** *(và mô tả liên thông `UC-11`, `UC-12`)*.
+- **Bảng Đặc tả Custom Use Case `UC-10`: Tính toán gói trả góp & Nộp hồ sơ trả góp sinh viên** *(đủ 6 mục chuẩn + Payload JSON/Schema + BDD `Given/When/Then`, mô tả liên thông `UC-11`, `UC-12`)*.
 - **BPMN / Activity Diagram** quy trình liên thông: Sinh viên nộp hồ sơ → Duyệt Lớp 1 (CCCD/Thẻ SV) → Duyệt Lớp 2 (SĐT/Email `.edu.vn`) → Thanh toán trả trước 3D-Secure → Gán S/N xuất kho → Xuất Hóa đơn PDF.
 - **Sequence Diagram** cho `UC-10` & `UC-11`.
 

@@ -111,3 +111,33 @@
 | **Extension 2** | `wp_gf_installment_applications` | `app_id (PK)`, `order_id (FK -> wp_wc_orders.id)`, `user_id (FK -> wp_users.ID)`, `plan_id (FK -> wp_gf_installment_plans.plan_id)`, `reviewer_id (FK -> wp_users.ID)` | Hồ sơ trả góp sinh viên: mã SV, email `.edu.vn`, hash CCCD, đường dẫn file mã hóa AES-256 (`cccd_encrypted_path`, `student_card_encrypted_path`), cờ `consent_nd13_accepted`, trạng thái duyệt 2 lớp (`l1_verified_at`, `l2_verified_at`, `status`), ghi chú từ chối. |
 | **Extension 3** | `wp_gf_order_serials` | `serial_id (PK)`, `order_id (FK -> wp_wc_orders.id)`, `order_item_id (FK -> wp_wc_order_items.order_item_id)`, `product_id (FK -> wp_posts.ID)` | Lưu mã `serial_number` / `service_tag` duy nhất (UNIQUE) cho từng máy xuất kho, ngày kích hoạt bảo hành, trạng thái bảo hành. |
 | **Extension 4** | `wp_gf_fraud_blacklist` | `blacklist_id (PK)`, `created_by (FK -> wp_users.ID)` | Lưu dấu vết chống gian lận (`target_type`: IP / USER / PHONE / CCCD_HASH, `target_value`, `reason`, `blocked_until`). |
+
+---
+
+## 6. MA TRẬN TRUY VẾT BR → FR → UC & GAP-ANALYSIS (CHUẨN BUY/CUSTOMIZE `trinhtin/ec312`)
+
+> Bám sát quy tắc vàng trong hướng dẫn `gap-analysis.md` & `requirements.md` của Thầy Trình Trọng Tín: **Giữ 70%–80% tính năng lõi Out-of-the-box của WooCommerce (Black-box)** và **tập trung đặc tả sâu 20%–30% khoảng trống (GAPs)** cần code Custom Plugin `gearforge-core` hoặc tích hợp API.
+
+### 6.1. Ma trận Fit-Gap Analysis & Phân rã BR → FR → UC
+
+| Business Requirement (BR) | Functional Requirement (FR) | Use Case (UC) | Trạng thái GAP | Giải pháp xử lý (WooCommerce Core vs Custom) |
+| :--- | :--- | :--- | :--- | :--- |
+| **BR-01:** Giúp sinh viên dễ tìm & đối chiếu cấu hình máy hợp túi tiền | `FR-01` (Catalog & Filter), `FR-02` (Compare Specs) | `UC-01`, `UC-02 ★`, `UC-03` | **Out-of-the-box** (`UC-01/03`) + **Functional Gap** (`UC-02`) | Dùng Catalog/Import CSV WooCommerce cho 500 SP (`Black-box`); code module `CompareSpecs` so sánh 2–3 máy + tiền góp dự kiến. |
+| **BR-02:** Mở rộng tiếp cận sinh viên qua cơ chế trả góp 3–6–12 tháng không cần thẻ tín dụng | `FR-08` (Calculator & Application) | `UC-10 ★` | **Functional Gap** | Code Custom Module `StudentInstallment` tính trả trước/góp tháng và upload CCCD + Thẻ SV mã hóa AES-256. |
+| **BR-03:** Đảm bảo an toàn tín dụng, tránh hồ sơ ảo & tuân thủ NĐ 13/2023/NĐ-CP | `FR-04` (`.edu.vn`), `FR-05` (RBAC/Encryption/Fraud), `FR-09` (2-Layer Review) | `UC-04`, `UC-05 ★`, `UC-11` | **Process Gap** & **Functional Gap** | Thiết lập quy trình duyệt 2 lớp (`L1 Docs` → `L2 .edu.vn`), Consent Banner NĐ 13/2023, `FraudGuardMiddleware` (Rate Limit + Blacklist) & RBAC. |
+| **BR-04:** Thanh toán trực tuyến an toàn & Theo dõi đơn hàng minh bạch | `FR-06` (Cart/Checkout), `FR-07` (OMS/Warranty), `FR-09` (Gateway) | `UC-07`, `UC-08 ★`, `UC-09`, `UC-11` | **Out-of-the-box** (`UC-07`) + **Integration Gap** (`UC-08/11`) | Dùng Cart/Coupon lõi WooCommerce (`Black-box`); tích hợp Gateway Sandbox (VNPay/MoMo/Fundiin 3DS) & tùy biến OMS Stepper theo tiến độ trả góp. |
+| **BR-05:** Chống tráo linh kiện khi bảo hành & Sẵn sàng xuất HĐĐT đúng luật VN | `FR-03` (BCT Policy), `FR-10` (S/N & T-VAN PDF) | `UC-03`, `UC-12` | **Process Gap** & **Integration Gap** | Bắt buộc nhập `Serial Number` vào `wp_gf_order_serials` trước khi chuyển `SHIPPING`; xuất Hóa đơn PDF chuẩn VAT 8–10% tương thích schema T-VAN. |
+
+### 6.2. Khung Mẫu 6 Mục Đặc tả Custom Use Case (Chuẩn Thầy Tín – Bắt buộc cho `UC-02`, `UC-05`, `UC-08`, `UC-10`)
+
+Khi viết đặc tả chi tiết cho **Use Case trọng tâm (`★`)** ở Chương 3.4–3.7, mỗi thành viên **bắt buộc trình bày đủ 6 phần** (kết hợp dòng chảy `Use Case → Sequence → Class → ERD`):
+
+1. **Thông tin định danh (Metadata):** Mã UC / Tên UC, Mô tả ngắn gọn, Phân loại (`Black-box` hay `Custom GAP`), Tác nhân chính/phụ (`Actor`), Tác nhân liên quan.
+2. **Tiền điều kiện & Hậu điều kiện (Pre-conditions & Post-conditions).**
+3. **Luồng sự kiện chính (Main Flow / Happy Path):** Đánh số tuần tự từng bước tương tác giữa Actor và System.
+4. **Luồng thay thế & Ngoại lệ (Alternative / Exception Flows):** Xử lý lỗi cụ thể (ví dụ: vượt quá 3 máy so sánh, thiếu tick Consent NĐ 13/2023, timeout Payment Gateway, vi phạm Rate Limit/Blacklist).
+5. **Yêu cầu dữ liệu & Giao diện (Data & UI Requirements):**
+   - *Quy tắc nghiệp vụ (Business Rules).*
+   - *Đặc tả Payload/Schema dữ liệu* (tên trường JSON hoặc cột bảng `wp_gf_*` liên quan).
+   - *Phân quyền & Giao diện (RBAC & UI Spec).*
+6. **Tiêu chí nghiệm thu (Acceptance Criteria – Chuẩn BDD):** Viết theo cấu trúc `Given ... When ... Then ...` để Role 2 (QA) đưa thẳng vào Test Cases.

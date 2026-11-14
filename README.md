@@ -13,28 +13,34 @@
 
 ```text
 D:\DANMH\TKeHT\
+├── 00_BAT_DAU_TAI_DAY_Huong_Dan_Nhom.docx         # Cẩm nang 10 phút bắt đầu dành cho cả 4 thành viên (Word)
+├── 00_BAT_DAU_TAI_DAY_Huong_Dan_Nhom.md           # Cẩm nang bắt đầu (Markdown)
 ├── README.md                                       # Bản đồ điều hướng toàn dự án (file này)
 ├── Ban_Mo_Ta_Du_An_GearForge.md                    # Bản mô tả dự án (Markdown)
 ├── Ban_Mo_Ta_Du_An_GearForge.docx                  # Bản mô tả dự án chuẩn UIT (Word A4)
 │
-├── 00_References\                                  # Tài liệu gốc & Rubric chấm điểm môn EC312
+├── 00_References\                                  # Tài liệu gốc & Rubric chấm điểm môn EC312 (Thầy Tín)
 │   ├── EC312_Mau_do_an_HK1_2025.docx               # Mẫu báo cáo chuẩn của Khoa/GVHD
 │   ├── project-template.md                         # Khung nội dung từng chương mục
 │   ├── project-rubric.md                           # Tiêu chí chấm điểm (100 điểm)
+│   ├── gap-analysis.md                             # Hướng dẫn GAP-Analysis & Use Case Custom (trinhtin/ec312)
+│   ├── requirements.md                             # Hướng dẫn phân rã BR -> FR -> NFR -> UC (trinhtin/ec312)
 │   └── build_docx.py                               # Script tự động xuất bản file Word (.docx)
 │
 ├── 01_Project_Management\                          # Bộ sườn Quản trị nhóm Scrum (4 Sprints)
-│   ├── role_selection_guide.md                     # Hướng dẫn chọn 4 vai trò (khi nhóm chưa chia việc)
+│   ├── Huong_Dan_Chon_Vai_Tro_GearForge.docx       # Bản Word hướng dẫn chọn 4 vai trò (Role 1..4)
+│   ├── role_selection_guide.md                     # Hướng dẫn chọn 4 vai trò (Markdown)
 │   ├── task_plan.md                                # Kế hoạch chi tiết 4 Sprints & Definition of Done
 │   ├── product_backlog.md                          # 4 Epics & 16 User Stories chuẩn INVEST + AC
 │   └── scrum_log_template.md                       # Mẫu Nhật ký làm việc nhóm nộp Phụ lục EC312
 │
 ├── 02_Shared_Specs_and_Standards\                  # Chuẩn dùng chung (Single Source of Truth)
-│   ├── shared_domain_glossary.md                   # Khóa cứng Actor, FR/NFR, UC-01..UC-12, Trạng thái, Bảng DB
+│   ├── shared_domain_glossary.md                   # Khóa cứng Actor, BR->FR->UC, GAP-Analysis, Trạng thái, Bảng DB
 │   └── architecture_and_uml_skeleton.md            # Khung sơ đồ Mermaid: Kiến trúc, UC, Class, State, ERD, Sequence
 │
 ├── 03_Report_Skeleton\                             # Khung Báo cáo tổng & Khảo sát thực tế
-│   ├── EC312_Bao_Cao_Master_Skeleton.md            # Khung sườn toàn bộ Chương 1..7 & Phụ lục (giao rõ cho từng Role)
+│   ├── EC312_Bao_Cao_Master_Skeleton.docx          # Bản Word khung sườn Chương 1..7 & Phụ lục
+│   ├── EC312_Bao_Cao_Master_Skeleton.md            # Khung sườn Báo cáo (Markdown)
 │   └── survey_questionnaire_template.md            # Mẫu 12 câu hỏi khảo sát sinh viên ĐHQG TP.HCM (Google Forms)
 │
 └── 04_Technical_and_QA_Skeleton\                   # Khung Kỹ thuật Demo WooCommerce & Kiểm thử QA
