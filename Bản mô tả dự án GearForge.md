@@ -12,18 +12,18 @@
 
 > Nhóm vận hành theo mô hình **Scrum Team liên chức năng (Cross-functional)** gồm 3 vai trò chuẩn của Scrum (**Product Owner**, **Scrum Master**, **Developers**). Vì quy mô nhóm gồm 4 thành viên và theo yêu cầu đồ án môn EC312 (*mỗi sinh viên chịu trách nhiệm phân tích – thiết kế tối thiểu 1 chức năng/Use Case riêng*), **Product Owner** và **Scrum Master** đồng thời kiêm nhiệm công việc phân tích, mô hình hóa và triển khai để đảm bảo khối lượng công việc đồng đều (25% / thành viên).
 
-| STT | Họ và tên | MSSV | Vai trò Scrum (Scrum Role) | Chức danh chuyên môn kiêm nhiệm | Phân hệ phụ trách chính (EC312 & MVP) |
-| :-: | :--- | :--- | :--- | :--- | :--- |
-| 1 | *[Họ và tên 1]* | *[MSSV 1]* | **Product Owner (PO)** | Nhóm trưởng / Business Analyst (BA) | Nghiệp vụ tổng thể, Danh mục, Bộ lọc chuyên sâu & So sánh cấu hình (Compare Specs), Dữ liệu ≥ 500 sản phẩm |
-| 2 | *[Họ và tên 2]* | *[MSSV 2]* | **Scrum Master (SM)** | Kiến trúc sư hệ thống / Security & QA Lead | Kiến trúc hệ thống, Xác thực & Phân quyền (RBAC), Bảo mật NĐ 13/2023 & Chống gian lận, Hạ tầng & Kiểm thử (QA) |
-| 3 | *[Họ và tên 3]* | *[MSSV 3]* | **Developer (Dev 1)** | UI/UX Designer & Frontend WooCommerce | Thiết kế UI/UX (Figma), Giao diện Storefront, Giỏ hàng, Đặt hàng & Quản lý đơn hàng (OMS) |
-| 4 | *[Họ và tên 4]* | *[MSSV 4]* | **Developer (Dev 2)** | Backend, Database & Payment Engineer | Thiết kế CSDL (ERD), Custom Plugin Trả góp sinh viên (3-6-12 tháng), Duyệt hồ sơ 2 lớp, Tích hợp VNPay/MoMo/Fundiin Sandbox, Quản lý S/N & Hóa đơn PDF |
+| STT | Họ và tên | MSSV | Vai trò Scrum (Scrum Role) | Chức danh chuyên môn kiêm nhiệm | Nhánh Git | Phân hệ phụ trách chính (EC312 & MVP) |
+| :-: | :--- | :--- | :--- | :--- | :--- | :--- |
+| 1 | *[Họ và tên 1]* | *[MSSV 1]* | **Product Owner (PO)** | Nhóm trưởng / Business Analyst (BA) | `role1-data-catalog` | Nghiệp vụ tổng thể, Danh mục, Bộ lọc chuyên sâu & So sánh cấu hình (Compare Specs), Dữ liệu ≥ 500 sản phẩm |
+| 2 | *[Họ và tên 2]* | *[MSSV 2]* | **Scrum Master (SM)** | Kiến trúc sư hệ thống / Security & QA Lead | `role2-security-qa` | Kiến trúc hệ thống, Xác thực & Phân quyền (RBAC), Bảo mật NĐ 13/2023 & Chống gian lận, Hạ tầng & Kiểm thử (QA) |
+| 3 | *[Họ và tên 3]* | *[MSSV 3]* | **Developer (Dev 1)** | UI/UX Designer & Frontend WooCommerce | `role3-ui-frontend` | Thiết kế UI/UX (Figma), Giao diện Storefront, Giỏ hàng, Đặt hàng & Quản lý đơn hàng (OMS) |
+| 4 | *[Họ và tên 4]* | *[MSSV 4]* | **Developer (Dev 2)** | Backend, Database & Payment Engineer | `role4-backend-payment` | Thiết kế CSDL (ERD), Custom Plugin Trả góp sinh viên (3-6-12 tháng), Duyệt hồ sơ 2 lớp, Tích hợp VNPay/MoMo/Fundiin Sandbox, Quản lý S/N & Hóa đơn PDF |
 
 ---
 
 ## PHẦN 1: GIỚI THIỆU DỰ ÁN & TẦM NHÌN CHIẾN LƯỢC
 
-- **Ngách sản phẩm:** Laptop, PC (máy bộ nguyên chiếc) và Phụ kiện công nghệ. (Cam kết dữ liệu mẫu tối thiểu 500 sản phẩm tham khảo từ GearVN/Phong Vũ).
+- **Ngách sản phẩm:** Laptop, PC (máy bộ nguyên chiếc) và Phụ kiện công nghệ. (Cam kết dữ liệu mẫu tối thiểu 500 sản phẩm tham khảo từ Xgear, MemoryZone, GearVN, Phong Vũ).
 - **Tên thương hiệu (Dự kiến):** GearForge
 - **Tầm nhìn chiến lược (Vision Statement):** Xây dựng hệ thống TMĐT chuyên phân phối Laptop, PC và Phụ kiện, giải quyết bài toán tài chính cho sinh viên đại học thông qua các giải pháp trả góp trực tuyến linh hoạt, thủ tục xét duyệt nhanh gọn với mức giá hợp lý nhất thị trường.
 - **Chỉ số đo lường (KPIs)** *(Ước tính giai đoạn thử nghiệm tại Khu đô thị ĐHQG TP.HCM)*:
@@ -85,7 +85,7 @@
 ### 2. Phương án chống rửa tiền và Gian lận thanh toán
 
 - **Kiểm soát dòng tiền:** Mọi giao dịch thanh toán trực tuyến và giải ngân từ đối tác trả góp (BNPL) đều được đối soát và kiểm soát dòng tiền qua tài khoản định danh của đơn vị kinh doanh. Tuyệt đối không sử dụng tài khoản cá nhân không rõ nguồn gốc để nhận tiền.
-- **Chống gian lận trả góp (Tín dụng ảo):** Đối với cổng BNPL (Fundiin, Kredivo), quy trình định danh điện tử (eKYC) sẽ do trực tiếp hệ thống của đối tác tài chính thực hiện và đảm bảo an toàn. Đối với luồng hỗ trợ trả góp sinh viên trên website, hệ thống áp dụng quy trình kiểm duyệt 2 lớp (đối chiếu thông tin CCCD, Thẻ sinh viên chính chủ và xác nhận qua số điện thoại/email sinh viên trường cấp) trước khi duyệt giao hàng.
+- **Chống gian lận trả góp (Tín dụng ảo):** Đối với cổng BNPL (Fundiin), quy trình định danh điện tử (eKYC) sẽ do trực tiếp hệ thống của đối tác tài chính thực hiện và đảm bảo an toàn. Đối với luồng hỗ trợ trả góp sinh viên trên website, hệ thống áp dụng quy trình kiểm duyệt 2 lớp (đối chiếu thông tin CCCD, Thẻ sinh viên chính chủ và xác nhận qua số điện thoại/email sinh viên trường cấp) trước khi duyệt giao hàng.
 - **Chống gian lận thanh toán:** Tích hợp các cổng thanh toán uy tín hỗ trợ tiêu chuẩn bảo mật **3D-Secure** cho các giao dịch qua thẻ. Đồng thời, thiết lập cơ chế giới hạn tần suất gửi yêu cầu (**Rate Limiting**) và đưa vào danh sách đen (**Blacklist**) các tài khoản/địa chỉ IP có hành vi spam tạo đơn hàng ảo hoặc tải lên hồ sơ giả mạo.
 - **Quản lý rủi ro hàng hóa:** Quản lý và lưu trữ chính xác mã **Serial Number (S/N) / Service Tag / Mã vạch** thiết bị trên vỏ hộp vào chi tiết đơn hàng ngay khi xuất kho để đối chiếu khi bảo hành hoặc đổi trả, phòng ngừa triệt để hành vi đánh tráo sản phẩm hoặc linh kiện.
 
@@ -127,7 +127,7 @@
   - Tham gia ước lượng kỹ thuật và phát triển các thành phần xử lý nghiệp vụ phía Backend, cơ sở dữ liệu và tích hợp API bên thứ ba.
   - Đảm bảo tính toàn vẹn dữ liệu đơn hàng, hồ sơ định danh và quy trình thanh toán an toàn.
 - **Công việc dự kiến (CSDL, Custom Plugin, Tích hợp & Báo cáo EC312):**
-  1. **Thiết kế Cơ sở dữ liệu (EC312 Mục 4.2):** Xây dựng **Mô hình ERD** và ánh xạ sang **CSDL quan hệ (MySQL)** kết hợp bảng mặc định của WooCommerce với các bảng mở rộng: *Hồ sơ trả góp sinh viên (`installment_applications`), Gói kỳ hạn & Lãi suất (`installment_plans`), Mã Serial/Service Tag (`order_item_serials`), Nhật ký đối soát & Blacklist*.
+  1. **Thiết kế Cơ sở dữ liệu (EC312 Mục 4.2):** Xây dựng **Mô hình ERD** và ánh xạ sang **CSDL quan hệ (MySQL)** kết hợp bảng mặc định của WooCommerce với các bảng mở rộng: *Gói kỳ hạn & Lãi suất (`wp_gf_installment_plans`), Hồ sơ trả góp sinh viên (`wp_gf_installment_applications`), Mã Serial/Service Tag (`wp_gf_order_serials`), Danh sách đen & Nhật ký chống gian lận (`wp_gf_fraud_blacklist`)*.
   2. **Mô hình hóa hệ thống (EC312 Mục 3):** Viết đặc tả Use Case + **BPMN / Activity Diagram + Sequence Diagram** cho cụm chức năng **Tính toán, Đăng ký trả góp sinh viên, Xét duyệt 2 lớp & Thanh toán trực tuyến**.
   3. **Lập trình Custom Plugin & Tích hợp API (Demo):** Phát triển **Custom WordPress Plugin (PHP/MySQL)** cho **Module trả góp sinh viên** (tính trả trước, chia kỳ hạn 3–6–12 tháng, lưu trữ & mã hóa tệp CCCD/Thẻ SV, luồng Admin xét duyệt 2 lớp qua SĐT/Email trường); tích hợp cổng thanh toán **Sandbox VNPay / MoMo / Fundiin** (hỗ trợ 3D-Secure); xây dựng tính năng gắn **Serial Number (S/N)** khi xuất kho và xuất **Hóa đơn PDF mẫu** chuẩn dữ liệu T-VAN.
 

@@ -190,13 +190,14 @@ def build():
 
     add_styled_table(
         doc,
-        headers=["STT", "Họ và tên / MSSV", "Vai trò Scrum", "Chức danh kiêm nhiệm", "Phân hệ phụ trách chính (EC312 & MVP)"],
+        headers=["STT", "Họ và tên / MSSV", "Vai trò Scrum", "Chức danh kiêm nhiệm", "Nhánh Git", "Phân hệ phụ trách chính (EC312 & MVP)"],
         rows=[
             [
                 "1",
                 [("[Họ và tên 1]\n", False, True), ("MSSV: [MSSV 1]", False, True)],
                 [("Product Owner (PO)", True, False)],
                 "Nhóm trưởng / Business Analyst",
+                "role1-data-catalog",
                 "Nghiệp vụ tổng thể, Danh mục, Bộ lọc chuyên sâu & So sánh cấu hình (Compare Specs), Dữ liệu ≥ 500 sản phẩm"
             ],
             [
@@ -204,6 +205,7 @@ def build():
                 [("[Họ và tên 2]\n", False, True), ("MSSV: [MSSV 2]", False, True)],
                 [("Scrum Master (SM)", True, False)],
                 "Kiến trúc sư hệ thống / Security & QA Lead",
+                "role2-security-qa",
                 "Kiến trúc hệ thống, Xác thực & Phân quyền (RBAC), Bảo mật NĐ 13/2023 & Chống gian lận, Hạ tầng & Kiểm thử"
             ],
             [
@@ -211,6 +213,7 @@ def build():
                 [("[Họ và tên 3]\n", False, True), ("MSSV: [MSSV 3]", False, True)],
                 [("Developer (Dev 1)", True, False)],
                 "UI/UX Designer & Frontend WooCommerce",
+                "role3-ui-frontend",
                 "Thiết kế UI/UX (Figma), Giao diện Storefront, Giỏ hàng, Đặt hàng & Theo dõi đơn hàng (OMS)"
             ],
             [
@@ -218,16 +221,17 @@ def build():
                 [("[Họ và tên 4]\n", False, True), ("MSSV: [MSSV 4]", False, True)],
                 [("Developer (Dev 2)", True, False)],
                 "Backend, Database & Payment Engineer",
+                "role4-backend-payment",
                 "CSDL (ERD), Custom Plugin Trả góp sinh viên (3-6-12 tháng), Duyệt hồ sơ 2 lớp, Sandbox VNPay/MoMo/Fundiin, S/N & Hóa đơn PDF"
             ],
         ],
-        col_widths_cm=[1.1, 3.3, 3.0, 3.5, 5.7],
-        alignments=[WD_ALIGN_PARAGRAPH.CENTER, WD_ALIGN_PARAGRAPH.LEFT, WD_ALIGN_PARAGRAPH.LEFT, WD_ALIGN_PARAGRAPH.LEFT, WD_ALIGN_PARAGRAPH.LEFT],
+        col_widths_cm=[0.9, 2.7, 2.5, 2.8, 2.8, 4.9],
+        alignments=[WD_ALIGN_PARAGRAPH.CENTER, WD_ALIGN_PARAGRAPH.LEFT, WD_ALIGN_PARAGRAPH.LEFT, WD_ALIGN_PARAGRAPH.LEFT, WD_ALIGN_PARAGRAPH.LEFT, WD_ALIGN_PARAGRAPH.LEFT],
     )
 
     # PHẦN 1
     add_heading_block(doc, "PHẦN 1: GIỚI THIỆU DỰ ÁN & TẦM NHÌN CHIẾN LƯỢC", level=1)
-    add_rich_bullet(doc, "Ngách sản phẩm:", "Laptop, PC (máy bộ nguyên chiếc) và Phụ kiện công nghệ. (Cam kết dữ liệu mẫu tối thiểu 500 sản phẩm tham khảo từ GearVN/Phong Vũ).")
+    add_rich_bullet(doc, "Ngách sản phẩm:", "Laptop, PC (máy bộ nguyên chiếc) và Phụ kiện công nghệ. (Cam kết dữ liệu mẫu tối thiểu 500 sản phẩm tham khảo từ Xgear, MemoryZone, GearVN, Phong Vũ).")
     add_rich_bullet(doc, "Tên thương hiệu (Dự kiến):", "GearForge")
     add_rich_bullet(doc, "Tầm nhìn chiến lược (Vision Statement):", "Xây dựng hệ thống TMĐT chuyên phân phối Laptop, PC và Phụ kiện, giải quyết bài toán tài chính cho sinh viên đại học thông qua các giải pháp trả góp trực tuyến linh hoạt, thủ tục xét duyệt nhanh gọn với mức giá hợp lý nhất thị trường.")
     add_rich_bullet(doc, "Chỉ số đo lường (KPIs):", "(Ước tính giai đoạn thử nghiệm tại Khu đô thị ĐHQG TP.HCM):")
@@ -294,7 +298,7 @@ def build():
 
     add_heading_block(doc, "2. Phương án chống rửa tiền và Gian lận thanh toán", level=2)
     add_rich_bullet(doc, "Kiểm soát dòng tiền:", "Mọi giao dịch thanh toán trực tuyến và giải ngân từ đối tác trả góp (BNPL) đều được đối soát và kiểm soát dòng tiền qua tài khoản định danh của đơn vị kinh doanh. Tuyệt đối không sử dụng tài khoản cá nhân không rõ nguồn gốc để nhận tiền.")
-    add_rich_bullet(doc, "Chống gian lận trả góp (Tín dụng ảo):", "Đối với cổng BNPL (Fundiin, Kredivo), quy trình định danh điện tử (eKYC) sẽ do trực tiếp hệ thống của đối tác tài chính thực hiện và đảm bảo an toàn. Đối với luồng hỗ trợ trả góp sinh viên trên website, hệ thống áp dụng quy trình kiểm duyệt 2 lớp (đối chiếu thông tin CCCD, Thẻ sinh viên chính chủ và xác nhận qua số điện thoại/email sinh viên trường cấp) trước khi duyệt giao hàng.")
+    add_rich_bullet(doc, "Chống gian lận trả góp (Tín dụng ảo):", "Đối với cổng BNPL (Fundiin), quy trình định danh điện tử (eKYC) sẽ do trực tiếp hệ thống của đối tác tài chính thực hiện và đảm bảo an toàn. Đối với luồng hỗ trợ trả góp sinh viên trên website, hệ thống áp dụng quy trình kiểm duyệt 2 lớp (đối chiếu thông tin CCCD, Thẻ sinh viên chính chủ và xác nhận qua số điện thoại/email sinh viên trường cấp) trước khi duyệt giao hàng.")
     add_rich_bullet(doc, "Chống gian lận thanh toán:", "Tích hợp các cổng thanh toán uy tín hỗ trợ tiêu chuẩn bảo mật 3D-Secure cho các giao dịch qua thẻ. Đồng thời, thiết lập cơ chế giới hạn tần suất gửi yêu cầu (Rate Limiting) và đưa vào danh sách đen (Blacklist) các tài khoản/địa chỉ IP có hành vi spam tạo đơn hàng ảo hoặc tải lên hồ sơ giả mạo.")
     add_rich_bullet(doc, "Quản lý rủi ro hàng hóa:", "Quản lý và lưu trữ chính xác mã Serial Number (S/N) / Service Tag / Mã vạch thiết bị trên vỏ hộp vào chi tiết đơn hàng ngay khi xuất kho để đối chiếu khi bảo hành hoặc đổi trả, phòng ngừa triệt để hành vi đánh tráo sản phẩm hoặc linh kiện.")
 
@@ -334,7 +338,7 @@ def build():
             "Thành viên 4 – Developer 2 (Backend, Database & Payment/Installment Engineer)",
             [
                 ("Trách nhiệm theo Scrum:", "Tham gia ước lượng kỹ thuật và hiện thực hóa các logic nghiệp vụ lõi ở tầng Backend, cơ sở dữ liệu và tích hợp API thanh toán đảm bảo tính toàn vẹn dữ liệu."),
-                ("Thiết kế CSDL (EC312 Mục 4.2):", "Xây dựng Mô hình ERD và ánh xạ sang CSDL quan hệ (MySQL) mở rộng trên WooCommerce (bảng Hồ sơ trả góp sinh viên, Kỳ hạn & Lãi suất, Mã Serial/Service Tag, Nhật ký đối soát & Blacklist)."),
+                ("Thiết kế CSDL (EC312 Mục 4.2):", "Xây dựng Mô hình ERD và ánh xạ sang CSDL quan hệ (MySQL) mở rộng trên WooCommerce (wp_gf_installment_plans, wp_gf_installment_applications, wp_gf_order_serials, wp_gf_fraud_blacklist)."),
                 ("Mô hình hóa (EC312 Mục 3):", "Viết đặc tả Use Case + BPMN / Activity Diagram + Sequence Diagram cho cụm Đăng ký trả góp sinh viên, Xét duyệt 2 lớp & Thanh toán trực tuyến."),
                 ("Lập trình Custom Plugin & Tích hợp (Demo):", "Phát triển Custom WordPress Plugin (PHP/MySQL) cho Module trả góp sinh viên (tính trả trước, chia kỳ hạn 3-6-12 tháng, mã hóa lưu trữ CCCD/Thẻ SV, luồng Admin duyệt 2 lớp); tích hợp Sandbox VNPay/MoMo/Fundiin (3D-Secure); quản lý Serial Number (S/N) xuất kho và xuất Hóa đơn PDF mẫu chuẩn dữ liệu T-VAN."),
             ],
