@@ -81,7 +81,7 @@
 
 ### 4.1. Ma trận Phân quyền RBAC (Đưa vào Chương 4.1 & Mục 3.5)
 
-| Vai trò (`Role`) | Xem & mua SP | Nộp hồ sơ trả góp | Sửa/Import 500 SP | Xác nhận đóng gói & Gán S/N | **Xem ảnh CCCD/Thẻ SV & Duyệt 2 lớp** | Cấu hình Blacklist & RBAC |
+| Vai trò (`Role`) | Xem & mua SP | Nộp hồ sơ trả góp | Sửa/Import 500 SP | Xác nhận đóng gói & Gán S/N | Xem ảnh CCCD/Thẻ SV & Duyệt 2 lớp | Cấu hình Blacklist & RBAC |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
 | `Guest` | Có | Không | Không | Không | **Không** | Không |
 | `StudentCustomer` | Có | Có (của mình) | Không | Không | **Chỉ xem trạng thái** | Không |
