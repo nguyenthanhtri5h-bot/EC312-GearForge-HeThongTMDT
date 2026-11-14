@@ -26,51 +26,64 @@
 
 ---
 
-## PHẦN 2: NGUỒN THAM CHIẾU TÍNH NĂNG TRONG & NGOÀI NƯỚC (VIỆT NAM, MỸ, TRUNG QUỐC)
+## PHẦN 2: NGUỒN THAM CHIẾU ĐÃ KIỂM ĐỊNH (XGEAR, MEMORYZONE, VIỆT NAM, MỸ, TRUNG QUỐC)
 
-Để tránh thiết kế cảm tính, nhóm đối chiếu trực tiếp các nền tảng TMĐT thực tế tại **Việt Nam, Mỹ và Trung Quốc** theo 4 nhóm chức năng cốt lõi của **GearForge**:
+Danh mục dưới đây hợp nhất bộ link từ Google Doc tham khảo của nhóm (`link` – ID `1N5phOZ1J_-odt2d6jFG5ilhG5Vscvr8KqHLFtk7pEQA`), bổ sung chuyên sâu **Xgear** và **MemoryZone**, đồng thời đã **kiểm định HTTP thực tế** để loại bỏ các link 404, link sập, link dính Google Dịch và link bài báo SEO trung gian.
 
-### 2.1. Lọc thông số kỹ thuật Laptop/PC & So sánh cấu hình (UC-01, UC-02 – Role 1 & Role 3)
+### 2.1. Tiền bán hàng: Danh mục, Bộ lọc Cấu hình, Build PC & Compare Specs (UC-01, UC-02 – Role 1 & Role 3)
 
-| Khu vực | Hệ thống tham chiếu | Link tham chiếu trực tiếp | Điểm học hỏi áp dụng vào GearForge |
+| Khu vực | Hệ thống tham chiếu | Link tham chiếu đã kiểm định | Điểm học hỏi áp dụng vào GearForge |
 | :--- | :--- | :--- | :--- |
-| **Mỹ (US)** | **Newegg Laptop Finder** | https://www.newegg.com/tools/laptop-finder , https://www.newegg.com/Laptops-Notebooks/SubCategory/ID-32 | Bộ lọc Guided Finder & đa thuộc tính nhiều tầng (CPU, GPU, RAM, SSD, màn hình, ngân sách, mục đích sử dụng). |
-| **Mỹ (US)** | **Best Buy Laptops & PC** | https://www.bestbuy.com/site/clp/laptops/pcmcat138500050001/c?id=pcmcat138500050001 , https://www.bestbuy.com/site/electronics/pc-comparisons/pcmcat1554823158010.c?id=pcmcat1554823158010 | Thanh chọn nhanh so sánh (Compare tray) và bố cục bảng so sánh theo phân khúc giá cho sinh viên dễ đối chiếu. |
-| **Mỹ (US)** | **Apple Compare Mac & Quiz** | https://www.apple.com/mac/compare/ , https://www.apple.com/shop/goto/buy_mac/mags_b | Bảng **Compare Specs** đặt 2–3 máy cạnh nhau tối giản, làm nổi bật thông số chênh lệch cốt lõi không gây rối mắt. |
-| **Mỹ (US)** | **PCPartPicker** | https://pcpartpicker.com/ | Cơ chế lọc sâu thông số phần cứng và kiểm tra tương thích cấu hình (ý tưởng mở rộng cho PC/Phụ kiện). |
-| **Trung Quốc** | **JD.com & JD Computers** | https://www.jd.com , https://computer.jd.com | Hệ thống **Faceted Filtering** gắn nhãn tóm tắt CPU/VGA/Tần số quét nổi bật ngay trên thẻ sản phẩm (Product Card). |
-| **Trung Quốc** | **ZOL (中关村在线)** | https://www.zol.com.cn | Cơ sở dữ liệu thông số Laptop/PC chuẩn hóa cực chi tiết và chế độ đối đầu thông số kỹ thuật (Parameter PK). |
-| **Việt Nam** | **GearVN & Phong Vũ** | https://gearvn.com/ , https://phongvu.vn/ | Cấu trúc cây danh mục Laptop chuẩn thị trường VN (Văn phòng, Gaming, Đồ họa), PC nguyên bộ, bộ thuộc tính WooCommerce (`Role 1`). |
-| **Việt Nam** | **ThinkPro** | https://thinkpro.vn/ | Giao diện tối giản, bảng **Compare Specs** gọn sạch giúp sinh viên so sánh nhanh cấu hình trọng tâm (`Role 3`). |
+| **Việt Nam** | **Xgear** | https://xgear.net/ , https://xgear.net/collections/laptop , https://xgear.net/collections/pc , https://xgear.net/collections/gaming-gear | Cấu trúc cây danh mục Laptop Gaming, PC và Gaming Gear rõ phân khúc; cách bố trí banner và thẻ thông số nổi bật cho người chơi game/đồ họa (`Role 1` & `Role 3`). |
+| **Việt Nam** | **MemoryZone** | https://memoryzone.com.vn/ , https://memoryzone.com.vn/laptop , https://memoryzone.com.vn/pc-gaming , https://memoryzone.com.vn/build-pc | Luồng danh mục **Laptop – PC – Gaming Gear – Linh kiện** chuẩn hóa và tính năng **Tự Build PC** chọn linh kiện tương thích kèm giá tạm tính (`Role 1` & `Role 3`). |
+| **Việt Nam** | **GearVN & Phong Vũ** | https://gearvn.com/ , https://phongvu.vn/c/laptop | Bộ thuộc tính WooCommerce chuẩn VN (CPU, RAM, VGA, SSD, Tần số quét) và cấu trúc danh mục 500+ sản phẩm (`Role 1`). |
+| **Việt Nam** | **CellphoneS, TGDĐ & ThinkPro** | https://cellphones.com.vn/laptop.html , https://www.thegioididong.com/laptop , https://thinkpro.vn/ | Bộ lọc theo nhu cầu sinh viên/văn phòng/gaming tại TGDĐ và bảng **Compare Specs** tinh gọn tại CellphoneS/ThinkPro (`Role 3`). |
+| **Quốc tế** | **GSMArena Compare** | https://www.gsmarena.com/compare.php3 | Logic giao diện đặt 2–3 thiết bị cạnh nhau, căn hàng theo từng nhóm thông số và highlight chênh lệch (`Role 3`). |
+| **Mỹ (US)** | **Apple Buy Mac & Compare** | https://www.apple.com/vn/shop/buy-mac , https://www.apple.com/mac/compare/ | Luồng tùy chọn nâng cấp cấu hình (RAM/SSD) trước khi thêm vào giỏ và bảng đối chiếu tối giản 2–3 máy. |
+| **Mỹ (US)** | **PCPartPicker, Newegg & Best Buy** | https://pcpartpicker.com/ , https://www.newegg.com/tools/laptop-finder , https://www.bestbuy.com/ | Bộ lọc Guided Finder nhiều tầng (Newegg), Compare tray (Best Buy) và kiểm tra tương thích linh kiện PC (PCPartPicker; mở trên trình duyệt). |
+| **Trung Quốc** | **JD.com & ZOL** | https://www.jd.com/ , https://computer.jd.com/ , https://www.zol.com.cn/ | Bộ lọc đa thuộc tính mật độ thông tin cao (JD) và CSDL so sánh thông số kỹ thuật đối đầu Parameter PK (ZOL). |
+| **TQ (Gear)** | **Taobao, 1688, AliExpress & Akko** | https://www.taobao.com/ , https://www.1688.com/ , https://www.aliexpress.com/ , https://akkogear.com.vn/ , https://en.akkogear.com/ | Tham khảo phân loại biến thể Gaming Gear (Switch/Keycap/Layout cho phụ kiện) theo chuẩn hãng nội địa Trung. |
 
-### 2.2. Định danh Sinh viên & Ưu đãi Giáo dục (UC-04, UC-05, UC-07 – Role 2 & Role 4)
+### 2.2. Định danh Sinh viên, Duyệt Hồ sơ & Ưu đãi Giáo dục (UC-04, UC-05, UC-07 – Role 2 & Role 4)
 
-| Khu vực | Hệ thống tham chiếu | Link tham chiếu trực tiếp | Điểm học hỏi áp dụng vào GearForge |
+| Khu vực | Hệ thống tham chiếu | Link tham chiếu đã kiểm định | Điểm học hỏi áp dụng vào GearForge |
 | :--- | :--- | :--- | :--- |
-| **Mỹ / VN** | **Apple Education Store** | https://www.apple.com/us-edu/store , https://www.apple.com/vn-edu/store | Tách bạch luồng giá ưu đãi giáo dục và ràng buộc điều kiện đối tượng sinh viên/giảng viên trước khi thanh toán. |
-| **Toàn cầu** | **UNiDAYS Verification** | https://www.myunidays.com/ , https://corporate.myunidays.com/ | Quy trình xác thực email trường đại học (`.edu` / `.edu.vn`) và cấp trạng thái *Verified Student* tách khỏi user thường (`Role 2`). |
-| **Toàn cầu** | **SheerID** | https://www.sheerid.com/ | Biểu mẫu tải lên giấy tờ chứng minh sinh viên, trạng thái chờ xét duyệt và cơ chế giới hạn lượt hưởng ưu đãi chống gian lận. |
-| **Việt Nam** | **CellphoneS (S-Student)** | https://cellphones.com.vn/s-student , https://cellphones.com.vn | Định danh 2 lớp bằng Email `.edu.vn` + ảnh Thẻ sinh viên & CCCD gắn chip để mở khóa đặc quyền giảm giá và trả góp sinh viên. |
+| **Việt Nam** | **CellphoneS (S-Student)** | https://cellphones.com.vn/uu-dai-sinh-vien-hoc-sinh , https://cellphones.com.vn/ | Cơ chế định danh 2 lớp bằng Email `.edu.vn` + ảnh Thẻ sinh viên & CCCD gắn chip để mở khóa đặc quyền giảm giá và trả góp sinh viên. |
+| **Việt Nam** | **zShop (Duyệt hồ sơ thiết bị)** | https://zshop.vn/cho-thue-may-anh/ | Tham khảo quy trình kiểm duyệt giấy tờ tùy thân (CCCD + Thẻ SV/Hộ khẩu) và xác minh thủ công trước khi bàn giao thiết bị giá trị cao. |
+| **Mỹ / VN** | **Apple Education Store** | https://www.apple.com/vn-edu/store , https://www.apple.com/us-edu/store | Tách bạch luồng giá ưu đãi giáo dục và ràng buộc điều kiện đối tượng sinh viên/giảng viên trước khi thanh toán. |
+| **Toàn cầu** | **UNiDAYS & SheerID** | https://www.myunidays.com/ , https://corporate.myunidays.com/ , https://www.sheerid.com/ | Xác thực email trường (`.edu` / `.edu.vn`), biểu mẫu tải minh chứng và giới hạn lượt hưởng ưu đãi chống gian lận (`Role 2`). |
 
-### 2.3. Trả góp Sinh viên, BNPL & Thanh toán Trực tuyến (UC-10, UC-11 – Role 2 & Role 4)
+### 2.3. Tính toán Bảng Trả góp Động, BNPL & Thanh toán Trực tuyến (UC-10, UC-11 – Role 2 & Role 4)
 
-| Khu vực | Hệ thống tham chiếu | Link tham chiếu trực tiếp | Điểm học hỏi áp dụng vào GearForge |
+| Khu vực | Hệ thống tham chiếu | Link tham chiếu đã kiểm định | Điểm học hỏi áp dụng vào GearForge |
 | :--- | :--- | :--- | :--- |
-| **Trung Quốc** | **JD Baitiao (京东白条)** | https://baitiao.jd.com | Chọn kỳ hạn trả góp (3–6–12 tháng), hiển thị minh bạch số tiền trả hàng tháng ngay trên trang sản phẩm và luồng duyệt hạn mức. |
-| **Mỹ (US)** | **Affirm Checkout Docs** | https://docs.affirm.com/developers/docs/checkout-overview , https://docs.affirm.com/developers/docs/set-up-direct-api | Mô hình Checkout Object trả góp theo tháng, luồng **Authorize / Capture** tách biệt và webhook callback xác nhận giải ngân. |
-| **Toàn cầu** | **Klarna Web Payments** | https://docs.klarna.com/palms/web-payments/ | Trải nghiệm widget chia kỳ hạn trả góp trực quan ngay trong trang Checkout. |
-| **Việt Nam** | **Thế Giới Di Động (Trả góp)** | https://www.thegioididong.com/tra-gop | Bảng tính dự toán trả góp tương tác (chọn tỷ lệ trả trước 20%–50%, kỳ hạn 3–6–12 tháng) — áp dụng cho endpoint `installment-calc`. |
-| **Việt Nam** | **Fundiin (BNPL)** | https://fundiin.vn/ | Kiến trúc tích hợp ví BNPL trên WooCommerce (Merchant ID, Client ID, Secret Key, IPN Notify URL). |
-| **Việt Nam** | **VNPay & MoMo Sandbox** | https://sandbox.vnpayment.vn/devreg/ , https://sandbox.vnpayment.vn/apis , https://developers.momo.vn/ | Chuẩn chữ ký HMAC-SHA256/SHA512 cho Callback/IPN và kịch bản test OTP / **3D-Secure** (`Role 4` & `Role 2`). |
+| **Việt Nam** | **Xgear (Hướng dẫn trả góp)** | https://xgear.net/pages/huong-dan-tra-gop | Phân tách rõ điều kiện trả góp qua thẻ tín dụng 0% và trả góp hồ sơ công ty tài chính/BNPL (HD SAISON, Fundiin, MPOS). |
+| **Việt Nam** | **MemoryZone (Trả góp)** | https://memoryzone.com.vn/huong-dan-tra-gop | Điều kiện ngưỡng giá trị đơn hàng tối thiểu được trả góp, kỳ hạn hỗ trợ và bảng phí chuyển đổi theo tháng. |
+| **Việt Nam** | **TGDĐ, CellphoneS & GearVN** | https://www.thegioididong.com/tra-gop/ , https://cellphones.com.vn/tra-gop , https://gearvn.com/pages/huong-dan-tra-gop | Bảng tính dự toán trả góp tương tác (chọn % trả trước 20%–50%, kỳ hạn 3–6–12 tháng) — mẫu cho endpoint `installment-calc`. |
+| **Việt Nam** | **Fundiin & VNPay / MoMo Sandbox** | https://fundiin.vn/ , https://sandbox.vnpayment.vn/apis/ , https://developers.momo.vn/ | Kiến trúc tích hợp ví BNPL (Client ID, Merchant ID, Secret Key, IPN) và chuẩn chữ ký HMAC Callback / OTP giả lập **3D-Secure** (`Role 4`). |
+| **Mỹ / TQ** | **Affirm, Klarna & JD Baitiao** | https://docs.affirm.com/ , https://www.affirm.com/ , https://docs.klarna.com/ , https://www.klarna.com/us/payments/ , https://baitiao.jd.com/ | Luồng **Authorize / Capture** theo kỳ hạn (Affirm), widget Checkout chia kỳ (Klarna) và hiển thị tiền trả hàng tháng trên trang SP (JD Baitiao). |
 
-### 2.4. Quản lý Đơn hàng (OMS), Serial Number & Tra cứu Bảo hành (UC-08, UC-09, UC-12 – Role 3 & Role 4)
+### 2.4. Xử lý Đơn hàng (OMS), Giao nhận KTX, E-Invoice, S/N & Bảo hành/RMA (UC-08, UC-09, UC-12 – Role 3 & Role 4)
 
-| Khu vực | Hệ thống tham chiếu | Link tham chiếu trực tiếp | Điểm học hỏi áp dụng vào GearForge |
+| Khu vực | Hệ thống tham chiếu | Link tham chiếu đã kiểm định | Điểm học hỏi áp dụng vào GearForge |
 | :--- | :--- | :--- | :--- |
-| **Mỹ / Toàn cầu** | **Dell Service Tag Lookup** | https://www.dell.com/support/home | Mô hình gắn mã **Service Tag / Serial Number (S/N)** duy nhất cho từng máy bán ra để kích hoạt và kiểm tra bảo hành. |
-| **Mỹ / Toàn cầu** | **Lenovo Warranty Lookup** | https://pcsupport.lenovo.com/warrantylookup | Giao diện tra cứu thời hạn bảo hành theo S/N và đối soát lịch sử bảo hành thiết bị. |
-| **Mỹ / Toàn cầu** | **Apple Check Coverage** | https://checkcoverage.apple.com/ | Form tra cứu 1 bước tối giản nhập S/N để xác nhận tình trạng kích hoạt và hỗ trợ kỹ thuật. |
-| **Việt Nam** | **GearVN & Phong Vũ (Kho S/N)** | https://gearvn.com/ , https://phongvu.vn/ | Bắt buộc nhập S/N xuất kho trước khi chuyển sang `SHIPPING`, in S/N lên hóa đơn PDF và theo dõi trạng thái đơn hàng đa bước. |
+| **Bảo hành VN** | **Xgear, MemoryZone & GearVN** | https://xgear.net/pages/chinh-sach-bao-hanh-doi-moi , https://memoryzone.com.vn/chinh-sach-bao-hanh , https://gearvn.com/pages/bao-hanh | Chính sách bảo hành tách biệt Laptop vs Linh kiện, đổi mới 7 ngày đầu và cổng tra cứu bảo hành riêng (`hotro.sieutoc.com/thong-tin-bao-hanh`). |
+| **Bảo hành Hãng** | **Asus, Lenovo, Apple & Dell** | https://www.asus.com/vn/support/ , https://pcsupport.lenovo.com/warrantylookup , https://checkcoverage.apple.com/ , https://www.dell.com/support/home/vi-vn | Mô hình gắn mã **Serial Number / Service Tag** duy nhất cho từng thiết bị xuất kho để khách tự tra cứu hạn bảo hành chính hãng. |
+| **Giao nhận KTX** | **GHN, Ahamove & GrabExpress** | https://ghn.vn/ , https://ahamove.com/ , https://www.grab.com/vn/express/ | Tham khảo mô hình giao hỏa tốc nội khu (KTX ĐHQG – Làng ĐH Thủ Đức) và quy chuẩn đồng kiểm niêm phong cho hàng công nghệ giá trị cao. |
+| **E-Invoice** | **MISA meInvoice, VNPT & FPT** | https://www.meinvoice.vn/ , https://vnpt-invoice.com.vn/ , https://fptshop.com.vn/ | Chuẩn thông tin xuất hóa đơn VAT điện tử **Nghị định 123/2020/NĐ-CP** (T-VAN, MST, VAT 8%–10%, S/N) áp dụng vào PDF Invoice. |
+| **Đổi trả (RMA)** | **Shopee, Tiki & Amazon** | https://help.shopee.vn/portal/4/article/77251-CH%C3%8DNH-S%C3%81CH-TR%E1%BA%A2-H%C3%80NG-V%C3%80-HO%C3%80N-TI%E1%BB%80N , https://tiki.vn/thong-tin/tiki-doi-tra-de-dang-an-tam-mua-sam , https://www.amazon.com/gp/help/customer/display.html?nodeId=GKM69DUUYKQWKWX7 | Quy trình RMA tạo yêu cầu hoàn trả/đổi lỗi, upload video mở hộp đồng kiểm và hoàn tiền/đổi máy theo SLA (`Role 3` & `Role 4`). |
+
+### 2.5. Nhật ký kiểm định & lọc link từ Google Doc (link) và bộ tham chiếu cũ
+
+| Trạng thái kiểm định | Link gốc trong Google Doc / bản cũ | Hành động xử lý chuẩn hóa | Link chuẩn giữ lại trong tài liệu |
+| :--- | :--- | :--- | :--- |
+| **HTTP 404** | `https://cellphones.com.vn/s-student` | Link cũ không tồn tại; thay bằng URL chương trình sinh viên chính thức đang hoạt động (`HTTP 200`). | https://cellphones.com.vn/uu-dai-sinh-vien-hoc-sinh |
+| **HTTP 404** | `https://www.apple.com/shop/goto/buy_mac/mags_b` | Quiz chọn Mac cũ bị 404; giữ URL tùy chọn cấu hình Mac VN đang hoạt động (`HTTP 200`). | https://www.apple.com/vn/shop/buy-mac |
+| **HTTP 404** | `https://docs.affirm.com/developers/docs/checkout-overview` & `set-up-direct-api`, `https://docs.klarna.com/palms/web-payments/`, `https://sandbox.vnpayment.vn/devreg/` | Các đường dẫn con cũ trả về 404; chuẩn hóa về trang gốc Developer Portal chính thức (`HTTP 200`). | https://docs.affirm.com/ , https://docs.klarna.com/ , https://www.klarna.com/us/payments/ , https://sandbox.vnpayment.vn/apis/ |
+| **Sập / Từ chối kết nối** | `https://kredivo.vn/` | Domain trả về lỗi `Connection Refused` khi kiểm tra; thay thế bằng Fundiin, Xgear và MemoryZone trả góp (`HTTP 200`). | https://fundiin.vn/ , https://xgear.net/pages/huong-dan-tra-gop , https://memoryzone.com.vn/huong-dan-tra-gop |
+| **Proxy Google Dịch** | `https://www-amazon-com.translate.goog/gp/help/customer/display.html?...` | Gỡ lớp trung gian `.translate.goog`, đưa về đường dẫn trợ giúp đổi trả chính thức của Amazon. | https://www.amazon.com/gp/help/customer/display.html?nodeId=GKM69DUUYKQWKWX7 |
+| **Link ẩn / Redirect** | Mục 5.2 Google Doc hiển thị chữ `shopee.vn` / `tiki.vn` nhưng trỏ sâu vào trang chính sách; Bảo hành Xgear & MemoryZone redirect | Hiển thị tường minh URL đích chính xác để tránh nhầm lẫn khi trích dẫn vào Chương 7 báo cáo. | https://xgear.net/pages/chinh-sach-bao-hanh-doi-moi , https://hotro.sieutoc.com/thong-tin-bao-hanh |
+| **Link SEO trung gian** | 4 link bài báo blog cuối Google Doc (`welog.vn`, `ghn.vn/blogs`, `cellphones.com.vn/sforum`, `baothanhhoa.vn`) | Loại bỏ nguồn báo trung gian thiếu tính học thuật; thay bằng website gốc của sàn TMĐT & hãng gear TQ (`HTTP 200`). | https://www.jd.com/ , https://www.taobao.com/ , https://www.1688.com/ , https://www.aliexpress.com/ , https://akkogear.com.vn/ |
 
 ---
 
