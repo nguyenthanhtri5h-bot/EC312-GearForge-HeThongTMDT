@@ -21,10 +21,10 @@
 ## 2. CHECKLIST CHI TIẾT THEO SPRINT & VAI TRÒ
 
 ### Sprint 0: Khởi tạo Bộ sườn & Chốt vai trò
-- [x] Khởi tạo cấu trúc thư mục và bộ tài liệu chuẩn hóa tại `D:\DANMH\TKeHT`.
-- [ ] **[Cả nhóm]** Họp phân vai theo `role_selection_guide.md`, điền Họ tên & MSSV vào `Ban_Mo_Ta_Du_An_GearForge.docx`.
-- [ ] **[Role 2 - SM]** Tạo repo Git (GitHub/GitLab), bảng Trello/GitHub Projects và test chạy thử `docker-compose.skeleton.yml`.
-- [ ] **[Role 1 - PO]** Duyệt lại `product_backlog.md` và gửi link Google Forms khảo sát từ `survey_questionnaire_template.md`.
+- [x] Khởi tạo cấu trúc thư mục và bộ tài liệu chuẩn hóa tại `D:\DANMH\TKeHT` (`0.` đến `4.`).
+- [ ] **[Cả nhóm]** Họp phân vai theo `Hướng dẫn chọn vai trò GearForge.docx`, điền Họ tên & MSSV vào `Bản mô tả dự án GearForge.docx` và chốt 4 nhánh Git (`role1-data-catalog`, `role2-security-qa`, `role3-ui-frontend`, `role4-backend-payment`).
+- [ ] **[Role 2 - SM]** Kiểm tra kho GitHub + 4 nhánh độc lập, bảng GitHub Projects/Issues (`#1..#4`) và test chạy thử `4. Kỹ thuật và Kiểm thử/docker-compose.skeleton.yml`.
+- [ ] **[Role 1 - PO]** Duyệt lại `Product Backlog 16 User Stories.md` và gửi link Google Forms khảo sát từ `3. Khung báo cáo đồ án EC312/Mẫu bảng hỏi khảo sát sinh viên ĐHQG.md`.
 
 ### Sprint 1: Phân tích Yêu cầu & Mô hình hóa Sơ bộ
 - [ ] **[Role 1 - PO]** Thu thập ≥ 50–100 phản hồi khảo sát sinh viên ĐHQG TP.HCM; viết Chương 1 & Chương 2 (Bài toán, KPIs, TCO, FR-01..FR-10, NFR-01..NFR-06).
@@ -37,7 +37,7 @@
 - [ ] **[Role 2 - SM]** Chốt **System Architecture Diagram**, **Class Diagram tổng thể**, **State Machine Diagram** (`Order` & `InstallmentApplication`).
 - [ ] **[Role 4 - Dev 2]** Thiết kế **ERD** & SQL Schema mở rộng (`wp_gf_installment_plans`, `wp_gf_installment_applications`, `wp_gf_order_serials`, `wp_gf_fraud_blacklist`).
 - [ ] **[Role 3 - Dev 1]** Hoàn thiện bộ **Mockup Figma** đầy đủ (Desktop + Mobile) cho Storefront, Compare Specs, Form Trả góp, Checkout, OMS, Admin Dashboard.
-- [ ] **[Cả 4 Role]** Vẽ xong **Activity Diagram / BPMN** và **Sequence Diagram** cho cụm Use Case mình phụ trách (tuân thủ 100% tên Class & Bảng trong `shared_domain_glossary.md`).
+- [ ] **[Cả 4 Role]** Vẽ xong **Activity Diagram / BPMN** và **Sequence Diagram** cho cụm Use Case mình phụ trách (tuân thủ 100% tên Class & Bảng trong `2. Quy ước và Sơ đồ UML/Từ điển thuật ngữ và Ma trận Fit-Gap.md`).
 - [ ] **[Role 1 - PO]** Chuẩn bị file CSV/Excel chuẩn hóa **≥ 500 sản phẩm** (Laptop, PC, Phụ kiện) từ dữ liệu tham khảo GearVN/Phong Vũ.
 
 ### Sprint 3: Triển khai MVP Core trên WooCommerce
@@ -51,16 +51,16 @@
 
 ### Sprint 4: Tích hợp Thanh toán Sandbox, S/N, QA & Hoàn thiện Báo cáo
 - [ ] **[Role 4 - Dev 2]** Tích hợp cổng thanh toán **Sandbox VNPay / MoMo / Fundiin** (hỗ trợ 3D-Secure); làm tính năng gắn **Serial Number (S/N)** khi xuất kho & xuất **Hóa đơn PDF mẫu** chuẩn T-VAN.
-- [ ] **[Role 2 - SM]** Chạy toàn bộ bộ Test Cases trong `test_plan_skeleton.md` (chức năng, bảo mật upload/blacklist, hiệu năng < 3s); tổng hợp Test Report.
+- [ ] **[Role 2 - SM]** Chạy toàn bộ bộ Test Cases trong `4. Kỹ thuật và Kiểm thử/Kế hoạch kiểm thử 16 Test Cases.md` (chức năng, bảo mật upload/blacklist, hiệu năng < 3s); tổng hợp Test Report.
 - [ ] **[Role 3 - Dev 1]** Chụp ảnh màn hình Demo chất lượng cao & hỗ trợ quay video luồng Demo end-to-end.
-- [ ] **[Role 1 & Role 2]** Ghép toàn bộ nội dung của 4 người vào `EC312_Bao_Cao_Master_Skeleton.md`, rà soát lỗi chính tả/đồng nhất thuật ngữ, xuất bản file `.docx` & `.pdf`, đính kèm file nguồn sơ đồ & Nhật ký nhóm.
+- [ ] **[Role 1 & Role 2]** Ghép toàn bộ nội dung của 4 người vào `3. Khung báo cáo đồ án EC312/Khung báo cáo đồ án EC312 GearForge.docx`, rà soát lỗi chính tả/đồng nhất thuật ngữ, xuất bản file `.docx` & `.pdf`, đính kèm file nguồn sơ đồ & Nhật ký nhóm.
 
 ---
 
 ## 3. TIÊU CHÍ HOÀN THÀNH (DEFINITION OF DONE - DoD)
 
 Một hạng mục chỉ được đánh dấu `[x]` khi đạt đủ 3 điều kiện:
-1. **Đúng chuẩn dùng chung:** Tên Actor, Use Case ID, trạng thái và bảng DB khớp 100% với `02_Shared_Specs_and_Standards/shared_domain_glossary.md`.
+1. **Đúng chuẩn dùng chung:** Tên Actor, Use Case ID, trạng thái và bảng DB khớp 100% với `2. Quy ước và Sơ đồ UML/Từ điển thuật ngữ và Ma trận Fit-Gap.md`.
 2. **Có minh chứng kiểm chứng:** Tài liệu có file `.md`/`.docx` + hình sơ đồ rõ nét (`.png`/`.svg`/`.puml`); tính năng Demo có log chạy thực tế hoặc test pass không lỗi console/PHP fatal error.
 3. **Được review chéo:** Có ít nhất 1 thành viên khác (PO kiểm tra nghiệp vụ hoặc SM kiểm tra kỹ thuật) xác nhận.
 

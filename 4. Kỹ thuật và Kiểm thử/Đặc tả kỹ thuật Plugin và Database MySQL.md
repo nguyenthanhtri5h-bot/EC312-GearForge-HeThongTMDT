@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS wp_gf_fraud_blacklist (
    - Hook vào sự kiện chuyển trạng thái đơn hàng `woocommerce_order_status_changed`: nếu đơn hàng có sản phẩm thuộc danh mục `Laptop` hoặc `PC` và chuyển sang `shipping`/`completed` nhưng bảng `wp_gf_order_serials` chưa có đủ số lượng `serial_number` khớp `order_item_id`, chặn chuyển trạng thái và báo lỗi nhắc nhập S/N.
 3. **Chuẩn hóa cấu trúc Hóa đơn PDF tương thích T-VAN:**
    - Dùng hook `wpo_wcpdf_after_item_meta` (nếu dùng plugin WP Overnight) hoặc `class-gf-invoice-pdf.php` xuất kèm các trường chuẩn Thông tư 78 / NĐ 123: Tên đơn vị bán (GearForge), MST giả lập, Thông tin người mua, Danh mục hàng hóa + **Serial Number**, Đơn giá trước thuế, Thuế suất **VAT (8% / 10%)**, Tiền thuế, Tổng thanh toán, Hình thức thanh toán (Trả thẳng / Trả góp SV).
-4. **Danh sách Hooks & REST API Endpoints phục vụ Demo Postman (theo `lab_api_notes.md`):**
+4. **Danh sách Hooks & REST API Endpoints phục vụ Demo Postman (theo `0. Tài liệu tham khảo/Tài liệu gốc GitHub Thầy Tín/lab_api_notes.md`):**
    - *Core WooCommerce REST API v3 (OAuth 1.0):* `GET/POST /wp-json/wc/v3/products` (quản lý ≥ 500 SP), `GET /wp-json/wc/v3/orders` (quản lý OMS).
    - *GearForge Custom REST API (`rest_api_init`):*
      - `GET /wp-json/gearforge/v1/installment-calc?price=20000000&down_pct=30&months=6` → Trả về JSON chi tiết số tiền trả trước, gốc vay, lãi/tháng, góp mỗi tháng.

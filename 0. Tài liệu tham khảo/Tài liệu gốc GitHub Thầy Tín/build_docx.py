@@ -369,7 +369,7 @@ def build():
     add_rich_bullet(doc, "Sprint 3 – Phát triển MVP Core (Storefront, Compare & Plugin Trả góp):", "Hoàn thiện giao diện Storefront, Bộ lọc cấu hình chuyên sâu, So sánh 2-3 Laptop/PC; lập trình Custom Plugin tính toán & nộp hồ sơ trả góp sinh viên (kèm Consent NĐ 13/2023 và mã hóa dữ liệu).")
     add_rich_bullet(doc, "Sprint 4 – Tích hợp Thanh toán Sandbox, OMS, Kiểm thử & Hoàn thiện Báo cáo:", "Tích hợp VNPay/MoMo/Fundiin Sandbox, luồng Admin duyệt 2 lớp, quản lý S/N, xuất hóa đơn PDF mẫu; kiểm thử bảo mật (Rate Limit/Blacklist) & chức năng; quay video/chuẩn bị Demo và xuất bản báo cáo .docx / .pdf.")
 
-    out_path = r"d:\DANMH\TKeHT\Ban_Mo_Ta_Du_An_GearForge.docx"
+    out_path = r"D:\DANMH\TKeHT\Bản mô tả dự án GearForge.docx"
     doc.save(out_path)
     print("Saved:", out_path)
 

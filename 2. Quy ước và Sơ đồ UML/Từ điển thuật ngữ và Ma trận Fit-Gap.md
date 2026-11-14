@@ -116,7 +116,7 @@
 
 ## 6. MA TRẬN TRUY VẾT BR → FR → UC & GAP-ANALYSIS (CHUẨN BUY/CUSTOMIZE `trinhtin/ec312`)
 
-> Bám sát quy tắc vàng trong hướng dẫn `gap-analysis.md` & `requirements.md` của Thầy Trình Trọng Tín: **Giữ 70%–80% tính năng lõi Out-of-the-box của WooCommerce (Black-box)** và **tập trung đặc tả sâu 20%–30% khoảng trống (GAPs)** cần code Custom Plugin `gearforge-core` hoặc tích hợp API.
+> Bám sát quy tắc vàng trong hướng dẫn `0. Tài liệu tham khảo/Tài liệu gốc GitHub Thầy Tín/gap-analysis.md` & `requirements.md` của Thầy Trình Trọng Tín: **Giữ 70%–80% tính năng lõi Out-of-the-box của WooCommerce (Black-box)** và **tập trung đặc tả sâu 20%–30% khoảng trống (GAPs)** cần code Custom Plugin `gearforge-core` hoặc tích hợp API.
 
 ### 6.1. Ma trận Fit-Gap Analysis & Phân rã BR → FR → UC
 

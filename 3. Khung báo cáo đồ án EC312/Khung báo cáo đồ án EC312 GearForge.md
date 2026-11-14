@@ -1,8 +1,8 @@
 # BÁO CÁO ĐỒ ÁN MÔN HỌC: THIẾT KẾ HỆ THỐNG THƯƠNG MẠI ĐIỆN TỬ (EC312)
 
 > **Hướng dẫn sử dụng Khung Báo cáo (Master Outline):**
-> - Tài liệu này được thiết kế chuẩn theo **Mẫu đồ án EC312** và **Rubric 100 điểm** (`00_References/project-template.md` & `project-rubric.md`).
-> - Các thẻ `[Role X viết]` chỉ rõ thành viên phụ trách biên soạn từng mục để 4 người viết song song mà không bị chồng chéo, sau đó Role 1 & Role 2 ghép lại và dùng script chuyển sang `.docx` / `.pdf`.
+> - Tài liệu này được thiết kế chuẩn theo **Mẫu đồ án EC312** và **Rubric 100 điểm** (`0. Tài liệu tham khảo/Tài liệu gốc GitHub Thầy Tín/project-template.md` & `project-rubric.md`).
+> - Các thẻ `[Role X viết]` chỉ rõ thành viên phụ trách biên soạn từng mục để 4 người viết song song mà không bị chồng chéo (trên Drive nên soạn bản nháp riêng rồi ghép vào đây), sau đó Role 1 & Role 2 rà soát xuất bản `.docx` / `.pdf`.
 
 ---
 
@@ -65,11 +65,11 @@
   - Conversion Rate mục tiêu 1.5% (~10.000 lượt truy cập chất lượng).
 
 ### 2.2. Khảo sát nhu cầu thực tế sinh viên ĐHQG TP.HCM *(Role 1)*
-- Mô tả đối tượng, cỡ mẫu khảo sát (`N >= ...` sinh viên từ `survey_questionnaire_template.md`).
+- Mô tả đối tượng, cỡ mẫu khảo sát (`N >= ...` sinh viên từ `3. Khung báo cáo đồ án EC312/Mẫu bảng hỏi khảo sát sinh viên ĐHQG.md`).
 - Biểu đồ thống kê & Nhận xét rút ra làm căn cứ thiết kế tính năng Compare Specs và Trả góp 3–6–12 tháng.
 
 ### 2.3. Yêu cầu Chức năng (Functional Requirements)
-- Đưa vào bảng chuẩn `FR-01` đến `FR-10` từ `02_Shared_Specs_and_Standards/shared_domain_glossary.md`.
+- Đưa vào bảng chuẩn `FR-01` đến `FR-10` từ `2. Quy ước và Sơ đồ UML/Từ điển thuật ngữ và Ma trận Fit-Gap.md`.
 
 ### 2.4. Yêu cầu Phi chức năng (Non-functional Requirements)
 - Đưa vào bảng chuẩn `NFR-01` đến `NFR-06` (Performance < 3s, Security NĐ 13/2023, Anti-Fraud 3DS/Rate Limit/S/N, Responsive, Maintainability, Availability).
@@ -89,7 +89,7 @@
 - Chèn sơ đồ Use Case tổng thể (`UC-01`..`UC-12`) + Bảng mô tả tổng quan 12 Use Cases.
 
 ### 3.2. Biểu đồ Lớp Tổng thể (Class Diagram) *(Role 2 chủ trì)*
-- Chèn Class Diagram chuẩn hóa khớp với `shared_domain_glossary.md` + Giải thích các mối quan hệ Aggregation, Composition, Association.
+- Chèn Class Diagram chuẩn hóa khớp với `2. Quy ước và Sơ đồ UML/Từ điển thuật ngữ và Ma trận Fit-Gap.md` + Giải thích các mối quan hệ Aggregation, Composition, Association.
 
 ### 3.3. Biểu đồ Trạng thái (State Machine Diagrams) *(Role 2 chủ trì)*
 - 3.3.1. Biểu đồ trạng thái Đơn hàng (`OrderStatus`: `CREATED` → `COMPLETED` / `CANCELLED` / `REFUNDED`).
@@ -152,7 +152,7 @@
 - 5.2.4. Gán mã Serial Number (S/N) xuất kho & Xuất Hóa đơn PDF mẫu chuẩn T-VAN *(Role 4)*.
 
 ### 5.3. Kiểm thử Hệ thống (QA & Testing) *(Role 2 chủ trì)*
-- Tổng hợp kết quả chạy Test Cases theo `04_Technical_and_QA_Skeleton/test_plan_skeleton.md` (Tỷ lệ Pass/Fail, kiểm tra tốc độ tải trang < 3s, kiểm tra bảo mật truy cập trực tiếp file CCCD).
+- Tổng hợp kết quả chạy Test Cases theo `4. Kỹ thuật và Kiểm thử/Kế hoạch kiểm thử 16 Test Cases.md` (Tỷ lệ Pass/Fail, kiểm tra tốc độ tải trang < 3s, kiểm tra bảo mật truy cập trực tiếp file CCCD).
 
 ---
 
@@ -182,5 +182,5 @@
 ## PHỤ LỤC (APPENDIX)
 
 - **Phụ lục A:** Tập tin mã nguồn sơ đồ UML/PlantUML/Mermaid & SQL Schema.
-- **Phụ lục B:** Nhật ký làm việc nhóm theo Scrum & Bảng đóng góp công việc (`scrum_log_template.md`).
+- **Phụ lục B:** Nhật ký làm việc nhóm theo Scrum & Bảng đóng góp công việc (`1. Quản lý nhóm và Phân vai/Mẫu nhật ký làm việc nhóm Scrum.md`).
 - **Phụ lục C:** Đường dẫn liên kết (GitHub Repository, Figma Prototype, Video Demo, Link Website thử nghiệm).

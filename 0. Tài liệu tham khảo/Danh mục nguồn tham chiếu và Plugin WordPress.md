@@ -114,11 +114,11 @@ Danh mục dưới đây hợp nhất bộ link từ Google Doc tham khảo củ
 
 ## PHẦN 4: THAM CHIẾU CHUẨN UML & REST API TỪ KHO `trinhtin/ec312`
 
-Nhóm đã lưu đầy đủ các file bài tập chuẩn của Thầy Trình Trọng Tín trong `00_References\`:
-1. [exercises_use_case_diagram.md](exercises_use_case_diagram.md): Quy chuẩn dùng `<<include>>` (ví dụ `Register` → `Verify Email`, `Make Payment` → `Payment Gateway`) và `<<extend>>` (ví dụ `Cancel Payment`, `Student Installment` mở rộng `Checkout`).
-2. [exercises_class_diagram.md](exercises_class_diagram.md): Quy chuẩn phân biệt **Association**, **Aggregation**, **Composition** (đặc biệt cấu trúc `Product – Category – ProductVariant – Attribute` áp dụng thẳng vào mô hình Laptop/PC).
-3. [exercises_sequence_diagram.md](exercises_sequence_diagram.md): Quy chuẩn luồng thông điệp 4 lớp `Actor → Page/UI → Service → Database` (khớp với sơ đồ trong `architecture_and_uml_skeleton.md`).
-4. [lab_api_notes.md](lab_api_notes.md): Quy chuẩn cấu hình Permalink **Post name**, tạo WooCommerce REST API Key (Read/Write) và test qua Postman tại `/wp-json/wc/v3/products`.
+Nhóm đã lưu đầy đủ các file bài tập chuẩn của Thầy Trình Trọng Tín trong `0. Tài liệu tham khảo\Tài liệu gốc GitHub Thầy Tín\`:
+1. [exercises_use_case_diagram.md](<Tài liệu gốc GitHub Thầy Tín/exercises_use_case_diagram.md>): Quy chuẩn dùng `<<include>>` (ví dụ `Register` → `Verify Email`, `Make Payment` → `Payment Gateway`) và `<<extend>>` (ví dụ `Cancel Payment`, `Student Installment` mở rộng `Checkout`).
+2. [exercises_class_diagram.md](<Tài liệu gốc GitHub Thầy Tín/exercises_class_diagram.md>): Quy chuẩn phân biệt **Association**, **Aggregation**, **Composition** (đặc biệt cấu trúc `Product – Category – ProductVariant – Attribute` áp dụng thẳng vào mô hình Laptop/PC).
+3. [exercises_sequence_diagram.md](<Tài liệu gốc GitHub Thầy Tín/exercises_sequence_diagram.md>): Quy chuẩn luồng thông điệp 4 lớp `Actor → Page/UI → Service → Database` (khớp với sơ đồ trong `2. Quy ước và Sơ đồ UML/Khung kiến trúc và Sơ đồ UML Mermaid.md`).
+4. [lab_api_notes.md](<Tài liệu gốc GitHub Thầy Tín/lab_api_notes.md>): Quy chuẩn cấu hình Permalink **Post name**, tạo WooCommerce REST API Key (Read/Write) và test qua Postman tại `/wp-json/wc/v3/products`.
 
 ---
 

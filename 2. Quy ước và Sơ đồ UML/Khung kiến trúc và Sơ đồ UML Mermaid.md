@@ -1,6 +1,6 @@
 # KHUNG KIẾN TRÚC & SƠ ĐỒ UML / ERD CHUẨN HÓA (GEARFORGE)
 
-> Tài liệu này cung cấp **bộ khung sơ đồ Mermaid chuẩn hóa** bám sát 100% các thuật ngữ trong `shared_domain_glossary.md`.
+> Tài liệu này cung cấp **bộ khung sơ đồ Mermaid chuẩn hóa** bám sát 100% các thuật ngữ trong `2. Quy ước và Sơ đồ UML/Từ điển thuật ngữ và Ma trận Fit-Gap.md`.
 > - **Cách sử dụng:** Các thành viên có thể render trực tiếp trên VS Code / GitHub / Mermaid Live Editor (mermaid.live) hoặc chuyển đổi sang PlantUML / Draw.io để xuất ảnh `.png` nét cao chèn vào Báo cáo Word (`EC312`).
 
 ---

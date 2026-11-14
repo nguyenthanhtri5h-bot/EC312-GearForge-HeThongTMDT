@@ -24,7 +24,7 @@
   - *Vấn đề:* *[Ví dụ: Thiếu mẫu khảo sát đối tượng đồ họa -> Giải pháp: Chia sẻ link vào group CLB Đồ họa UIT]*
 - **Buổi họp 2 – Sprint Review & Retrospective (Ngày .../...):**
   - *Kết quả nghiệm thu:* *[Các tài liệu đã hoàn thành]*
-  - *Bài học rút kinh nghiệm (Start / Stop / Continue):* *[Ví dụ: Cần dùng chung tên bảng DB trong shared_domain_glossary.md]*
+  - *Bài học rút kinh nghiệm (Start / Stop / Continue):* *[Ví dụ: Cần dùng chung tên bảng DB trong Từ điển thuật ngữ và Ma trận Fit-Gap.md]*
 
 ---
 

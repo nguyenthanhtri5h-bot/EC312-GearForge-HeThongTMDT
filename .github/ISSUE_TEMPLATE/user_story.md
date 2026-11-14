@@ -8,6 +8,7 @@ assignees: ''
 
 ## 1. Thông tin chung
 - **Vai trò phụ trách:** Role ...
+- **Nhánh Git độc quyền:** `roleX-...` *(chỉ push trên đúng nhánh Role của mình)*
 - **Liên kết Epic / Use Case:** `EPIC-0X` / `UC-XX` / `FR-XX`
 - **Sprint mục tiêu:** Sprint ...
 
@@ -17,4 +18,4 @@ assignees: ''
 ## 3. Tiêu chí nghiệm thu (Acceptance Criteria)
 - [ ] AC 1: ...
 - [ ] AC 2: ...
-- [ ] Khớp chuẩn `02_Shared_Specs_and_Standards/shared_domain_glossary.md`.
+- [ ] Khớp chuẩn `2. Quy ước và Sơ đồ UML/Từ điển thuật ngữ và Ma trận Fit-Gap.md`.

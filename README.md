@@ -3,8 +3,8 @@
 > **Môn học:** Thiết kế Hệ thống Thương mại điện tử (**EC312**) – Khoa HTTT, UIT – ĐHQG TP.HCM  
 > **Đề tài:** Xây dựng Hệ thống Thương mại điện tử kinh doanh Laptop, PC và Phụ kiện (**GearForge**)  
 > **Giảng viên hướng dẫn:** ThS. Trình Trọng Tín  
-> **Quy mô nhóm:** 4 thành viên (vận hành theo mô hình **Scrum Team liên chức năng**)  
-> **Thư mục Google Drive nhóm:** [MONCUATHAYTIN (Google Drive)](https://drive.google.com/drive/folders/17V1tjxDp0T4hoQtF4pSNsXWjcD4WRJpm)  
+> **Quy mô nhóm:** 4 thành viên (vận hành theo mô hình **Scrum Team liên chức năng**, tách 4 nhánh Git độc lập)  
+> **Thư mục Google Drive nhóm (bản Word gọn sạch):** [MONCUATHAYTIN (Google Drive)](https://drive.google.com/drive/folders/17V1tjxDp0T4hoQtF4pSNsXWjcD4WRJpm)  
 > **Kho lưu trữ GitHub:** [nguyenthanhtri5h-bot/EC312-GearForge-HeThongTMDT](https://github.com/nguyenthanhtri5h-bot/EC312-GearForge-HeThongTMDT)
 
 ---
@@ -13,70 +13,68 @@
 
 ```text
 D:\DANMH\TKeHT\
-├── 00_BAT_DAU_TAI_DAY_Huong_Dan_Nhom.docx         # Cẩm nang 10 phút bắt đầu dành cho cả 4 thành viên (Word)
-├── 00_BAT_DAU_TAI_DAY_Huong_Dan_Nhom.md           # Cẩm nang bắt đầu (Markdown)
-├── README.md                                       # Bản đồ điều hướng toàn dự án (file này)
-├── Ban_Mo_Ta_Du_An_GearForge.md                    # Bản mô tả dự án (Markdown)
-├── Ban_Mo_Ta_Du_An_GearForge.docx                  # Bản mô tả dự án chuẩn UIT (Word A4)
+├── 0. Bắt đầu tại đây - Hướng dẫn nhóm.docx         (+ bản .md)
+├── Bản mô tả dự án GearForge.docx                   (+ bản .md)
+├── README.md                                        # Bản đồ điều hướng toàn dự án (trang chủ GitHub)
 │
-├── 00_References\                                  # Tài liệu gốc, Rubric & Nguồn tham chiếu WordPress (EC312)
-│   ├── EC312_Mau_do_an_HK1_2025.docx               # Mẫu báo cáo chuẩn của Khoa/GVHD
-│   ├── Danh_Muc_Nguon_Tham_Chieu_Va_Plugin_WordPress.docx # Tổng hợp nguồn VN, Plugin WP & Hooks (Word)
-│   ├── reference_sources_and_wp_plugins.md         # Tổng hợp nguồn tham chiếu & Plugin WordPress (Markdown)
-│   ├── project-template.md                         # Khung nội dung từng chương mục
-│   ├── project-rubric.md                           # Tiêu chí chấm điểm (100 điểm)
-│   ├── gap-analysis.md                             # Hướng dẫn GAP-Analysis & Use Case Custom (trinhtin/ec312)
-│   ├── requirements.md                             # Hướng dẫn phân rã BR -> FR -> NFR -> UC (trinhtin/ec312)
-│   ├── lab_api_notes.md                            # Lab WooCommerce REST API + Postman (trinhtin/ec312)
-│   ├── exercises_*.md                              # Bộ bài tập Use Case, Class, Sequence (trinhtin/ec312)
-│   └── build_docx.py                               # Script tự động xuất bản file Word (.docx)
+├── 0. Tài liệu tham khảo\                           # Tài liệu gốc, Rubric & Nguồn tham chiếu WordPress
+│   ├── Mẫu đồ án EC312 HK1 2025.docx                # Mẫu báo cáo chuẩn của Khoa/GVHD
+│   ├── Danh mục nguồn tham chiếu và Plugin WordPress.docx (+ bản .md) # Đã kiểm định VN (Xgear, MemoryZone), Mỹ, TQ
+│   └── Tài liệu gốc GitHub Thầy Tín\                # Đề mục, Rubric, Fit-Gap, Requirements, API Labs, Bài tập UML & script build_docx.py
 │
-├── 01_Project_Management\                          # Bộ sườn Quản trị nhóm Scrum (4 Sprints)
-│   ├── Huong_Dan_Chon_Vai_Tro_GearForge.docx       # Bản Word hướng dẫn chọn 4 vai trò (Role 1..4)
-│   ├── role_selection_guide.md                     # Hướng dẫn chọn 4 vai trò (Markdown)
-│   ├── task_plan.md                                # Kế hoạch chi tiết 4 Sprints & Definition of Done
-│   ├── product_backlog.md                          # 4 Epics & 16 User Stories chuẩn INVEST + AC
-│   └── scrum_log_template.md                       # Mẫu Nhật ký làm việc nhóm nộp Phụ lục EC312
+├── 1. Quản lý nhóm và Phân vai\                     # Bộ sườn Quản trị nhóm Scrum (4 Sprints)
+│   ├── Hướng dẫn chọn vai trò GearForge.docx        (+ bản .md)
+│   ├── Kế hoạch 4 Sprints và Chia việc.docx         (+ bản .md)
+│   ├── Product Backlog 16 User Stories.docx         (+ bản .md)
+│   └── Mẫu nhật ký làm việc nhóm Scrum.docx         (+ bản .md)
 │
-├── 02_Shared_Specs_and_Standards\                  # Chuẩn dùng chung (Single Source of Truth)
-│   ├── shared_domain_glossary.md                   # Khóa cứng Actor, BR->FR->UC, GAP-Analysis, Trạng thái, Bảng DB
-│   └── architecture_and_uml_skeleton.md            # Khung sơ đồ Mermaid: Kiến trúc, UC, Class, State, ERD, Sequence
+├── 2. Quy ước và Sơ đồ UML\                         # Chuẩn dùng chung (Single Source of Truth)
+│   ├── Từ điển thuật ngữ và Ma trận Fit-Gap.docx    (+ bản .md) # Khóa cứng Actor, BR->FR->UC, Fit-Gap, Trạng thái, Bảng DB
+│   └── Khung kiến trúc và Sơ đồ UML Mermaid.docx    (+ bản .md) # Khung Mermaid: Kiến trúc, UC, Class, State, ERD, Sequence
 │
-├── 03_Report_Skeleton\                             # Khung Báo cáo tổng & Khảo sát thực tế
-│   ├── EC312_Bao_Cao_Master_Skeleton.docx          # Bản Word khung sườn Chương 1..7 & Phụ lục
-│   ├── EC312_Bao_Cao_Master_Skeleton.md            # Khung sườn Báo cáo (Markdown)
-│   └── survey_questionnaire_template.md            # Mẫu 12 câu hỏi khảo sát sinh viên ĐHQG TP.HCM (Google Forms)
+├── 3. Khung báo cáo đồ án EC312\                    # Khung Báo cáo tổng & Khảo sát thực tế
+│   ├── Khung báo cáo đồ án EC312 GearForge.docx     (+ bản .md) # Sườn Chương 1..7 & Phụ lục có gắn nhãn [Role X viết]
+│   └── Mẫu bảng hỏi khảo sát sinh viên ĐHQG.docx    (+ bản .md) # Mẫu 12 câu hỏi Google Forms
 │
-└── 04_Technical_and_QA_Skeleton\                   # Khung Kỹ thuật Demo WooCommerce & Kiểm thử QA
-    ├── docker-compose.skeleton.yml                 # Cấu hình Docker (WordPress + MySQL 8.0 + phpMyAdmin + Vault)
-    ├── plugin_skeleton_spec.md                     # Kiến trúc Custom Plugin gearforge-core & SQL DDL 4 bảng wp_gf_*
-    └── test_plan_skeleton.md                       # 16 kịch bản kiểm thử trọng tâm (Chức năng, Bảo mật NĐ 13/2023, QA)
+└── 4. Kỹ thuật và Kiểm thử\                         # Khung Kỹ thuật Demo WooCommerce & Kiểm thử QA
+    ├── docker-compose.skeleton.yml                  # Môi trường Docker (WordPress + MySQL 8.0 + phpMyAdmin + Vault)
+    ├── Đặc tả kỹ thuật Plugin và Database MySQL.docx (+ bản .md) # Kiến trúc Plugin gearforge-core & SQL DDL 4 bảng wp_gf_*
+    └── Kế hoạch kiểm thử 16 Test Cases.docx         (+ bản .md) # 16 kịch bản Test chức năng, bảo mật NĐ 13/2023 & hiệu năng
 ```
 
 ---
 
-## 2. LỘ TRÌNH 5 BƯỚC BẮT ĐẦU CHO NHÓM 4 NGƯỜI
+## 2. PHÂN NHÁNH GIT & CHỐNG ĐÈ VIỆC CHO 4 THÀNH VIÊN
 
-### Bước 1: Họp nhóm & Chốt vai trò (`Role 1..4`)
-- Cả 4 thành viên cùng đọc [role_selection_guide.md](01_Project_Management/role_selection_guide.md) để chọn gói công việc hợp thế mạnh nhất:
-  - **Role 1 (PO / BA):** Khảo sát, Chương 1–2, Use Case tổng thể, `UC-02` (Compare Specs), Dữ liệu ≥ 500 sản phẩm, Chính sách pháp lý.
-  - **Role 2 (SM / Architect / QA):** Kiến trúc, Class, State Machine, `UC-05` (RBAC, Bảo mật NĐ 13/2023, Blacklist), Docker/Hosting, QA & Biên tập báo cáo.
-  - **Role 3 (Dev 1 – UI/UX & Frontend):** Mockup Figma, Storefront UI, Bộ lọc & Bảng Compare, Consent Banner NĐ 13/2023, `UC-08` (Checkout & OMS).
-  - **Role 4 (Dev 2 – Backend, DB & Payment):** ERD & SQL Schema, Custom Plugin `gearforge-core`, `UC-10/UC-11` (Trả góp SV & Duyệt 2 lớp), Sandbox Payment, S/N & Hóa đơn PDF.
-- Điền Họ tên & MSSV vào bảng đăng ký và cập nhật sang `Ban_Mo_Ta_Du_An_GearForge.md` / `.docx`.
+Kho GitHub đã tạo sẵn **4 nhánh độc quyền** tương ứng 4 Issues (`#1`..`#4`). Mỗi thành viên **chỉ code & push trên đúng nhánh của mình**, mỗi ngày trước khi làm chạy `git fetch origin` + `git merge origin/main`, sau đó mở **Pull Request** vào `main`:
+
+| Role | Issue | Nhánh Git độc quyền | Lãnh thổ file sở hữu chính |
+| :--- | :-: | :--- | :--- |
+| **Role 1 (PO / BA)** | `#1` | `role1-data-catalog` | Khảo sát, Chương 1–2, UC tổng thể, `UC-01..03`, CSV ≥ 500 SP, `class-gf-compare-specs.php`, Pháp lý BCT |
+| **Role 2 (SM / QA)** | `#2` | `role2-security-qa` | Kiến trúc (4.1), Class & State Machine, `UC-04..06`, `docker-compose`, `class-gf-rbac.php`, `class-gf-fraud-guard.php`, Test Report & Nhật ký nhóm |
+| **Role 3 (Dev 1 - UI)** | `#3` | `role3-ui-frontend` | Figma (4.3), `UC-07..09`, Child Theme, `templates/` (`compare-table`, `installment-widget`, `oms-tracking`) & `assets/` (`css/`, `js/`) |
+| **Role 4 (Dev 2 - BE)** | `#4` | `role4-backend-payment` | ERD & Từ điển DB (4.2), `UC-10..12`, các class Backend trong `includes/` (`activator`, `installment-calc`, `vault-crypto`, `review`, `payment-sandbox`, `serial-manager`, `invoice-pdf`) & `admin/` |
+
+---
+
+## 3. LỘ TRÌNH 5 BƯỚC BẮT ĐẦU CHO NHÓM 4 NGƯỜI
+
+### Bước 1: Đọc Cẩm nang 10 phút & Chốt 4 vai trò (`Role 1..4`)
+- Mở [0. Bắt đầu tại đây - Hướng dẫn nhóm.md](<0. Bắt đầu tại đây - Hướng dẫn nhóm.md>) và [Hướng dẫn chọn vai trò GearForge.md](<1. Quản lý nhóm và Phân vai/Hướng dẫn chọn vai trò GearForge.md>) để nhận đúng Role và đúng nhánh Git.
+- Điền Họ tên & MSSV vào bảng đăng ký và cập nhật sang [Bản mô tả dự án GearForge.md](<Bản mô tả dự án GearForge.md>) (và bản `.docx`).
 
 ### Bước 2: Phát hành Khảo sát sinh viên ĐHQG TP.HCM
-- **Role 1** copy nội dung từ [survey_questionnaire_template.md](03_Report_Skeleton/survey_questionnaire_template.md) lên Google Forms và thu thập tối thiểu 60–100 mẫu để lấy số liệu thực tế cho Chương 2.
+- **Role 1** copy nội dung từ [Mẫu bảng hỏi khảo sát sinh viên ĐHQG.md](<3. Khung báo cáo đồ án EC312/Mẫu bảng hỏi khảo sát sinh viên ĐHQG.md>) lên Google Forms và thu thập tối thiểu 60–100 mẫu cho Chương 2.
 
 ### Bước 3: Khóa chuẩn dùng chung trước khi vẽ UML / Thiết kế DB / Figma
-- Toàn bộ nhóm **bắt buộc** bám sát tên Actor, mã `UC-01..UC-12`, tên Class, `OrderStatus`, `InstallmentApplicationStatus` và 4 bảng `wp_gf_*` trong [shared_domain_glossary.md](02_Shared_Specs_and_Standards/shared_domain_glossary.md).
-- Mở [architecture_and_uml_skeleton.md](02_Shared_Specs_and_Standards/architecture_and_uml_skeleton.md) để kế thừa ngay các sơ đồ khung và phát triển tiếp phần riêng của từng Role.
+- Toàn bộ nhóm **bắt buộc** bám sát tên Actor, mã `UC-01..UC-12`, tên Class, `OrderStatus`, `InstallmentApplicationStatus` và 4 bảng `wp_gf_*` trong [Từ điển thuật ngữ và Ma trận Fit-Gap.md](<2. Quy ước và Sơ đồ UML/Từ điển thuật ngữ và Ma trận Fit-Gap.md>).
+- Mở [Khung kiến trúc và Sơ đồ UML Mermaid.md](<2. Quy ước và Sơ đồ UML/Khung kiến trúc và Sơ đồ UML Mermaid.md>) để kế thừa các sơ đồ khung và xuất ảnh PNG bằng Mermaid Live.
 
-### Bước 4: Dựng môi trường Demo & Chia việc theo Backlog
-- **Role 2** dựng môi trường chạy chung từ [docker-compose.skeleton.yml](04_Technical_and_QA_Skeleton/docker-compose.skeleton.yml).
-- **Role 3 & Role 4** đối chiếu danh sách 16 User Stories trong [product_backlog.md](01_Project_Management/product_backlog.md) và đặc tả Plugin trong [plugin_skeleton_spec.md](04_Technical_and_QA_Skeleton/plugin_skeleton_spec.md) để code song song.
-- **Role 2** ghi chép đều đặn tiến độ vào [task_plan.md](01_Project_Management/task_plan.md) và [scrum_log_template.md](01_Project_Management/scrum_log_template.md).
+### Bước 4: Dựng môi trường Demo & Code song song trên 4 nhánh
+- **Role 2** dựng môi trường chung từ [docker-compose.skeleton.yml](<4. Kỹ thuật và Kiểm thử/docker-compose.skeleton.yml>).
+- **Role 3 & Role 4** đối chiếu [Product Backlog 16 User Stories.md](<1. Quản lý nhóm và Phân vai/Product Backlog 16 User Stories.md>) và [Đặc tả kỹ thuật Plugin và Database MySQL.md](<4. Kỹ thuật và Kiểm thử/Đặc tả kỹ thuật Plugin và Database MySQL.md>) để code đúng vùng file của mình trên nhánh `role3-ui-frontend` và `role4-backend-payment`.
+- **Role 2** ghi chép tiến độ vào [Kế hoạch 4 Sprints và Chia việc.md](<1. Quản lý nhóm và Phân vai/Kế hoạch 4 Sprints và Chia việc.md>) và [Mẫu nhật ký làm việc nhóm Scrum.md](<1. Quản lý nhóm và Phân vai/Mẫu nhật ký làm việc nhóm Scrum.md>).
 
 ### Bước 5: Kiểm thử & Ghép bài hoàn chỉnh vào Master Report
-- Chạy hết 16 Test Cases trong [test_plan_skeleton.md](04_Technical_and_QA_Skeleton/test_plan_skeleton.md).
-- Từng Role điền phần bài của mình vào đúng vị trí đã đánh dấu sẵn trong [EC312_Bao_Cao_Master_Skeleton.md](03_Report_Skeleton/EC312_Bao_Cao_Master_Skeleton.md) để xuất bản file `.docx` và `.pdf` đồng nhất.
+- Chạy đủ 16 Test Cases trong [Kế hoạch kiểm thử 16 Test Cases.md](<4. Kỹ thuật và Kiểm thử/Kế hoạch kiểm thử 16 Test Cases.md>).
+- Mỗi Role viết phần bài gắn thẻ `[Role X viết]` ra file nháp riêng trên Drive (`Nháp Role X - Họ Tên.docx`), sau đó Role 1 & Role 2 ghép sạch vào [Khung báo cáo đồ án EC312 GearForge.md](<3. Khung báo cáo đồ án EC312/Khung báo cáo đồ án EC312 GearForge.md>) và bản `.docx`.
