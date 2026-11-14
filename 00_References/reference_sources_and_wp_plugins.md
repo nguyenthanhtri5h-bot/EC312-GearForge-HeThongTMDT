@@ -1,6 +1,6 @@
 # ĐÁNH GIÁ TÍNH HỢP LÝ & DANH MỤC NGUỒN THAM CHIẾU CHỨC NĂNG WORDPRESS (GEARFORGE – EC312)
 
-> Tài liệu này tổng hợp kết quả rà soát thiết kế hiện tại dưới góc nhìn triển khai **WordPress + WooCommerce**, đồng thời cung cấp bộ **Nguồn tham chiếu thực tế** (Website TMĐT Việt Nam, Hệ sinh thái Plugin WordPress/WooCommerce, Cổng thanh toán Sandbox & Chuẩn UML/API của Thầy Trình Trọng Tín).
+> Tài liệu này tổng hợp kết quả rà soát thiết kế hiện tại dưới góc nhìn triển khai **WordPress + WooCommerce**, đồng thời cung cấp bộ **Nguồn tham chiếu thực tế trong & ngoài nước** (Website TMĐT tại Việt Nam, Mỹ, Trung Quốc, Hệ sinh thái Plugin WordPress/WooCommerce, Cổng thanh toán Sandbox & Chuẩn UML/API của Thầy Trình Trọng Tín).
 
 ---
 
@@ -26,15 +26,51 @@
 
 ---
 
-## PHẦN 2: NGUỒN THAM CHIẾU NGHIỆP VỤ TỪ CÁC HỆ THỐNG TMĐT TẠI VIỆT NAM
+## PHẦN 2: NGUỒN THAM CHIẾU TÍNH NĂNG TRONG & NGOÀI NƯỚC (VIỆT NAM, MỸ, TRUNG QUỐC)
 
-| Hệ thống tham chiếu | Website / Nguồn | Điểm học hỏi áp dụng trực tiếp vào GearForge | Gói Role áp dụng |
-| :--- | :--- | :--- | :---: |
-| **GearVN & Phong Vũ** | `gearvn.com`, `phongvu.vn` | Cấu trúc cây danh mục Laptop (Văn phòng, Gaming, Đồ họa), PC nguyên bộ, Phụ kiện; bộ thông số kỹ thuật chuẩn (CPU, RAM, GPU, SSD, Màn hình); quy trình ghi nhận **Serial Number / Service Tag** khi xuất kho bảo hành; chính sách trả góp 20%–50%. | **Role 1** *(Dữ liệu 500 SP)* & **Role 4** *(S/N)* |
-| **CellphoneS (S-Student)** | `cellphones.com.vn` | Cơ chế **định danh sinh viên** bằng Email trường (`.edu.vn`) kết hợp ảnh **Thẻ sinh viên + CCCD gắn chip** để mở khóa ưu đãi "Back to School" và gói trả góp sinh viên (*S-Financing*). | **Role 2** *(Auth `.edu.vn`)* & **Role 4** *(Duyệt 2 lớp)* |
-| **ThinkPro** | `thinkpro.vn` | Phong cách giao diện tối giản, bảng **Compare Specs** đặt cạnh các mẫu Laptop trực quan, làm nổi bật thông số cốt lõi giúp sinh viên không bị ngợp chữ. | **Role 3** *(Figma & UI)* |
-| **Fundiin (BNPL)** | `fundiin.vn` | Tài liệu tích hợp plugin WooCommerce BNPL (Client ID, Merchant ID, Secret Key, Notify URL / IPN) cho luồng mua trước trả sau qua ví BNPL. | **Role 4** *(Payment)* |
-| **VNPay & MoMo Sandbox** | Cổng Developer VNPay / MoMo | Chuẩn chữ ký HMAC-SHA256/SHA512 cho Callback/IPN, hỗ trợ xác thực **3D-Secure / OTP giả lập** trên môi trường test. | **Role 4** *(Payment)* & **Role 2** *(Security)* |
+Để tránh thiết kế cảm tính, nhóm đối chiếu trực tiếp các nền tảng TMĐT thực tế tại **Việt Nam, Mỹ và Trung Quốc** theo 4 nhóm chức năng cốt lõi của **GearForge**:
+
+### 2.1. Lọc thông số kỹ thuật Laptop/PC & So sánh cấu hình (UC-01, UC-02 – Role 1 & Role 3)
+
+| Khu vực | Hệ thống tham chiếu | Link tham chiếu trực tiếp | Điểm học hỏi áp dụng vào GearForge |
+| :--- | :--- | :--- | :--- |
+| **Mỹ (US)** | **Newegg Laptop Finder** | https://www.newegg.com/tools/laptop-finder , https://www.newegg.com/Laptops-Notebooks/SubCategory/ID-32 | Bộ lọc Guided Finder & đa thuộc tính nhiều tầng (CPU, GPU, RAM, SSD, màn hình, ngân sách, mục đích sử dụng). |
+| **Mỹ (US)** | **Best Buy Laptops & PC** | https://www.bestbuy.com/site/clp/laptops/pcmcat138500050001/c?id=pcmcat138500050001 , https://www.bestbuy.com/site/electronics/pc-comparisons/pcmcat1554823158010.c?id=pcmcat1554823158010 | Thanh chọn nhanh so sánh (Compare tray) và bố cục bảng so sánh theo phân khúc giá cho sinh viên dễ đối chiếu. |
+| **Mỹ (US)** | **Apple Compare Mac & Quiz** | https://www.apple.com/mac/compare/ , https://www.apple.com/shop/goto/buy_mac/mags_b | Bảng **Compare Specs** đặt 2–3 máy cạnh nhau tối giản, làm nổi bật thông số chênh lệch cốt lõi không gây rối mắt. |
+| **Mỹ (US)** | **PCPartPicker** | https://pcpartpicker.com/ | Cơ chế lọc sâu thông số phần cứng và kiểm tra tương thích cấu hình (ý tưởng mở rộng cho PC/Phụ kiện). |
+| **Trung Quốc** | **JD.com & JD Computers** | https://www.jd.com , https://computer.jd.com | Hệ thống **Faceted Filtering** gắn nhãn tóm tắt CPU/VGA/Tần số quét nổi bật ngay trên thẻ sản phẩm (Product Card). |
+| **Trung Quốc** | **ZOL (中关村在线)** | https://www.zol.com.cn | Cơ sở dữ liệu thông số Laptop/PC chuẩn hóa cực chi tiết và chế độ đối đầu thông số kỹ thuật (Parameter PK). |
+| **Việt Nam** | **GearVN & Phong Vũ** | https://gearvn.com/ , https://phongvu.vn/ | Cấu trúc cây danh mục Laptop chuẩn thị trường VN (Văn phòng, Gaming, Đồ họa), PC nguyên bộ, bộ thuộc tính WooCommerce (`Role 1`). |
+| **Việt Nam** | **ThinkPro** | https://thinkpro.vn/ | Giao diện tối giản, bảng **Compare Specs** gọn sạch giúp sinh viên so sánh nhanh cấu hình trọng tâm (`Role 3`). |
+
+### 2.2. Định danh Sinh viên & Ưu đãi Giáo dục (UC-04, UC-05, UC-07 – Role 2 & Role 4)
+
+| Khu vực | Hệ thống tham chiếu | Link tham chiếu trực tiếp | Điểm học hỏi áp dụng vào GearForge |
+| :--- | :--- | :--- | :--- |
+| **Mỹ / VN** | **Apple Education Store** | https://www.apple.com/us-edu/store , https://www.apple.com/vn-edu/store | Tách bạch luồng giá ưu đãi giáo dục và ràng buộc điều kiện đối tượng sinh viên/giảng viên trước khi thanh toán. |
+| **Toàn cầu** | **UNiDAYS Verification** | https://www.myunidays.com/ , https://corporate.myunidays.com/ | Quy trình xác thực email trường đại học (`.edu` / `.edu.vn`) và cấp trạng thái *Verified Student* tách khỏi user thường (`Role 2`). |
+| **Toàn cầu** | **SheerID** | https://www.sheerid.com/ | Biểu mẫu tải lên giấy tờ chứng minh sinh viên, trạng thái chờ xét duyệt và cơ chế giới hạn lượt hưởng ưu đãi chống gian lận. |
+| **Việt Nam** | **CellphoneS (S-Student)** | https://cellphones.com.vn/s-student , https://cellphones.com.vn | Định danh 2 lớp bằng Email `.edu.vn` + ảnh Thẻ sinh viên & CCCD gắn chip để mở khóa đặc quyền giảm giá và trả góp sinh viên. |
+
+### 2.3. Trả góp Sinh viên, BNPL & Thanh toán Trực tuyến (UC-10, UC-11 – Role 2 & Role 4)
+
+| Khu vực | Hệ thống tham chiếu | Link tham chiếu trực tiếp | Điểm học hỏi áp dụng vào GearForge |
+| :--- | :--- | :--- | :--- |
+| **Trung Quốc** | **JD Baitiao (京东白条)** | https://baitiao.jd.com | Chọn kỳ hạn trả góp (3–6–12 tháng), hiển thị minh bạch số tiền trả hàng tháng ngay trên trang sản phẩm và luồng duyệt hạn mức. |
+| **Mỹ (US)** | **Affirm Checkout Docs** | https://docs.affirm.com/developers/docs/checkout-overview , https://docs.affirm.com/developers/docs/set-up-direct-api | Mô hình Checkout Object trả góp theo tháng, luồng **Authorize / Capture** tách biệt và webhook callback xác nhận giải ngân. |
+| **Toàn cầu** | **Klarna Web Payments** | https://docs.klarna.com/palms/web-payments/ | Trải nghiệm widget chia kỳ hạn trả góp trực quan ngay trong trang Checkout. |
+| **Việt Nam** | **Thế Giới Di Động (Trả góp)** | https://www.thegioididong.com/tra-gop | Bảng tính dự toán trả góp tương tác (chọn tỷ lệ trả trước 20%–50%, kỳ hạn 3–6–12 tháng) — áp dụng cho endpoint `installment-calc`. |
+| **Việt Nam** | **Fundiin (BNPL)** | https://fundiin.vn/ | Kiến trúc tích hợp ví BNPL trên WooCommerce (Merchant ID, Client ID, Secret Key, IPN Notify URL). |
+| **Việt Nam** | **VNPay & MoMo Sandbox** | https://sandbox.vnpayment.vn/devreg/ , https://sandbox.vnpayment.vn/apis , https://developers.momo.vn/ | Chuẩn chữ ký HMAC-SHA256/SHA512 cho Callback/IPN và kịch bản test OTP / **3D-Secure** (`Role 4` & `Role 2`). |
+
+### 2.4. Quản lý Đơn hàng (OMS), Serial Number & Tra cứu Bảo hành (UC-08, UC-09, UC-12 – Role 3 & Role 4)
+
+| Khu vực | Hệ thống tham chiếu | Link tham chiếu trực tiếp | Điểm học hỏi áp dụng vào GearForge |
+| :--- | :--- | :--- | :--- |
+| **Mỹ / Toàn cầu** | **Dell Service Tag Lookup** | https://www.dell.com/support/home | Mô hình gắn mã **Service Tag / Serial Number (S/N)** duy nhất cho từng máy bán ra để kích hoạt và kiểm tra bảo hành. |
+| **Mỹ / Toàn cầu** | **Lenovo Warranty Lookup** | https://pcsupport.lenovo.com/warrantylookup | Giao diện tra cứu thời hạn bảo hành theo S/N và đối soát lịch sử bảo hành thiết bị. |
+| **Mỹ / Toàn cầu** | **Apple Check Coverage** | https://checkcoverage.apple.com/ | Form tra cứu 1 bước tối giản nhập S/N để xác nhận tình trạng kích hoạt và hỗ trợ kỹ thuật. |
+| **Việt Nam** | **GearVN & Phong Vũ (Kho S/N)** | https://gearvn.com/ , https://phongvu.vn/ | Bắt buộc nhập S/N xuất kho trước khi chuyển sang `SHIPPING`, in S/N lên hóa đơn PDF và theo dõi trạng thái đơn hàng đa bước. |
 
 ---
 
