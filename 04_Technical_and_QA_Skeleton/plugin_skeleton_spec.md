@@ -4,7 +4,21 @@
 
 ---
 
-## 1. CẤU TRÚC THƯ MỤC PLUGIN `gearforge-core`
+## 1. CHIẾN LƯỢC WORDPRESS: PLUGINS CÓ SẴN VS CUSTOM PLUGIN `gearforge-core`
+
+Theo chuẩn **Buy & Customize (70%–80% Out-of-the-box, 20%–30% Custom GAP)** của môn EC312, nhóm kết hợp các plugin miễn phí uy tín trên WordPress.org cho phần phổ thông và dồn code vào **`gearforge-core`** cho các nghiệp vụ đặc thù:
+
+| Thành phần | Sử dụng Plugin có sẵn (WordPress.org / GitHub) | Phần Custom code trong `gearforge-core` |
+| :--- | :--- | :--- |
+| **Bộ lọc thông số** | **HUSKY (WOOF) Products Filter** hoặc **WBW Product Filter** | Chuẩn hóa Attributes (CPU, RAM, GPU, Nhu cầu) & import ≥ 500 SP qua REST API |
+| **So sánh cấu hình** | **Products Compare for WooCommerce (BeRocket)** *(tùy chọn nền)* | Shortcode/Hook chèn thêm dòng **Tiền trả góp SV dự kiến/tháng** |
+| **Trả góp SV & Vault** | *Không dùng plugin ngoài (100% Custom GAP)* | Calculator 3–6–12 tháng, Consent NĐ 13/2023, Mã hóa AES-256 `/var/www/gf-vault`, Duyệt 2 lớp |
+| **Thanh toán Sandbox** | Tham khảo `woo-vnpay`, `kanbox-momo-payment-gateway`, Plugin **Fundiin** | Adapter xử lý thanh toán tiền cọc trả trước & verify chữ ký IPN (3D-Secure) |
+| **Serial Number & PDF** | **PDF Invoices & Packing Slips (WP Overnight)** *(tạo khung PDF)* | Bảng `wp_gf_order_serials`, Hook chặn `SHIPPING` nếu thiếu `S/N`, Hook in `S/N` & VAT 8–10% vào PDF |
+
+---
+
+## 2. CẤU TRÚC THƯ MỤC PLUGIN `gearforge-core`
 
 ```text
 plugins/gearforge-core/
@@ -31,7 +45,7 @@ plugins/gearforge-core/
 
 ---
 
-## 2. SCRIPT SQL KHỞI TẠO 4 BẢNG MỞ RỘNG (MYSQL 8.0)
+## 3. SCRIPT SQL KHỞI TẠO 4 BẢNG MỞ RỘNG (MYSQL 8.0)
 
 *(Được thực thi tự động trong `class-gf-activator.php` khi kích hoạt Plugin)*
 
@@ -107,7 +121,7 @@ CREATE TABLE IF NOT EXISTS wp_gf_fraud_blacklist (
 
 ---
 
-## 3. QUY ƯỚC BẢO MẬT & KIẾN TRÚC API NỘI BỘ
+## 4. QUY ƯỚC BẢO MẬT, HOOKS & REST API NỘI BỘ
 
 1. **Bảo mật tải tệp CCCD/Thẻ SV (NĐ 13/2023):**
    - Kiểm tra MIME type thực tế (`finfo_file`), chỉ cho phép `image/jpeg`, `image/png`, `application/pdf`, kích thước ≤ 5MB.
@@ -116,4 +130,9 @@ CREATE TABLE IF NOT EXISTS wp_gf_fraud_blacklist (
 2. **Logic chặn xuất kho thiếu Serial Number:**
    - Hook vào sự kiện chuyển trạng thái đơn hàng `woocommerce_order_status_changed`: nếu đơn hàng có sản phẩm thuộc danh mục `Laptop` hoặc `PC` và chuyển sang `shipping`/`completed` nhưng bảng `wp_gf_order_serials` chưa có đủ số lượng `serial_number` khớp `order_item_id`, chặn chuyển trạng thái và báo lỗi nhắc nhập S/N.
 3. **Chuẩn hóa cấu trúc Hóa đơn PDF tương thích T-VAN:**
-   - Xuất kèm các trường chuẩn Thông tư 78 / NĐ 123: Tên đơn vị bán (GearForge), MST giả lập, Thông tin người mua, Danh mục hàng hóa + **Serial Number**, Đơn giá trước thuế, Thuế suất **VAT (8% / 10%)**, Tiền thuế, Tổng thanh toán, Hình thức thanh toán (Trả thẳng / Trả góp SV).
+   - Dùng hook `wpo_wcpdf_after_item_meta` (nếu dùng plugin WP Overnight) hoặc `class-gf-invoice-pdf.php` xuất kèm các trường chuẩn Thông tư 78 / NĐ 123: Tên đơn vị bán (GearForge), MST giả lập, Thông tin người mua, Danh mục hàng hóa + **Serial Number**, Đơn giá trước thuế, Thuế suất **VAT (8% / 10%)**, Tiền thuế, Tổng thanh toán, Hình thức thanh toán (Trả thẳng / Trả góp SV).
+4. **Danh sách Hooks & REST API Endpoints phục vụ Demo Postman (theo `lab_api_notes.md`):**
+   - *Core WooCommerce REST API v3 (OAuth 1.0):* `GET/POST /wp-json/wc/v3/products` (quản lý ≥ 500 SP), `GET /wp-json/wc/v3/orders` (quản lý OMS).
+   - *GearForge Custom REST API (`rest_api_init`):*
+     - `GET /wp-json/gearforge/v1/installment-calc?price=20000000&down_pct=30&months=6` → Trả về JSON chi tiết số tiền trả trước, gốc vay, lãi/tháng, góp mỗi tháng.
+     - `GET /wp-json/gearforge/v1/oms-status/{order_id}` → Trả về trạng thái kết hợp `OrderStatus` + `InstallmentApplicationStatus` + danh sách `serial_number` đã gán.

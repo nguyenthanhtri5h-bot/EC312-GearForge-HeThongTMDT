@@ -19,12 +19,16 @@ D:\DANMH\TKeHT\
 ├── Ban_Mo_Ta_Du_An_GearForge.md                    # Bản mô tả dự án (Markdown)
 ├── Ban_Mo_Ta_Du_An_GearForge.docx                  # Bản mô tả dự án chuẩn UIT (Word A4)
 │
-├── 00_References\                                  # Tài liệu gốc & Rubric chấm điểm môn EC312 (Thầy Tín)
+├── 00_References\                                  # Tài liệu gốc, Rubric & Nguồn tham chiếu WordPress (EC312)
 │   ├── EC312_Mau_do_an_HK1_2025.docx               # Mẫu báo cáo chuẩn của Khoa/GVHD
+│   ├── Danh_Muc_Nguon_Tham_Chieu_Va_Plugin_WordPress.docx # Tổng hợp nguồn VN, Plugin WP & Hooks (Word)
+│   ├── reference_sources_and_wp_plugins.md         # Tổng hợp nguồn tham chiếu & Plugin WordPress (Markdown)
 │   ├── project-template.md                         # Khung nội dung từng chương mục
 │   ├── project-rubric.md                           # Tiêu chí chấm điểm (100 điểm)
 │   ├── gap-analysis.md                             # Hướng dẫn GAP-Analysis & Use Case Custom (trinhtin/ec312)
 │   ├── requirements.md                             # Hướng dẫn phân rã BR -> FR -> NFR -> UC (trinhtin/ec312)
+│   ├── lab_api_notes.md                            # Lab WooCommerce REST API + Postman (trinhtin/ec312)
+│   ├── exercises_*.md                              # Bộ bài tập Use Case, Class, Sequence (trinhtin/ec312)
 │   └── build_docx.py                               # Script tự động xuất bản file Word (.docx)
 │
 ├── 01_Project_Management\                          # Bộ sườn Quản trị nhóm Scrum (4 Sprints)
