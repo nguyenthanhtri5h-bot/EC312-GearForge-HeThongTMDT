@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GearForge UI/UX Showcase – 6 Màn hình Role 3 (EC312)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="studio-bar">
+    <div class="studio-brand">
+      <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="7" fill="#0066FF"/><path d="M8 9H20V12H11V14.5H18V17.5H11V20H8V9Z" fill="white"/></svg>
+      <span>GearForge Figma Showcase (6 Frames)</span>
+    </div>
+    <div class="studio-tabs">
+      <button class="studio-tab is-active" data-screen="uc01">1. [UC-01] Home &amp; Filter</button>
+      <button class="studio-tab" data-screen="uc02">2. [UC-02] Compare 3 Máy</button>
+      <button class="studio-tab" data-screen="uc10">3. [UC-10] Chi tiết &amp; Tính góp</button>
+      <button class="studio-tab" data-screen="uc08-checkout">4. [UC-08] Checkout &amp; NĐ13</button>
+      <button class="studio-tab" data-screen="uc08-oms">5. [UC-08] OMS 7 Bước</button>
+      <button class="studio-tab" data-screen="uc11">6. [UC-11] Admin Duyệt &amp; S/N</button>
+    </div>
+    <div class="viewport-toggle">
+      <button class="vp-btn is-active" data-vp="desktop">Desktop</button>
+      <button class="vp-btn" data-vp="mobile">Mobile 375px</button>
+    </div>
+  </div>
+
+  <div class="canvas-stage">
+    <div id="artboard" class="artboard">
+      <div class="frame-caption">
+        <span>Frame: <strong id="frame-label">[UC-01] Home_Category_Filter</strong></span>
+        <span class="mono" id="vp-label">Desktop 1320px</span>
+      </div>
+
+      <header class="gf-header">
+        <div class="gf-logo">
+          <svg width="26" height="26" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="7" fill="#0066FF"/><path d="M8 9H20V12H11V14.5H18V17.5H11V20H8V9Z" fill="white"/></svg>
+          <span>GearForge</span>
+        </div>
+        <input class="gf-search" type="search" placeholder="Tìm Laptop Gaming, Đồ họa, RTX 4060, RAM 16GB..." />
+        <nav class="gf-nav">
+          <span class="active-link" onclick="switchScreen('uc01')">Cửa hàng (520 SP)</span>
+          <span onclick="switchScreen('uc02')">So sánh (3)</span>
+          <span onclick="switchScreen('uc08-oms')">Tra cứu OMS</span>
+          <span onclick="switchScreen('uc08-checkout')">Giỏ hàng</span>
+          <span onclick="switchScreen('uc11')">Admin Ops</span>
+        </nav>
+      </header>
+
+      <!-- SCREEN 1: [UC-01] Home & Category Filter -->
+      <section id="screen-uc01" class="screen is-active">
+        <div class="bento-hero">
+          <div class="hero-dark">
+            <div>
+              <span class="chip" style="background:rgba(0,102,255,0.2);color:#93c5fd;margin-bottom:10px;">ĐHQG TP.HCM • HARDWARE STORE</span>
+              <h2>Laptop &amp; PC chuẩn sinh viên — So sánh cấu hình, trả góp 0%</h2>
+              <p>Đối chiếu tối đa 3 máy theo CPU, RAM, GPU. Hồ sơ CCCD &amp; Thẻ SV mã hóa AES-256 chuẩn Nghị định 13/2023/NĐ-CP.</p>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <button class="btn btn-primary" onclick="switchScreen('uc10')">Tính trả góp ngay</button>
+                <button class="btn btn-outline" style="background:rgba(255,255,255,0.1);color:#fff;border-color:rgba(255,255,255,0.25);" onclick="switchScreen('uc02')">Mở Compare Specs</button>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:center;">
+              <svg width="230" height="146" viewBox="0 0 240 150" fill="none">
+                <rect x="28" y="12" width="184" height="108" rx="10" fill="#0F172A" stroke="#334155" stroke-width="2"/>
+                <rect x="38" y="22" width="164" height="88" rx="5" fill="#0066FF"/>
+                <polygon points="38,22 140,22 92,110 38,110" fill="white" fill-opacity="0.14"/>
+                <path d="M12 120H228L238 134H2L12 120Z" fill="#CBD5E1"/>
+              </svg>
+            </div>
+          </div>
+          <div class="hero-side-stack">
+            <div class="card" style="padding:18px;flex:1;">
+              <h3 style="font-size:15px;margin-bottom:6px;">Trả góp SV 3–6–12 tháng</h3>
+              <p style="font-size:13px;color:var(--muted);margin:0 0 10px;">Trả trước từ 20%, lãi 0% kỳ hạn 3 tháng. Duyệt 2 lớp qua Email .edu.vn &amp; SĐT.</p>
+              <a href="javascript:void(0)" onclick="switchScreen('uc10')" style="font-size:13px;font-weight:700;color:var(--cobalt);text-decoration:none;">Mở công cụ tính &rarr;</a>
+            </div>
+            <div class="card" style="padding:18px;flex:1;">
+              <h3 style="font-size:15px;margin-bottom:6px;">Bảo hành S/N &amp; Hóa đơn T-VAN</h3>
+              <p style="font-size:13px;color:var(--muted);margin:0 0 10px;">Gắn Serial Number xuất kho chống tráo linh kiện, xuất PDF VAT 10%.</p>
+              <a href="javascript:void(0)" onclick="switchScreen('uc08-oms')" style="font-size:13px;font-weight:700;color:var(--cobalt);text-decoration:none;">Xem OMS Stepper &rarr;</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="shop-split">
+          <aside class="card" style="padding:16px;align-self:start;">
+            <div class="filter-group">
+              <h4>Nhu cầu sử dụng</h4>
+              <div class="filter-pills">
+                <button class="filter-pill is-on" data-seg="all">Tất cả (520)</button>
+                <button class="filter-pill" data-seg="van-phong">Văn phòng</button>
+                <button class="filter-pill" data-seg="gaming">Gaming</button>
+                <button class="filter-pill" data-seg="do-hoa">Đồ họa</button>
+              </div>
+            </div>
+            <div class="filter-group">
+              <h4>Dung lượng RAM</h4>
+              <div class="filter-pills">
+                <span class="chip">8GB</span>
+                <span class="chip" style="background:#eff6ff;color:var(--cobalt);">16GB</span>
+                <span class="chip">32GB</span>
+              </div>
+            </div>
+            <div class="filter-group" style="margin-bottom:0;">
+              <h4>Card đồ họa (GPU)</h4>
+              <div class="filter-pills">
+                <span class="chip">RTX 2050</span>
+                <span class="chip">RTX 3050</span>
+                <span class="chip">RTX 4050</span>
+                <span class="chip">RTX 4060</span>
+              </div>
+            </div>
+          </aside>
+          <div id="proto-product-grid" class="product-grid"></div>
+        </div>
+      </section>
+
+      <!-- SCREEN 2: [UC-02] Compare Specs 3 Devices -->
+      <section id="screen-uc02" class="screen">
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+            <div>
+              <span class="chip" style="background:#eff6ff;color:var(--cobalt);margin-bottom:4px;">UC-02 • SMART COMPARE</span>
+              <h2 style="font-size:20px;">Đối chiếu cấu hình 3 Laptop Sinh viên</h2>
+            </div>
+            <span class="chip chip-ok">Tô sáng khác biệt cấu hình</span>
+          </div>
+          <div class="table-scroll">
+            <table class="cmp-table">
+              <thead>
+                <tr>
+                  <th style="width:22%;">Thông số</th>
+                  <th style="width:26%;">ASUS Vivobook 15 OLED<br><span style="color:var(--crimson);" class="tabular">15.990.000đ</span></th>
+                  <th style="width:26%;">Lenovo LOQ 15IAX9 Gaming<br><span style="color:var(--crimson);" class="tabular">19.990.000đ</span></th>
+                  <th style="width:26%;">Acer Nitro V 15<br><span style="color:var(--crimson);" class="tabular">22.490.000đ</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Trả góp SV 0% (3 tháng)</strong></td>
+                  <td><span class="chip chip-ok tabular">4.264.000đ/th</span></td>
+                  <td><span class="chip chip-ok tabular">5.331.000đ/th</span></td>
+                  <td><span class="chip chip-ok tabular">5.997.000đ/th</span></td>
+                </tr>
+                <tr class="cmp-diff">
+                  <td><strong>CPU</strong></td>
+                  <td>Intel Core i5-13500H</td>
+                  <td>Intel Core i5-12450HX</td>
+                  <td>Intel Core i5-13420H</td>
+                </tr>
+                <tr><td><strong>RAM</strong></td><td>16GB DDR4</td><td>16GB DDR5</td><td>16GB DDR5</td></tr>
+                <tr class="cmp-diff">
+                  <td><strong>GPU</strong></td>
+                  <td>Intel Iris Xe</td>
+                  <td>NVIDIA RTX 3050 6GB</td>
+                  <td>NVIDIA RTX 4050 6GB</td>
+                </tr>
+                <tr class="cmp-diff">
+                  <td><strong>Màn hình</strong></td>
+                  <td>15.6" OLED FHD</td>
+                  <td>15.6" FHD 144Hz</td>
+                  <td>15.6" FHD 144Hz</td>
+                </tr>
+                <tr>
+                  <td><strong>Thao tác</strong></td>
+                  <td><button class="btn btn-primary" onclick="switchScreen('uc10')">Chọn góp SV</button></td>
+                  <td><button class="btn btn-primary" onclick="switchScreen('uc10')">Chọn góp SV</button></td>
+                  <td><button class="btn btn-primary" onclick="switchScreen('uc10')">Chọn góp SV</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN 3: [UC-10] Product Detail & Installment Calculator -->
+      <section id="screen-uc10" class="screen">
+        <div class="detail-grid">
+          <div class="card">
+            <div class="p-thumb" style="padding:36px;margin-bottom:14px;">
+              <svg width="240" height="150" viewBox="0 0 240 150" fill="none">
+                <rect x="28" y="12" width="184" height="108" rx="10" fill="#0F172A" stroke="#334155" stroke-width="2"/>
+                <rect x="38" y="22" width="164" height="88" rx="5" fill="#0066FF"/>
+                <polygon points="38,22 140,22 92,110 38,110" fill="white" fill-opacity="0.14"/>
+                <path d="M12 120H228L238 134H2L12 120Z" fill="#CBD5E1"/>
+              </svg>
+            </div>
+            <h2 style="font-size:20px;margin-bottom:8px;">Lenovo LOQ 15IAX9 Gaming (16GB / 512GB)</h2>
+            <div style="font-size:22px;font-weight:800;color:var(--crimson);margin-bottom:10px;" class="tabular">19.990.000đ <s style="color:#94a3b8;font-size:14px;">20.990.000đ</s></div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+              <span class="chip">Core i5-12450HX</span>
+              <span class="chip">16GB DDR5</span>
+              <span class="chip">RTX 3050 6GB</span>
+              <span class="chip">15.6" 144Hz</span>
+              <span class="chip chip-ok">Còn 18 máy (S/N chính hãng)</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <span class="chip" style="background:#eff6ff;color:var(--cobalt);margin-bottom:8px;">UC-10 • TRẢ GÓP SINH VIÊN</span>
+            <h3 style="font-size:18px;margin-bottom:14px;">Tính toán &amp; Đăng ký Trả góp (3–6–12 tháng)</h3>
+            <div class="form-2col">
+              <div>
+                <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;">Tỷ lệ trả trước</label>
+                <select id="calc-down" class="inp">
+                  <option value="20">20% (Tối thiểu)</option>
+                  <option value="30" selected>30% (Khuyên dùng)</option>
+                  <option value="50">50%</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;">Kỳ hạn góp</label>
+                <select id="calc-months" class="inp">
+                  <option value="3">3 tháng (0% lãi)</option>
+                  <option value="6" selected>6 tháng (1.2%/tháng)</option>
+                  <option value="12">12 tháng (1.5%/tháng)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="calc-kpis tabular">
+              <div><span>Trả trước ngay</span><strong id="kpi-down">5.997.000đ</strong></div>
+              <div><span>Gốc vay còn lại</span><strong id="kpi-loan">13.993.000đ</strong></div>
+              <div><span>Góp hàng tháng</span><strong id="kpi-monthly" style="color:var(--cobalt);">2.500.000đ/th</strong></div>
+            </div>
+
+            <button class="btn btn-primary" style="width:100%;" onclick="switchScreen('uc08-checkout')">Tiếp tục nộp hồ sơ &amp; Xác nhận NĐ 13/2023 &rarr;</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN 4: [UC-08] Cart, Checkout & Consent NĐ 13/2023 -->
+      <section id="screen-uc08-checkout" class="screen">
+        <div class="checkout-grid">
+          <div class="card">
+            <span class="chip" style="background:#eff6ff;color:var(--cobalt);margin-bottom:6px;">UC-08 • CHECKOUT &amp; NĐ 13/2023</span>
+            <h3 style="font-size:18px;margin-bottom:14px;">Hồ sơ Trả góp Sinh viên &amp; Consent Bảo mật</h3>
+            <div class="form-2col">
+              <input class="inp" type="text" value="24521838" placeholder="MSSV" />
+              <input class="inp" type="email" value="24521838@gm.uit.edu.vn" placeholder="Email .edu.vn" />
+            </div>
+            <div class="form-2col">
+              <input class="inp" type="text" value="079204008888" placeholder="Số CCCD 12 số" />
+              <input class="inp" type="tel" value="0909123456" placeholder="SĐT xác nhận Lớp 2" />
+            </div>
+            <div class="form-2col">
+              <div style="border:1px dashed #cbd5e1;border-radius:10px;padding:12px;font-size:12px;color:var(--muted);">
+                <strong>Ảnh CCCD gắn chip:</strong><br/>cccd_mat_truoc.jpg (1.4MB • JPG)
+              </div>
+              <div style="border:1px dashed #cbd5e1;border-radius:10px;padding:12px;font-size:12px;color:var(--muted);">
+                <strong>Ảnh Thẻ Sinh viên:</strong><br/>the_sv_uit.jpg (920KB • JPG)
+              </div>
+            </div>
+
+            <div class="consent-box">
+              <strong>Thông báo Xử lý Dữ liệu Cá nhân (Nghị định 13/2023/NĐ-CP):</strong><br/>
+              GearForge mã hóa tệp ảnh CCCD &amp; Thẻ SV bằng chuẩn <strong>AES-256-CBC</strong> bên ngoài webroot (<code>/var/www/gf-vault</code>). Chỉ <code>InstallmentReviewer</code> được cấp quyền giải mã để xét duyệt 2 lớp.
+              <label style="display:flex;gap:8px;align-items:flex-start;margin-top:8px;font-weight:700;cursor:pointer;">
+                <input id="proto-consent-check" type="checkbox" style="margin-top:2px;" />
+                <span>Tôi đồng ý với Điều khoản bảo vệ dữ liệu cá nhân nêu trên (Bắt buộc).</span>
+              </label>
+            </div>
+
+            <div id="proto-checkout-status" style="margin-bottom:10px;"></div>
+            <button id="proto-submit-app" class="btn btn-primary" style="width:100%;" disabled>Nộp hồ sơ Trả góp Sinh viên (Duyệt 2 lớp)</button>
+          </div>
+
+          <div class="card" style="align-self:start;">
+            <h3 style="font-size:16px;margin-bottom:12px;">Tóm tắt đơn hàng</h3>
+            <div style="font-size:13px;line-height:1.8;" class="tabular">
+              <div style="display:flex;justify-content:space-between;"><span>Lenovo LOQ 15IAX9</span><strong>19.990.000đ</strong></div>
+              <div style="display:flex;justify-content:space-between;color:var(--emerald);"><span>Coupon <code>BACKTOSCHOOL</code></span><strong>-500.000đ</strong></div>
+              <hr style="border:none;border-top:1px solid var(--border);margin:10px 0;" />
+              <div style="display:flex;justify-content:space-between;font-size:15px;"><span>Tổng đơn hàng</span><strong>19.490.000đ</strong></div>
+              <div style="display:flex;justify-content:space-between;color:var(--cobalt);margin-top:4px;"><span>Trả trước (30%)</span><strong>5.847.000đ</strong></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN 5: [UC-08] OMS 7-Step Tracking -->
+      <section id="screen-uc08-oms" class="screen">
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+            <div>
+              <span class="chip" style="background:#eff6ff;color:var(--cobalt);margin-bottom:4px;">UC-08 / UC-09 • OMS STEPPER</span>
+              <h2 style="font-size:20px;">Theo dõi Đơn hàng <span class="mono">#545</span></h2>
+            </div>
+            <span class="chip chip-ok mono">ORDER: SERIAL_ASSIGNED</span>
+          </div>
+
+          <div class="oms-steps">
+            <div class="oms-step done"><div class="oms-dot">1</div><div>CREATED</div></div>
+            <div class="oms-step done"><div class="oms-dot">2</div><div>APPROVAL</div></div>
+            <div class="oms-step done"><div class="oms-dot">3</div><div>PROCESSING</div></div>
+            <div class="oms-step done"><div class="oms-dot">4</div><div>SERIAL_ASSIGNED</div></div>
+            <div class="oms-step"><div class="oms-dot">5</div><div>SHIPPING</div></div>
+            <div class="oms-step"><div class="oms-dot">6</div><div>DELIVERED</div></div>
+            <div class="oms-step"><div class="oms-dot">7</div><div>COMPLETED</div></div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;" class="form-2col">
+            <div style="background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:14px;">
+              <h4 style="font-size:14px;margin-bottom:8px;">Tiến độ Duyệt 2 lớp &amp; Thanh toán 3DS</h4>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                <span class="chip chip-ok">L1_DOCS_VERIFIED</span>
+                <span class="chip chip-ok">L2_EDU_CONFIRMED</span>
+                <span class="chip chip-ok">ACTIVE_INSTALLMENT (VNPay 3DS)</span>
+              </div>
+            </div>
+            <div style="background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:14px;">
+              <h4 style="font-size:14px;margin-bottom:8px;">Serial Number (S/N) &amp; Hóa đơn T-VAN</h4>
+              <div style="font-size:13px;" class="mono">S/N: <strong>SN-GF-E2E-545</strong> (BH 24 tháng)</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN 6: [UC-11] Admin Review & S/N Assignment -->
+      <section id="screen-uc11" class="screen">
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+            <div>
+              <span class="chip" style="background:#eff6ff;color:var(--cobalt);margin-bottom:4px;">UC-11 / UC-12 • ADMIN OPS (RBAC)</span>
+              <h2 style="font-size:20px;">Duyệt Trả góp 2 Lớp &amp; Ràng buộc Serial Number</h2>
+            </div>
+            <span class="chip chip-ok">Role: InstallmentReviewer</span>
+          </div>
+
+          <div class="table-scroll">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Hồ sơ / Đơn</th>
+                  <th>Sinh viên (.edu.vn)</th>
+                  <th>Vault AES-256</th>
+                  <th>Trạng thái 2 lớp</th>
+                  <th>Thao tác duyệt tuần tự</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="mono">#APP-02 / #543</td>
+                  <td><strong>24521838</strong><br/>24521838@gm.uit.edu.vn</td>
+                  <td><span class="chip">Giải mã xem CCCD</span> <span class="chip">Thẻ SV</span></td>
+                  <td><span id="admin-app-status" class="chip chip-warn">SUBMITTED</span></td>
+                  <td style="display:flex;gap:6px;flex-wrap:wrap;">
+                    <button id="admin-l1-btn" class="btn btn-primary">1. Duyệt Lớp 1</button>
+                    <button id="admin-l2-btn" class="btn btn-emerald" disabled>2. Duyệt Lớp 2 (.edu.vn)</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <strong style="font-size:13px;">Ràng buộc S/N xuất kho (#543):</strong>
+            <input id="admin-sn-input" class="inp mono" style="min-width:265px;max-width:285px;" type="text" placeholder="Nhập S/N (VD: SN-GF-2026-543)" />
+            <button id="admin-ship-btn" class="btn btn-outline">Thử chuyển SHIPPING</button>
+            <span id="admin-sn-msg"></span>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

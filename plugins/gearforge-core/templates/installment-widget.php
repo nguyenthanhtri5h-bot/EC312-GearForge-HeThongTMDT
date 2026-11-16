@@ -32,7 +32,7 @@ $initial_calc  = GF_Installment_Calc::calculate($initial_price, 30, 6);
                 <?php if (!empty($plans)): ?>
                     <?php foreach ($plans as $pl): ?>
                         <option value="<?php echo esc_attr((string) $pl['duration_months']); ?>" <?php selected((int) $pl['duration_months'], 6); ?>>
-                            <?php echo esc_html($pl['plan_name']); ?> (<?php echo esc_html((string) $pl['monthly_interest_pct']); ?>%/th)
+                            <?php echo esc_html((string) $pl['duration_months']); ?> tháng (<?php echo esc_html((string) $pl['monthly_interest_pct']); ?>%/tháng)
                         </option>
                     <?php endforeach; ?>
                 <?php else: ?>

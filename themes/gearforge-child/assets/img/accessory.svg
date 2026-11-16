@@ -1,16 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 280" width="400" height="280">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 320" width="480" height="320">
   <defs>
-    <linearGradient id="bgacc" x1="0" y1="0" x2="1" y2="1">
+    <radialGradient id="studioGear" cx="50%" cy="45%" r="60%">
       <stop offset="0%" stop-color="#1e293b"/>
-      <stop offset="100%" stop-color="#0f2942"/>
-    </linearGradient>
+      <stop offset="100%" stop-color="#0b1220"/>
+    </radialGradient>
   </defs>
-  <rect width="400" height="280" rx="16" fill="url(#bgacc)"/>
-  <rect x="65" y="96" width="180" height="90" rx="10" fill="#0f172a" stroke="#38bdf8" stroke-width="3"/>
-  <rect x="80" y="112" width="150" height="16" rx="3" fill="#38bdf8" opacity="0.4"/>
-  <rect x="80" y="136" width="150" height="16" rx="3" fill="#38bdf8" opacity="0.3"/>
-  <rect x="80" y="160" width="90" height="12" rx="3" fill="#f59e0b" opacity="0.6"/>
-  <rect x="270" y="88" width="66" height="106" rx="33" fill="#0f172a" stroke="#f59e0b" stroke-width="3"/>
-  <line x1="303" y1="98" x2="303" y2="128" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"/>
-  <text x="200" y="232" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#e0f2fe" text-anchor="middle">GAMING GEAR &amp; ACCESSORIES</text>
+  <rect width="480" height="320" rx="14" fill="url(#studioGear)"/>
+  <ellipse cx="240" cy="238" rx="165" ry="12" fill="#000000" opacity="0.45"/>
+  <!-- Mechanical Keyboard -->
+  <rect x="54" y="102" width="256" height="114" rx="12" fill="#1e293b" stroke="#475569" stroke-width="2.5"/>
+  <rect x="68" y="116" width="228" height="20" rx="4" fill="#334155"/>
+  <rect x="68" y="142" width="228" height="20" rx="4" fill="#334155"/>
+  <rect x="68" y="168" width="160" height="20" rx="4" fill="#334155"/>
+  <rect x="234" y="168" width="62" height="20" rx="4" fill="#0066ff"/>
+  <rect x="112" y="194" width="110" height="12" rx="4" fill="#0284c7"/>
+  <!-- Wireless Mouse -->
+  <rect x="338" y="92" width="84" height="128" rx="42" fill="#0f172a" stroke="#38bdf8" stroke-width="2.5"/>
+  <line x1="338" y1="142" x2="422" y2="142" stroke="#334155" stroke-width="2"/>
+  <rect x="376" y="106" width="8" height="24" rx="4" fill="#0066ff"/>
+  <text x="240" y="286" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="600" letter-spacing="2" fill="#94a3b8" text-anchor="middle">GAMING GEAR &amp; PERIPHERALS</text>
 </svg>

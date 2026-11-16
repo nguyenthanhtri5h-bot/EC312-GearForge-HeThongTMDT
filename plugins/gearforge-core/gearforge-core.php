@@ -70,7 +70,8 @@ final class GF_Core {
         add_shortcode('gearforge_oms_tracking', [self::class, 'render_oms_shortcode']);
 
         add_action('woocommerce_single_product_summary', [self::class, 'render_product_installment_preview'], 25);
-        add_action('woocommerce_after_shop_loop_item', [self::class, 'render_loop_product_badges'], 15);
+        add_action('woocommerce_after_shop_loop_item', [self::class, 'render_loop_product_badges'], 5);
+        add_action('woocommerce_after_shop_loop_item', [self::class, 'render_loop_compare_button'], 15);
         add_action('woocommerce_order_details_before_order_table', [self::class, 'render_my_account_oms_stepper'], 10, 1);
     }
 
@@ -284,13 +285,24 @@ final class GF_Core {
 
         $specs = array_filter([$cpu, $ram, $gpu]);
         if (!empty($specs)) {
-            echo '<div class="gf-card-specs">' . esc_html(implode(' • ', $specs)) . '</div>';
+            echo '<div class="gf-card-specs">';
+            foreach ($specs as $sp) {
+                echo '<span class="gf-spec-chip">' . esc_html($sp) . '</span>';
+            }
+            echo '</div>';
         }
         if ($price >= 3000000) {
-            $calc = GF_Installment_Calc::calculate($price, 20, 6);
-            echo '<div class="gf-card-installment-tag">Góp SV từ ' . esc_html(number_format($calc['monthly_amount'], 0, ',', '.')) . 'đ/th</div>';
+            $calc = GF_Installment_Calc::calculate($price, 20, 3);
+            echo '<div class="gf-card-installment-tag">Góp SV 0%: ' . esc_html(number_format($calc['monthly_amount'], 0, ',', '.')) . 'đ/th</div>';
         }
-        echo '<button type="button" class="gf-btn-compare-card gf-add-compare" data-product-id="' . esc_attr((string) $product->get_id()) . '">So sánh</button>';
+    }
+
+    public static function render_loop_compare_button(): void {
+        global $product;
+        if (!$product instanceof WC_Product) {
+            return;
+        }
+        echo '<button type="button" class="gf-btn-compare-card gf-add-compare" data-product-id="' . esc_attr((string) $product->get_id()) . '">+ So sánh cấu hình</button>';
     }
 
     public static function render_my_account_oms_stepper(WC_Order $order): void {
