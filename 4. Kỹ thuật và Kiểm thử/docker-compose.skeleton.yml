@@ -23,7 +23,7 @@ services:
       - gearforge_net
 
   wordpress:
-    image: wordpress:6.6-php8.2-apache
+    image: wordpress:php8.2-apache
     container_name: gearforge_wp
     depends_on:
       db:

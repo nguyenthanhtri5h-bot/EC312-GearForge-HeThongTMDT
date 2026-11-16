@@ -1,0 +1,75 @@
+# GearForge EC312 - Docker Compose Environment (WordPress + WooCommerce + MySQL 8.0 + phpMyAdmin)
+# Chay: docker compose up -d
+# Truy cap: Web http://localhost:8080 | phpMyAdmin http://localhost:8081
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: gearforge_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${GF_DB_NAME:-gearforge_db}
+      MYSQL_USER: ${GF_DB_USER:-gf_user}
+      MYSQL_PASSWORD: ${GF_DB_PASSWORD:-gf_local_pass_2026}
+      MYSQL_ROOT_PASSWORD: ${GF_DB_ROOT_PASSWORD:-gf_root_pass_2026}
+    volumes:
+      - gf_db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - gearforge_net
+
+  wordpress:
+    image: wordpress:php8.2-apache
+    container_name: gearforge_wp
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    ports:
+      - "${GF_WP_PORT:-8080}:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: ${GF_DB_NAME:-gearforge_db}
+      WORDPRESS_DB_USER: ${GF_DB_USER:-gf_user}
+      WORDPRESS_DB_PASSWORD: ${GF_DB_PASSWORD:-gf_local_pass_2026}
+      WORDPRESS_TABLE_PREFIX: wp_
+      GF_VAULT_ENCRYPTION_KEY: ${GF_VAULT_ENCRYPTION_KEY}
+      GF_VAULT_DIR: /var/www/gf-vault
+      GF_SANDBOX_HMAC_SECRET: ${GF_SANDBOX_HMAC_SECRET}
+    volumes:
+      - gf_wp_data:/var/www/html
+      - ./plugins/gearforge-core:/var/www/html/wp-content/plugins/gearforge-core
+      - ./themes/gearforge-child:/var/www/html/wp-content/themes/gearforge-child
+      - ./gf-vault:/var/www/gf-vault
+      - ./data:/var/www/gf-data:ro
+    networks:
+      - gearforge_net
+
+  phpmyadmin:
+    image: phpmyadmin:5.2
+    container_name: gearforge_pma
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    ports:
+      - "${GF_PMA_PORT:-8081}:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: ${GF_DB_USER:-gf_user}
+      PMA_PASSWORD: ${GF_DB_PASSWORD:-gf_local_pass_2026}
+      UPLOAD_LIMIT: 64M
+    networks:
+      - gearforge_net
+
+volumes:
+  gf_db_data:
+  gf_wp_data:
+
+networks:
+  gearforge_net:
+    driver: bridge

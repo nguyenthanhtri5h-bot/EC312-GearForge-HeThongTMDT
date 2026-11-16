@@ -1,0 +1,111 @@
+{
+  "info": {
+    "name": "GearForge EC312 - WooCommerce & Custom Installment API",
+    "description": "Postman Collection aligned with trinhtin/ec312 lab_api_notes.md for GearForge (WordPress + WooCommerce + gearforge-core).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8080" },
+    { "key": "wc_consumer_key", "value": "ck_replace_with_your_key" },
+    { "key": "wc_consumer_secret", "value": "cs_replace_with_your_secret" },
+    { "key": "order_id", "value": "1" },
+    { "key": "product_id", "value": "10" }
+  ],
+  "item": [
+    {
+      "name": "1. GearForge Custom API - Calculate Student Installment (TC-12)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/wp-json/gearforge/v1/installment-calc?price=20000000&down_pct=30&months=6",
+          "host": ["{{base_url}}"],
+          "path": ["wp-json", "gearforge", "v1", "installment-calc"],
+          "query": [
+            { "key": "price", "value": "20000000" },
+            { "key": "down_pct", "value": "30" },
+            { "key": "months", "value": "6" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "2. GearForge Custom API - Get OMS + 2-Layer Installment + S/N Status",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/wp-json/gearforge/v1/oms-status/{{order_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["wp-json", "gearforge", "v1", "oms-status", "{{order_id}}"]
+        }
+      }
+    },
+    {
+      "name": "3. WooCommerce REST v3 - GET All Products (500+ Catalog)",
+      "request": {
+        "auth": {
+          "type": "oauth1",
+          "oauth1": [
+            { "key": "consumerKey", "value": "{{wc_consumer_key}}", "type": "string" },
+            { "key": "consumerSecret", "value": "{{wc_consumer_secret}}", "type": "string" },
+            { "key": "signatureMethod", "value": "HMAC-SHA1", "type": "string" }
+          ]
+        },
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/wp-json/wc/v3/products?per_page=20&page=1",
+          "host": ["{{base_url}}"],
+          "path": ["wp-json", "wc", "v3", "products"],
+          "query": [
+            { "key": "per_page", "value": "20" },
+            { "key": "page", "value": "1" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "4. WooCommerce REST v3 - POST Create Laptop Product",
+      "request": {
+        "auth": {
+          "type": "oauth1",
+          "oauth1": [
+            { "key": "consumerKey", "value": "{{wc_consumer_key}}", "type": "string" },
+            { "key": "consumerSecret", "value": "{{wc_consumer_secret}}", "type": "string" },
+            { "key": "signatureMethod", "value": "HMAC-SHA1", "type": "string" }
+          ]
+        },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Laptop ASUS Vivobook Test API\",\n  \"type\": \"simple\",\n  \"regular_price\": \"15990000\",\n  \"description\": \"Demo tao san pham qua WooCommerce REST API v3\",\n  \"short_description\": \"i5-13500H | 16GB | 512GB SSD\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/wp-json/wc/v3/products",
+          "host": ["{{base_url}}"],
+          "path": ["wp-json", "wc", "v3", "products"]
+        }
+      }
+    },
+    {
+      "name": "5. WooCommerce REST v3 - GET Orders (OMS)",
+      "request": {
+        "auth": {
+          "type": "oauth1",
+          "oauth1": [
+            { "key": "consumerKey", "value": "{{wc_consumer_key}}", "type": "string" },
+            { "key": "consumerSecret", "value": "{{wc_consumer_secret}}", "type": "string" },
+            { "key": "signatureMethod", "value": "HMAC-SHA1", "type": "string" }
+          ]
+        },
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/wp-json/wc/v3/orders",
+          "host": ["{{base_url}}"],
+          "path": ["wp-json", "wc", "v3", "orders"]
+        }
+      }
+    }
+  ]
+}

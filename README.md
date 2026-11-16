@@ -78,3 +78,12 @@ Kho GitHub đã tạo sẵn **4 nhánh độc quyền** tương ứng 4 Issues (
 ### Bước 5: Kiểm thử & Ghép bài hoàn chỉnh vào Master Report
 - Chạy đủ 16 Test Cases trong [Kế hoạch kiểm thử 16 Test Cases.md](<4. Kỹ thuật và Kiểm thử/Kế hoạch kiểm thử 16 Test Cases.md>).
 - Mỗi Role viết phần bài gắn thẻ `[Role X viết]` ra file nháp riêng trên Drive (`Nháp Role X - Họ Tên.docx`), sau đó Role 1 & Role 2 ghép sạch vào [Khung báo cáo đồ án EC312 GearForge.md](<3. Khung báo cáo đồ án EC312/Khung báo cáo đồ án EC312 GearForge.md>) và bản `.docx`.
+
+---
+
+## 4. CHẠY NHANH MÔI TRƯỜNG DEMO LOCAL (DOCKER + WOOCOMMERCE + 520 SẢN PHẨM)
+
+1. Copy `.env.example` thành `.env` và điền khóa AES-256-CBC 64 ký tự hex (`GF_VAULT_ENCRYPTION_KEY`) cùng mật khẩu DB cục bộ.
+2. Khởi chạy hệ thống: `docker compose up -d` → Truy cập Web Storefront tại `http://localhost:8080` và phpMyAdmin tại `http://localhost:8081`.
+3. Import dữ liệu 520 sản phẩm mẫu: `docker exec gearforge_wp wp eval-file /var/www/gf-data/import_products.php --allow-root`.
+4. Kiểm thử tự động toàn luồng & REST API: sử dụng [GearForge_EC312.postman_collection.json](<4. Kỹ thuật và Kiểm thử/GearForge_EC312.postman_collection.json>), [verify_gearforge.php](<4. Kỹ thuật và Kiểm thử/verify_gearforge.php>) và [verify_http.py](<4. Kỹ thuật và Kiểm thử/verify_http.py>).
