@@ -5,7 +5,7 @@
 
 # Encrypted ID Vault (Chứa ảnh CCCD / Thẻ sinh viên mã hóa theo NĐ 13/2023)
 gf-vault/
-04_Technical_and_QA_Skeleton/gf-vault/
+4. Kỹ thuật và Kiểm thử/gf-vault/
 
 # WordPress & Docker runtime data
 wp-content/uploads/

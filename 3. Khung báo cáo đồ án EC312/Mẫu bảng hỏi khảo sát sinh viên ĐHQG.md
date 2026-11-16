@@ -83,7 +83,7 @@ Khảo sát chỉ mất khoảng **2 phút**, mọi thông tin bạn cung cấp 
 11. **Phương thức thanh toán trực tuyến bạn thường dùng nhất là gì?** *(Chọn tối đa 2)*
     - [ ] Ví điện tử (MoMo, ZaloPay...)
     - [ ] Chuyển khoản / Quét mã QR ngân hàng (VNPay-QR / VietQR)
-    - [ ] Cổng mua trước trả sau (Fundiin, Kredivo...)
+    - [ ] Cổng mua trước trả sau (Fundiin...)
     - [ ] Thanh toán khi nhận hàng (COD)
 
 12. **Bạn có góp ý thêm tính năng nào cho website bán Laptop/PC dành cho sinh viên không?** *(Câu hỏi mở – Không bắt buộc)*

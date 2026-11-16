@@ -192,6 +192,14 @@ classDiagram
         +calculateTotal()
     }
 
+    class CartItem {
+        +int cartItemId
+        +string cartId
+        +int productId
+        +int quantity
+        +decimal unitPrice
+    }
+
     class Order {
         +int orderId
         +int userId
@@ -263,7 +271,8 @@ classDiagram
     User "1" --> "0..*" InstallmentApplication : submits
     Product "1" *-- "1" ProductSpecAttribute : has
     ComparisonSession "0..*" o-- "2..3" Product : compares
-    Cart "1" *-- "0..*" Product : contains
+    Cart "1" *-- "0..*" CartItem : contains
+    CartItem "0..*" --> "1" Product : references
     Order "1" *-- "1..*" OrderItem : consists of
     OrderItem "0..*" --> "1" Product : references
     Order "1" --> "0..1" InstallmentApplication : uses
