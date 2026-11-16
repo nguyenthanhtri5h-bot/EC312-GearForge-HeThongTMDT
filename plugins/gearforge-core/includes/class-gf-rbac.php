@@ -18,10 +18,18 @@ class GF_RBAC {
 
     public static function init(): void {
         add_action('init', [self::class, 'ensure_admin_caps']);
+        add_filter('woocommerce_prevent_admin_access', [self::class, 'allow_ops_admin_access'], 20);
         add_action('show_user_profile', [self::class, 'render_edu_email_field']);
         add_action('edit_user_profile', [self::class, 'render_edu_email_field']);
         add_action('personal_options_update', [self::class, 'save_edu_email_field']);
         add_action('edit_user_profile_update', [self::class, 'save_edu_email_field']);
+    }
+
+    public static function allow_ops_admin_access(bool $prevent_access): bool {
+        if (self::can_review_installments() || self::can_assign_serial()) {
+            return false;
+        }
+        return $prevent_access;
     }
 
     public static function register_roles_and_caps(): void {

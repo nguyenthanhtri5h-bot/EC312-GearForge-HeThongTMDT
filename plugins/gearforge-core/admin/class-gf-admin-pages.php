@@ -156,7 +156,7 @@ class GF_Admin_Pages {
                                         <input type="hidden" name="order_item_id" value="<?php echo esc_attr((string) $item_id); ?>" />
                                         <input type="hidden" name="product_id" value="<?php echo esc_attr((string) $item->get_product_id()); ?>" />
                                         <div><strong><?php echo esc_html($item->get_name()); ?></strong> (SL: <?php echo esc_html((string) $item->get_quantity()); ?>)</div>
-                                        <input type="text" name="serial_number" placeholder="Nhập S/N (VD: SN-GF-2026-001)" required />
+                                        <input type="text" name="serial_number" placeholder="Nhập S/N (VD: SN-GF-2026-001)" style="min-width:215px;" required />
                                         <input type="number" name="warranty_months" value="24" min="1" max="60" style="width:70px;" /> tháng
                                         <button type="submit" class="button button-primary">Lưu S/N</button>
                                     </form>

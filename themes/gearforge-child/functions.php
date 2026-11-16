@@ -197,3 +197,7 @@ add_action('wp_footer', static function (): void {
     </script>
     <?php
 }, 20);
+
+add_filter('woocommerce_order_button_text', static function (): string {
+    return 'Đặt hàng ngay';
+});
