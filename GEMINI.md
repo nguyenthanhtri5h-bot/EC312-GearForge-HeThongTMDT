@@ -56,3 +56,23 @@
 | **Role 2** | SM / Architect / QA | **0–5% Code** | `role2-security-qa` | `UC-04`, **`UC-05 ★`** (RBAC/NĐ 13/Fraud), `UC-06`; Kiến trúc, Class, State, 16 Test Cases, Nhật ký Scrum; **Giữ quyền merge vào `main`** |
 | **Role 3** | Dev 1 (UI/UX & FE) | **Ít Code** (Figma/CSS) | `role3-ui-frontend` | `UC-07`, **`UC-08 ★`** (Checkout & OMS), `UC-09`; 6 màn Figma, Theme & `templates/`, `assets/` |
 | **Role 4** | Dev 2 (Backend & DB) | **Code PHP/MySQL** | `role4-backend-payment` | **`UC-10 ★`** (Trả góp SV), `UC-11`, `UC-12`; ERD, 4 bảng `wp_gf_*`, `includes/`, Sandbox, S/N, PDF |
+
+---
+
+## 5. TRẠNG THÁI TRIỂN KHAI HIỆN TẠI (CẬP NHẬT TỚI 16/11/2026)
+
+- **Trạng thái Docker Live (`http://localhost:8080/` & phpMyAdmin `http://localhost:8081/`):**
+  - Đã dựng sạch trên `gearforge_net` (`gearforge_wp`, `gearforge_mysql`, `gearforge_pma`), tách biệt hoàn toàn khỏi cụm CRM (`crm_*`) và `wp_app:8000`.
+  - Đã import **520 sản phẩm** (`260 Laptop`, `110 PC`, `150 Phụ kiện`), tiền tệ VND, mã `BACKTOSCHOOL`, 3 tài khoản test (`student_test`, `reviewer_test`, `staff_test`).
+- **Bảo mật & Kiểm thử tự động (sau `b9f085d`):**
+  - Đã vá IDOR `order_id`, lỗ hổng guest `0 === 0` ở PDF/OMS, HMAC `$mode` trong Sandbox 3DS, rate limit theo IP, REST validation và hỗ trợ Classic Checkout.
+  - `php -l`: sạch lỗi trên 17 file PHP (`gearforge-core` + `gearforge-child`).
+  - `verify_gearforge.php`: **16/16 checks PASS**; `verify_http.py`: **10/10 checks PASS**.
+- **Giao diện UI/UX & Figma Showcase (sau `4bb5f96`):**
+  - Khóa spec thiết kế trong `DESIGN.md` (`#0B1220` Obsidian + `#FFFFFF` + `#0066FF` Cobalt; `Plus Jakarta Sans` / `Inter` / `JetBrains Mono`).
+  - Đại tu WordPress Storefront Child Theme (`themes/gearforge-child/`) + SVG hardware (`laptop.svg`, `pc.svg`, `accessory.svg`) + layout Left Filter Sidebar (`260px`) / Fullwidth Single Product & Checkout / Bento Hero / Sort mặc định `price-desc`.
+  - Hoàn thiện bộ **Prototype 6 màn hình Role 3** tại `figma-prototype/` (`index.html`, `styles.css`, `app.js`) có Desktop `1320px` & Mobile `375px`; đã kiểm tra trực quan Playwright (`overflowX = False`, `brokenImgs = 0`, không lỗi console).
+- **Việc còn chờ nhóm / phiên sau:**
+  1. Điền tên thật + MSSV 4 thành viên sau khi chốt vote Zalo (Nguyễn Thanh Trí `24521838` ưu tiên Role 3; tuyệt đối không tự bịa tên thành viên).
+  2. Chốt phương án Figma cho Role 3 (`figma_figma` MCP hiện có `send_code_to_figma` dạng Figma Make/Code Layer trên `team::1552131145446902151` với `seat: View`, hoặc dùng `figma-prototype/index.html` xuất ảnh / plugin `html.to.design`).
+  3. Hoàn thiện phần viết báo cáo chi tiết các chương còn lại trong `3. Khung báo cáo đồ án EC312/` và đồng bộ bản `.docx` lên Drive `MONCUATHAYTIN`.
