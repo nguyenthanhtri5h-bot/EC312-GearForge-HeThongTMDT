@@ -68,10 +68,10 @@
   - Đã vá IDOR `order_id`, lỗ hổng guest `0 === 0` ở PDF/OMS, HMAC `$mode` trong Sandbox 3DS, rate limit theo IP, REST validation và hỗ trợ Classic Checkout.
   - `php -l`: sạch lỗi trên 17 file PHP (`gearforge-core` + `gearforge-child`).
   - `verify_gearforge.php`: **16/16 checks PASS**; `verify_http.py`: **10/10 checks PASS**.
-- **Giao diện UI/UX & Figma Showcase (sau `4bb5f96`):**
+- **Giao diện UI/UX & Figma Showcase (sau `8be7102`):**
   - Khóa spec thiết kế trong `DESIGN.md` (`#0B1220` Obsidian + `#FFFFFF` + `#0066FF` Cobalt; `Plus Jakarta Sans` / `Inter` / `JetBrains Mono`).
-  - Đại tu WordPress Storefront Child Theme (`themes/gearforge-child/`) + SVG hardware (`laptop.svg`, `pc.svg`, `accessory.svg`) + layout Left Filter Sidebar (`260px`) / Fullwidth Single Product & Checkout / Bento Hero / Sort mặc định `price-desc`.
-  - Hoàn thiện bộ **Prototype 6 màn hình Role 3** tại `figma-prototype/` (`index.html`, `styles.css`, `app.js`) có Desktop `1320px` & Mobile `375px`; đã kiểm tra trực quan Playwright (`overflowX = False`, `brokenImgs = 0`, không lỗi console).
+  - Đại tu WordPress Storefront Child Theme (`themes/gearforge-child/`) + SVG hardware (`laptop.svg`, `pc.svg`, `accessory.svg`) + layout Left Filter Sidebar (`260px`) / Fullwidth Single Product, Cart, Checkout, Compare & OMS / Bento Hero / Sort mặc định `price-desc`, cùng quyền `woocommerce_prevent_admin_access` cho `InstallmentReviewer` và `OrderStaff` (`class-gf-rbac.php`).
+  - Hoàn thiện bộ **Prototype 6 màn hình Role 3** tại `figma-prototype/` (`index.html`, `styles.css`, `app.js`) có Desktop `1320px` & Mobile `375px`; lưu trọn bộ **17 ảnh chụp giao diện** (10 màn WordPress + 7 màn Prototype) tại `3. Khung báo cáo đồ án EC312/Ảnh chụp giao diện hệ thống/`.
 - **Việc còn chờ nhóm / phiên sau:**
   1. Điền tên thật + MSSV 4 thành viên sau khi chốt vote Zalo (Nguyễn Thanh Trí `24521838` ưu tiên Role 3; tuyệt đối không tự bịa tên thành viên).
   2. Chốt phương án Figma cho Role 3 (`figma_figma` MCP hiện có `send_code_to_figma` dạng Figma Make/Code Layer trên `team::1552131145446902151` với `seat: View`, hoặc dùng `figma-prototype/index.html` xuất ảnh / plugin `html.to.design`).
