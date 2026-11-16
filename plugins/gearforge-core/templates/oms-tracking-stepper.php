@@ -8,9 +8,46 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-$order = $order_id > 0 && function_exists('wc_get_order') ? wc_get_order($order_id) : null;
+if (!is_user_logged_in()) {
+    echo '<div class="gf-empty-state">Vui lòng <a href="' . esc_url(wc_get_page_permalink('myaccount')) . '">đăng nhập tài khoản sinh viên</a> để tra cứu đơn hàng và tiến độ trả góp OMS.</div>';
+    return;
+}
+
+if ($order_id <= 0) {
+    $my_orders = function_exists('wc_get_orders') ? wc_get_orders(['customer_id' => get_current_user_id(), 'limit' => 10, 'orderby' => 'date', 'order' => 'DESC']) : [];
+    ?>
+    <div class="gf-oms-box">
+        <div class="gf-oms-header">
+            <div>
+                <span class="gf-eyebrow">GearForge OMS Tracking</span>
+                <h3>Tra cứu tiến độ Đơn hàng &amp; Hồ sơ Trả góp Sinh viên</h3>
+            </div>
+        </div>
+        <form method="get" action="<?php echo esc_url(home_url('/tra-cuu-don-hang/')); ?>" class="gf-rma-form" style="margin-bottom:16px;">
+            <input type="number" name="order_id" min="1" placeholder="Nhập mã đơn hàng (VD: 543)..." required />
+            <button type="submit" class="gf-btn gf-btn-primary gf-btn-sm">Tra cứu đơn hàng</button>
+        </form>
+        <?php if (!empty($my_orders)): ?>
+            <h4>Đơn hàng gần đây của bạn</h4>
+            <ul>
+                <?php foreach ($my_orders as $mo): ?>
+                    <li>
+                        <a href="<?php echo esc_url(add_query_arg('order_id', $mo->get_id(), home_url('/tra-cuu-don-hang/'))); ?>">
+                            Đơn #<?php echo esc_html((string) $mo->get_id()); ?>
+                        </a> — Trạng thái: <code><?php echo esc_html(GF_Core::map_order_status($mo->get_status())); ?></code>
+                        (<?php echo esc_html(number_format((float) $mo->get_total(), 0, ',', '.')); ?>đ)
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+    </div>
+    <?php
+    return;
+}
+
+$order = function_exists('wc_get_order') ? wc_get_order($order_id) : null;
 if (!$order) {
-    echo '<div class="gf-empty-state">Không tìm thấy thông tin đơn hàng. Vui lòng kiểm tra lại mã đơn hàng.</div>';
+    echo '<div class="gf-empty-state">Không tìm thấy thông tin đơn hàng #' . esc_html((string) $order_id) . '. Vui lòng kiểm tra lại mã đơn hàng.</div>';
     return;
 }
 

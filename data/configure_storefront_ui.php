@@ -17,7 +17,21 @@ update_option('woocommerce_currency_pos', 'right_space');
 update_option('woocommerce_price_thousand_sep', '.');
 update_option('woocommerce_price_decimal_sep', ',');
 update_option('woocommerce_price_num_decimals', 0);
-echo "Published WooCommerce store & configured VND currency.\n";
+update_option('woocommerce_cod_settings', ['enabled' => 'yes', 'title' => 'Thanh toán khi nhận hàng (COD)']);
+update_option('woocommerce_gearforge_sandbox_settings', ['enabled' => 'yes', 'title' => 'Thanh toán trực tuyến (VNPay / MoMo / Fundiin Sandbox 3DS)']);
+echo "Published WooCommerce store, configured VND currency & payment gateways.\n";
+
+// Use Classic Cart/Checkout shortcodes so custom GF_Gateway_Sandbox_WC payment_fields() renders cleanly
+if (function_exists('wc_get_page_id')) {
+    $cart_id     = wc_get_page_id('cart');
+    $checkout_id = wc_get_page_id('checkout');
+    if ($cart_id > 0) {
+        wp_update_post(['ID' => $cart_id, 'post_content' => '<!-- wp:shortcode -->[woocommerce_cart]<!-- /wp:shortcode -->']);
+    }
+    if ($checkout_id > 0) {
+        wp_update_post(['ID' => $checkout_id, 'post_content' => '<!-- wp:shortcode -->[woocommerce_checkout]<!-- /wp:shortcode -->']);
+    }
+}
 
 // 1. Set Shop page as front page so visitors immediately see hero + catalog + filters
 $shop_id = function_exists('wc_get_page_id') ? wc_get_page_id('shop') : 0;

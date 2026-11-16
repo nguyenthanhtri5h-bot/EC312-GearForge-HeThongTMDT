@@ -31,12 +31,13 @@ class GF_Payment_Sandbox {
         return defined('AUTH_SALT') ? (string) AUTH_SALT : 'gf_local_sandbox_fallback_salt';
     }
 
-    public static function sign_payload(int $order_id, int $amount, string $provider): string {
-        return hash_hmac('sha256', "{$order_id}|{$amount}|{$provider}", self::get_hmac_secret());
+    public static function sign_payload(int $order_id, int $amount, string $provider, string $mode = 'full'): string {
+        return hash_hmac('sha256', "{$order_id}|{$amount}|{$provider}|{$mode}", self::get_hmac_secret());
     }
 
     public static function get_sandbox_checkout_url(int $order_id, int $amount, string $provider = 'VNPAY', string $mode = 'full'): string {
-        $sig = self::sign_payload($order_id, $amount, $provider);
+        $mode = $mode === 'downpayment' ? 'downpayment' : 'full';
+        $sig  = self::sign_payload($order_id, $amount, $provider, $mode);
         return add_query_arg([
             'gf_sandbox_3ds' => '1',
             'order_id'       => $order_id,
@@ -55,10 +56,10 @@ class GF_Payment_Sandbox {
         $order_id = (int) ($_GET['order_id'] ?? 0);
         $amount   = (int) ($_GET['amount'] ?? 0);
         $provider = strtoupper(sanitize_key((string) ($_GET['provider'] ?? 'VNPAY')));
-        $mode     = sanitize_key((string) ($_GET['mode'] ?? 'full'));
+        $mode     = sanitize_key((string) ($_GET['mode'] ?? 'full')) === 'downpayment' ? 'downpayment' : 'full';
         $sig      = sanitize_text_field((string) ($_GET['sig'] ?? ''));
 
-        $expected_sig = self::sign_payload($order_id, $amount, $provider);
+        $expected_sig = self::sign_payload($order_id, $amount, $provider, $mode);
         if (!hash_equals($expected_sig, $sig) || $order_id <= 0 || $amount <= 0) {
             wp_die('403 Forbidden: Chữ ký giao dịch Sandbox không hợp lệ (HMAC Verification Failed).', '403 Forbidden', ['response' => 403]);
         }
@@ -123,11 +124,11 @@ class GF_Payment_Sandbox {
         $order_id = (int) ($_POST['order_id'] ?? 0);
         $amount   = (int) ($_POST['amount'] ?? 0);
         $provider = strtoupper(sanitize_key((string) ($_POST['provider'] ?? 'VNPAY')));
-        $mode     = sanitize_key((string) ($_POST['mode'] ?? 'full'));
+        $mode     = sanitize_key((string) ($_POST['mode'] ?? 'full')) === 'downpayment' ? 'downpayment' : 'full';
         $sig      = sanitize_text_field((string) ($_POST['sig'] ?? ''));
         $otp      = sanitize_text_field((string) ($_POST['otp'] ?? ''));
 
-        $expected_sig = self::sign_payload($order_id, $amount, $provider);
+        $expected_sig = self::sign_payload($order_id, $amount, $provider, $mode);
         if (!hash_equals($expected_sig, $sig)) {
             wp_die('403 Forbidden: Sai chữ ký HMAC IPN.', '403 Forbidden', ['response' => 403]);
         }
@@ -138,6 +139,24 @@ class GF_Payment_Sandbox {
         $order = wc_get_order($order_id);
         if (!$order) {
             wp_die('404 Not Found', '404 Not Found', ['response' => 404]);
+        }
+
+        if ($mode === 'downpayment') {
+            global $wpdb;
+            $app = $wpdb->get_row(
+                $wpdb->prepare(
+                    "SELECT app_id, downpayment_amount, status FROM {$wpdb->prefix}gf_installment_applications WHERE order_id = %d AND status = 'APPROVED_WAITING_DOWNPAYMENT' ORDER BY app_id DESC LIMIT 1",
+                    $order_id
+                ),
+                ARRAY_A
+            );
+            if (!$app || (int) round((float) $app['downpayment_amount']) !== $amount) {
+                wp_die('400 Bad Request: Hồ sơ không ở trạng thái chờ thanh toán trả trước hoặc sai số tiền.', '400 Bad Request', ['response' => 400]);
+            }
+        } else {
+            if (!in_array($order->get_status(), ['pending', 'on-hold'], true) || (int) round((float) $order->get_total()) !== $amount) {
+                wp_die('400 Bad Request: Đơn hàng đã được xử lý hoặc số tiền thanh toán không khớp.', '400 Bad Request', ['response' => 400]);
+            }
         }
 
         $tx_id = sprintf('GF-%s-%d-%s', $provider, $order_id, substr(bin2hex(random_bytes(4)), 0, 8));

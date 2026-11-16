@@ -100,8 +100,30 @@ class GF_Installment_Review {
         }
 
         // 4. Determine order/price & create WooCommerce Order if not provided
-        $order = $order_id > 0 && function_exists('wc_get_order') ? wc_get_order($order_id) : null;
-        if (!$order) {
+        $order = null;
+        if ($order_id > 0) {
+            $order = function_exists('wc_get_order') ? wc_get_order($order_id) : null;
+            if (!$order) {
+                return new WP_Error('gf_order_not_found', 'Không tìm thấy đơn hàng để gắn hồ sơ trả góp.', ['status' => 404]);
+            }
+            if ((int) $order->get_customer_id() !== $user_id && !current_user_can('manage_woocommerce')) {
+                return new WP_Error('gf_forbidden', '403 Forbidden: Bạn không phải chủ sở hữu đơn hàng này.', ['status' => 403]);
+            }
+            global $wpdb;
+            $dup_app = $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT app_id FROM {$wpdb->prefix}gf_installment_applications
+                     WHERE order_id = %d AND status IN ('SUBMITTED','L1_DOCS_VERIFIED','L2_EDU_CONFIRMED','APPROVED_WAITING_DOWNPAYMENT','ACTIVE_INSTALLMENT')
+                     LIMIT 1",
+                    $order_id
+                )
+            );
+            if ($dup_app) {
+                return new WP_Error('gf_duplicate_application', 'Đơn hàng này đã có hồ sơ trả góp đang xử lý.', ['status' => 409]);
+            }
+            $order->set_status('wc-gf-installment', 'Đơn hàng chuyển sang chờ duyệt hồ sơ trả góp 2 lớp.');
+            $order->save();
+        } else {
             $product = function_exists('wc_get_product') && $product_id > 0 ? wc_get_product($product_id) : null;
             if (!$product) {
                 return new WP_Error('gf_invalid_product', 'Không tìm thấy sản phẩm để tạo đơn trả góp.', ['status' => 400]);
@@ -122,9 +144,6 @@ class GF_Installment_Review {
             $order->set_status('wc-gf-installment', 'Khởi tạo đơn hàng trả góp sinh viên (chờ duyệt 2 lớp).');
             $order->save();
             $order_id = $order->get_id();
-        } else {
-            $order->set_status('wc-gf-installment', 'Đơn hàng chuyển sang chờ duyệt hồ sơ trả góp 2 lớp.');
-            $order->save();
         }
 
         $calc = GF_Installment_Calc::calculate((float) $order->get_total(), $down_pct, $months);

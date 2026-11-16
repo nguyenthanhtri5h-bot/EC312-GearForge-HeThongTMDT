@@ -13,6 +13,11 @@ class GF_Invoice_PDF {
     public static function init(): void {
         add_action('wpo_wcpdf_after_item_meta', [self::class, 'append_sn_to_wpo_pdf'], 10, 3);
         add_action('wp_ajax_gf_download_invoice', [self::class, 'ajax_download_invoice']);
+        add_action('wp_ajax_nopriv_gf_download_invoice', [self::class, 'deny_unauthenticated']);
+    }
+
+    public static function deny_unauthenticated(): void {
+        wp_die('403 Forbidden: Vui lòng đăng nhập để tải hóa đơn.', '403 Forbidden', ['response' => 403]);
     }
 
     public static function get_download_url(int $order_id): string {
@@ -42,7 +47,11 @@ class GF_Invoice_PDF {
         if (!$order) {
             wp_die('404 Not Found', '404 Not Found', ['response' => 404]);
         }
-        if (!current_user_can('manage_woocommerce') && !GF_RBAC::can_assign_serial() && (int) $order->get_customer_id() !== get_current_user_id()) {
+        if (!is_user_logged_in()) {
+            wp_die('403 Forbidden', '403 Forbidden', ['response' => 403]);
+        }
+        $uid = get_current_user_id();
+        if (!current_user_can('manage_woocommerce') && !GF_RBAC::can_assign_serial() && (int) $order->get_customer_id() !== $uid) {
             wp_die('403 Forbidden', '403 Forbidden', ['response' => 403]);
         }
 

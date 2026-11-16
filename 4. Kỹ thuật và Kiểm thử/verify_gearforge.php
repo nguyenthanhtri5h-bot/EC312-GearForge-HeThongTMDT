@@ -196,6 +196,26 @@ if (is_wp_error($sub)) {
     $pdf = GF_Invoice_PDF::build_order_pdf($order_shipped);
     $tc16_ok = str_starts_with($pdf, '%PDF-1.4') && str_contains($pdf, $sn_code) && str_contains($pdf, 'VAT 10%') && str_contains($pdf, 'T-VAN');
     $record('TC-16', $tc16_ok, sprintf('Generated %d bytes valid %%PDF-1.4 containing %s, VAT 10%%, T-VAN metadata', strlen($pdf), $sn_code));
+
+    // SEC-AUDIT: Verify IDOR blocked when reviewer/other user tries attaching installment to student order, and HMAC mode tampering fails
+    $idor_check = GF_Installment_Review::process_submission(
+        $staff->ID,
+        [
+            'order_id'              => $order_id,
+            'student_code'          => '00000000',
+            'student_edu_email'     => 'attacker@gm.uit.edu.vn',
+            'cccd_number'           => '079204001111',
+            'consent_nd13_accepted' => '1',
+        ],
+        [
+            'cccd_file'         => ['name' => 'a.png', 'type' => 'image/png', 'tmp_name' => $tmp_cccd, 'error' => UPLOAD_ERR_OK, 'size' => strlen($png_1px)],
+            'student_card_file' => ['name' => 'b.png', 'type' => 'image/png', 'tmp_name' => $tmp_card, 'error' => UPLOAD_ERR_OK, 'size' => strlen($png_1px)],
+        ]
+    );
+    $hmac_full = GF_Payment_Sandbox::sign_payload($order_id, 1000000, 'VNPAY', 'full');
+    $hmac_down = GF_Payment_Sandbox::sign_payload($order_id, 1000000, 'VNPAY', 'downpayment');
+    $sec_ok = is_wp_error($idor_check) && $idor_check->get_error_code() === 'gf_forbidden' && !hash_equals($hmac_full, $hmac_down);
+    $record('SEC-AUDIT', $sec_ok, 'IDOR blocked on cross-user order_id (403 gf_forbidden) & HMAC mode tampering blocked');
 }
 
 $passed = count(array_filter($results, static fn(array $r): bool => $r['pass']));

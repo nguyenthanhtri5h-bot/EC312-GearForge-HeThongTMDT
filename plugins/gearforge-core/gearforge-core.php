@@ -5,6 +5,8 @@
  * Version: 1.0.0
  * Author: GearForge UIT EC312 Team
  * Requires PHP: 8.2
+ * WC requires at least: 8.0
+ * WC tested up to: 11.3
  * Text Domain: gearforge-core
  */
 
@@ -75,6 +77,7 @@ final class GF_Core {
     public static function declare_hpos_compatibility(): void {
         if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
             \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
+            \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('cart_checkout_blocks', __FILE__, false);
         }
     }
 
@@ -147,12 +150,20 @@ final class GF_Core {
             'methods'             => 'GET',
             'callback'            => [GF_Installment_Calc::class, 'rest_calculate'],
             'permission_callback' => '__return_true',
+            'args'                => [
+                'price'    => ['required' => true, 'validate_callback' => static fn($v): bool => is_numeric($v) && (float) $v > 0],
+                'down_pct' => ['required' => false, 'default' => 20, 'validate_callback' => static fn($v): bool => is_numeric($v) && (float) $v >= 0 && (float) $v <= 80],
+                'months'   => ['required' => false, 'default' => 6, 'validate_callback' => static fn($v): bool => in_array((int) $v, [3, 6, 12], true)],
+            ],
         ]);
 
         register_rest_route('gearforge/v1', '/oms-status/(?P<order_id>\d+)', [
             'methods'             => 'GET',
             'callback'            => [self::class, 'rest_get_oms_status'],
             'permission_callback' => [self::class, 'can_view_order_rest'],
+            'args'                => [
+                'order_id' => ['required' => true, 'validate_callback' => static fn($v): bool => is_numeric($v) && (int) $v > 0],
+            ],
         ]);
 
         register_rest_route('gearforge/v1', '/installment/submit', [
@@ -165,6 +176,11 @@ final class GF_Core {
             'methods'             => 'POST',
             'callback'            => [GF_Serial_Manager::class, 'rest_request_warranty'],
             'permission_callback' => static fn(): bool => is_user_logged_in(),
+            'args'                => [
+                'order_id'      => ['required' => true, 'validate_callback' => static fn($v): bool => is_numeric($v) && (int) $v > 0],
+                'serial_number' => ['required' => true, 'sanitize_callback' => 'sanitize_text_field'],
+                'reason'        => ['required' => true, 'sanitize_callback' => 'sanitize_textarea_field'],
+            ],
         ]);
     }
 

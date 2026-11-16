@@ -20,15 +20,20 @@ class GF_Fraud_Guard {
         $max_attempts   = (int) apply_filters('gf_rate_limit_max_attempts', $max_attempts, $action);
         $window_seconds = (int) apply_filters('gf_rate_limit_window_seconds', $window_seconds, $action);
 
-        $ip  = self::get_client_ip();
-        $key = 'gf_rl_' . md5($action . '|' . $ip . '|' . $user_id);
+        $ip     = self::get_client_ip();
+        $key    = 'gf_rl_' . md5($action . '|' . $ip . '|' . $user_id);
+        $ip_key = 'gf_rl_ip_' . md5($action . '|' . $ip);
 
-        $data = get_transient($key);
+        $data    = get_transient($key);
+        $ip_data = get_transient($ip_key);
         if (!is_array($data)) {
             $data = ['count' => 0, 'expires' => time() + $window_seconds];
         }
+        if (!is_array($ip_data)) {
+            $ip_data = ['count' => 0, 'expires' => time() + $window_seconds];
+        }
 
-        if ($data['count'] >= $max_attempts) {
+        if ($data['count'] >= $max_attempts || $ip_data['count'] >= ($max_attempts * 2)) {
             return new WP_Error(
                 'gf_rate_limited',
                 'Bạn thao tác quá nhanh. Vui lòng thử lại sau ít phút (Rate Limit 429).',
@@ -37,8 +42,9 @@ class GF_Fraud_Guard {
         }
 
         $data['count']++;
-        $ttl = max(1, (int) ($data['expires'] - time()));
-        set_transient($key, $data, $ttl);
+        $ip_data['count']++;
+        set_transient($key, $data, max(1, (int) ($data['expires'] - time())));
+        set_transient($ip_key, $ip_data, max(1, (int) ($ip_data['expires'] - time())));
         return true;
     }
 
