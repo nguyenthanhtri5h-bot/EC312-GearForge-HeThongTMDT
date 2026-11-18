@@ -20,7 +20,7 @@
 
 ---
 
-## 2. NHẬT KÝ CÁC BẢN VÁ BẢO MẬT & TỐI ƯU HÓA (SENIOR REVIEW HARDENING)
+## 2. NHẬT KÝ CÁC BẢN VÁ BẢO MẬT & TỐI ƯU HÓA HỆ THỐNG
 
 | Mã vá | Hạng mục & File | Vấn đề trước khi vá | Cách đã vá | Lý do kỹ thuật & Tác động hệ thống |
 | :-: | :--- | :--- | :--- | :--- |

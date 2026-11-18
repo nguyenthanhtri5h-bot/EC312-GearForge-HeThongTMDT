@@ -483,7 +483,7 @@ classDiagram
 2. **Hóa đơn PDF chuẩn dữ liệu T-VAN (`TC-16`):**
    - Tham khảo chuẩn thông tin hóa đơn điện tử **Nghị định 123/2020/NĐ-CP** từ **MISA meInvoice** & **VNPT Invoice**. Bộ sinh `%PDF-1.4` thuần PHP xuất hóa đơn chứa đầy đủ Tên đơn vị bán (`CONG TY TNHH CONG NGHE GEARFORGE`), MST (`0312345678`), **Serial Number**, **VAT 10%**, và hình thức trả góp SV (tệp mẫu: `Ảnh minh chứng Role 4/GearForge-Invoice-20.pdf`).
 
-### 5.2.5. Tóm tắt các điểm Nâng cấp Bảo mật & Tối ưu CSDL (Senior Hardening)
+### 5.2.5. Tóm tắt các điểm Nâng cấp Bảo mật & Tối ưu CSDL
 - **Atomic Conditional Update (`FIX-01`):** Chặn Race Condition khi duyệt 2 lớp.
 - **Keyed HMAC-SHA256 Pepper (`FIX-02`):** Bảo vệ `cccd_hash` chống brute-force Rainbow Table.
 - **MySQL Transaction & Advisory Lock (`FIX-03`, `FIX-10`):** Đảm bảo tính ACID khi từ chối/blacklist và Idempotency chống Replay Attack khi nhận IPN.
