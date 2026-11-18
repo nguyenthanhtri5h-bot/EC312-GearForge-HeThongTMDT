@@ -8,6 +8,7 @@
 
 | Hạng mục | Quy định dành riêng cho Role 4 |
 | :--- | :--- |
+| **Thành viên đảm nhận (Nhóm 7)** | **Lê Lưu Luân** — MSSV: `24521027` |
 | **Chức danh** | Developer 2 – Backend, Database & Payment/Installment Engineer |
 | **Mức độ Code** | **Code chính (PHP 8.2 + MySQL 8.0 + REST API)** — Nhưng kế thừa ~70% lõi WooCommerce & Plugin PDF/Thanh toán nên chỉ tập trung code phần khác biệt |
 | **Nhánh GitHub độc quyền** | `role4-backend-payment` *(Issue `#4`)* — Tuyệt đối không push thẳng vào `main` |

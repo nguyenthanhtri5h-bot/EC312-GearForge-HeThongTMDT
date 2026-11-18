@@ -3,7 +3,7 @@
 > **Môn học:** Thiết kế Hệ thống Thương mại điện tử (**EC312**) – Khoa HTTT, UIT – ĐHQG TP.HCM  
 > **Đề tài:** Xây dựng Hệ thống Thương mại điện tử kinh doanh Laptop, PC và Phụ kiện (**GearForge**)  
 > **Giảng viên hướng dẫn:** ThS. Trình Trọng Tín  
-> **Quy mô nhóm:** 4 thành viên (vận hành theo mô hình **Scrum Team liên chức năng**, tách 4 nhánh Git độc lập)  
+> **Nhóm thực hiện:** **Nhóm 7** – 4 thành viên (vận hành theo mô hình **Scrum Team liên chức năng**, tách 4 nhánh Git độc lập)  
 > **Thư mục Google Drive nhóm (bản Word gọn sạch):** [MONCUATHAYTIN (Google Drive)](https://drive.google.com/drive/folders/17V1tjxDp0T4hoQtF4pSNsXWjcD4WRJpm)  
 > **Kho lưu trữ GitHub:** [nguyenthanhtri5h-bot/EC312-GearForge-HeThongTMDT](https://github.com/nguyenthanhtri5h-bot/EC312-GearForge-HeThongTMDT)
 
@@ -46,14 +46,14 @@ D:\DANMH\TKeHT\
 
 ## 2. PHÂN NHÁNH GIT & CHỐNG ĐÈ VIỆC CHO 4 THÀNH VIÊN
 
-Kho GitHub đã tạo sẵn **4 nhánh độc quyền** tương ứng 4 Issues (`#1`..`#4`). Mỗi thành viên **chỉ code & push trên đúng nhánh của mình**, mỗi ngày trước khi làm chạy `git fetch origin` + `git merge origin/main`, sau đó mở **Pull Request** vào `main`:
+Kho GitHub đã tạo sẵn **4 nhánh độc quyền** tương ứng 4 Issues (`#1`..`#4`). Mỗi nhánh `role*` được giữ gọn **chỉ chứa đúng file Hướng dẫn của Role đó** (toàn bộ tài liệu dùng chung nằm trên `main` để tra cứu); khi nộp phần việc, mở **Pull Request** vào `main`:
 
-| Role | Issue | Nhánh Git độc quyền | Lãnh thổ file sở hữu chính |
-| :--- | :-: | :--- | :--- |
-| **Role 1 (PO / BA)** | `#1` | `role1-data-catalog` | Khảo sát, Chương 1–2, UC tổng thể, `UC-01..03`, CSV ≥ 500 SP, `class-gf-compare-specs.php`, Pháp lý BCT |
-| **Role 2 (SM / QA)** | `#2` | `role2-security-qa` | Kiến trúc (4.1), Class & State Machine, `UC-04..06`, `docker-compose`, `class-gf-rbac.php`, `class-gf-fraud-guard.php`, Test Report & Nhật ký nhóm |
-| **Role 3 (Dev 1 - UI)** | `#3` | `role3-ui-frontend` | Figma (4.3), `UC-07..09`, Child Theme, `templates/` (`compare-table`, `installment-widget`, `oms-tracking`) & `assets/` (`css/`, `js/`) |
-| **Role 4 (Dev 2 - BE)** | `#4` | `role4-backend-payment` | ERD & Từ điển DB (4.2), `UC-10..12`, các class Backend trong `includes/` (`activator`, `installment-calc`, `vault-crypto`, `review`, `payment-sandbox`, `serial-manager`, `invoice-pdf`) & `admin/` |
+| Role | Thành viên (Nhóm 7) | MSSV | Issue | Nhánh Git độc quyền | Lãnh thổ file sở hữu chính |
+| :--- | :--- | :--- | :-: | :--- | :--- |
+| **Role 1 (PO / BA)** | **Trịnh Duy Long** | `24521021` | `#1` | `role1-data-catalog` | Khảo sát, Chương 1–2, UC tổng thể, `UC-01..03`, CSV ≥ 500 SP, `class-gf-compare-specs.php`, Pháp lý BCT |
+| **Role 2 (SM / QA)** | **Ngô Trọng Đạt** | `24520275` | `#2` | `role2-security-qa` | Kiến trúc (4.1), Class & State Machine, `UC-04..06`, `docker-compose`, `class-gf-rbac.php`, `class-gf-fraud-guard.php`, Test Report & Nhật ký nhóm |
+| **Role 3 (Dev 1 - UI)** | **Nguyễn Thanh Trí** | `24521838` | `#3` | `role3-ui-frontend` | Figma (4.3), `UC-07..09`, Child Theme, `templates/` (`compare-table`, `installment-widget`, `oms-tracking`) & `assets/` (`css/`, `js/`) |
+| **Role 4 (Dev 2 - BE)** | **Lê Lưu Luân** | `24521027` | `#4` | `role4-backend-payment` | ERD & Từ điển DB (4.2), `UC-10..12`, các class Backend trong `includes/` (`activator`, `installment-calc`, `vault-crypto`, `review`, `payment-sandbox`, `serial-manager`, `invoice-pdf`) & `admin/` |
 
 ---
 

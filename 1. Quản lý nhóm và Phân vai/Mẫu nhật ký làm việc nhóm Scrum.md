@@ -8,6 +8,7 @@
 
 - **Tên đề tài:** Xây dựng Hệ thống Thương mại điện tử kinh doanh Laptop, PC và Phụ kiện – **GearForge**
 - **Môn học:** Thiết kế Hệ thống Thương mại điện tử (**EC312**) – GVHD: **ThS. Trình Trọng Tín**
+- **Nhóm thực hiện:** **Nhóm 7** (Trịnh Duy Long – `24521021`, Ngô Trọng Đạt – `24520275`, Nguyễn Thanh Trí – `24521838`, Lê Lưu Luân – `24521027`)
 - **Kênh trao đổi & Công cụ quản lý:** *[Ví dụ: Zalo/Discord, Google Drive, GitHub Repo, Trello/Jira, Figma]*
 - **Lịch họp định kỳ (Weekly Sync / Sprint Review):** *[Ví dụ: 20h00 Thứ Tư & Chủ Nhật hàng tuần]*
 
@@ -68,8 +69,8 @@
 
 | STT | Họ và tên | MSSV | Vai trò Scrum | Các hạng mục đã hoàn thành (Báo cáo & Demo) | Tỷ lệ đóng góp | Xác nhận của nhóm |
 | :-: | :--- | :--- | :--- | :--- | :---: | :---: |
-| 1 | *[Họ tên 1]* | *[MSSV 1]* | **Product Owner (PO)** | Khảo sát, Chương 1–2, UC Tổng thể, UC-02 (Compare Specs), Import 500 SP, Trang Pháp lý | **25%** | `[ ] Đồng ý` |
-| 2 | *[Họ tên 2]* | *[MSSV 2]* | **Scrum Master (SM)** | Kiến trúc, Class, State Machine, UC-05 (Bảo mật/RBAC/Blacklist), Docker/Hosting, Test Report, Biên tập báo cáo | **25%** | `[ ] Đồng ý` |
-| 3 | *[Họ tên 3]* | *[MSSV 3]* | **Developer 1 (UI/UX)** | Bộ Mockup Figma, UC-08 (Checkout/OMS), Theme Storefront, UI Bộ lọc/Compare, Consent Banner | **25%** | `[ ] Đồng ý` |
-| 4 | *[Họ tên 4]* | *[MSSV 4]* | **Developer 2 (Backend)** | ERD & MySQL Schema, UC-10 (Trả góp SV), Custom Plugin `gearforge-core`, Duyệt 2 lớp, Sandbox Payment, S/N & Hóa đơn PDF | **25%** | `[ ] Đồng ý` |
+| 1 | **Trịnh Duy Long** | `24521021` | **Product Owner (PO)** | Khảo sát, Chương 1–2, UC Tổng thể, UC-02 (Compare Specs), Import 500 SP, Trang Pháp lý | **25%** | `[ ] Đồng ý` |
+| 2 | **Ngô Trọng Đạt** | `24520275` | **Scrum Master (SM)** | Kiến trúc, Class, State Machine, UC-05 (Bảo mật/RBAC/Blacklist), Docker/Hosting, Test Report, Biên tập báo cáo | **25%** | `[ ] Đồng ý` |
+| 3 | **Nguyễn Thanh Trí** | `24521838` | **Developer 1 (UI/UX)** | Bộ Mockup Figma, UC-08 (Checkout/OMS), Theme Storefront, UI Bộ lọc/Compare, Consent Banner | **25%** | `[ ] Đồng ý` |
+| 4 | **Lê Lưu Luân** | `24521027` | **Developer 2 (Backend)** | ERD & MySQL Schema, UC-10 (Trả góp SV), Custom Plugin `gearforge-core`, Duyệt 2 lớp, Sandbox Payment, S/N & Hóa đơn PDF | **25%** | `[ ] Đồng ý` |
 | | | | | **TỔNG CỘNG** | **100%** | |

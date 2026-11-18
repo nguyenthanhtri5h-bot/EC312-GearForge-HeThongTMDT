@@ -8,6 +8,7 @@
 
 | Hạng mục | Quy định dành riêng cho Role 3 |
 | :--- | :--- |
+| **Thành viên đảm nhận (Nhóm 7)** | **Nguyễn Thanh Trí** — MSSV: `24521838` |
 | **Chức danh** | Developer 1 – UI/UX Designer & Frontend WooCommerce Specialist |
 | **Mức độ Code** | **Code ít (UI là chính)** — Thiết kế Figma + Dựng trang WordPress bằng Theme/Elementor/CSS + Template hiển thị trong `templates/` & `assets/` |
 | **Nhánh GitHub độc quyền** | `role3-ui-frontend` *(Issue `#3`)* — Tuyệt đối không push thẳng vào `main` |

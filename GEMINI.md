@@ -8,6 +8,7 @@
 
 - **Môn học:** Thiết kế Hệ thống Thương mại điện tử (**EC312**) – ĐH CNTT (UIT), ĐHQG TP.HCM
 - **Giảng viên hướng dẫn:** ThS. Trình Trọng Tín (Chuẩn đối chiếu: `github.com/trinhtin/ec312`)
+- **Nhóm thực hiện:** **Nhóm 7** (Trịnh Duy Long – `24521021`, Ngô Trọng Đạt – `24520275`, Nguyễn Thanh Trí – `24521838`, Lê Lưu Luân – `24521027`)
 - **Đề tài:** Xây dựng Hệ thống TMĐT B2C kinh doanh **Laptop, PC và Phụ kiện** cho sinh viên – Thương hiệu **GearForge** (tối thiểu **500 sản phẩm**).
 - **Thư mục máy (Workspace chính):** `D:\DANMH\TKeHT` *(Tuyệt đối không lưu file dự án sang workspace khác)*.
 - **Kho lưu trữ GitHub:** `https://github.com/nguyenthanhtri5h-bot/EC312-GearForge-HeThongTMDT`
@@ -50,9 +51,11 @@
 
 ## 4. PHÂN CÔNG 4 VAI TRÒ SCRUM & CHỐNG ĐÈ NHÁNH
 
-| Role | Chức danh | Mức Code | Nhánh GitHub | Cụm Use Case & Tài liệu chính |
-| :--- | :--- | :---: | :--- | :--- |
-| **Role 1** | PO / Nhóm trưởng / BA | **0% Code** | `role1-data-catalog` | `UC-01`, **`UC-02 ★`** (Compare Specs), `UC-03`; CSV ≥ 500 SP; Chương 1–2, 3.1, 3.4, 6.1–6.2 |
-| **Role 2** | SM / Architect / QA | **0–5% Code** | `role2-security-qa` | `UC-04`, **`UC-05 ★`** (RBAC/NĐ 13/Fraud), `UC-06`; Kiến trúc, Class, State, 16 Test Cases, Nhật ký Scrum; **Giữ quyền merge vào `main`** |
-| **Role 3** | Dev 1 (UI/UX & FE) | **Ít Code** (Figma/CSS) | `role3-ui-frontend` | `UC-07`, **`UC-08 ★`** (Checkout & OMS), `UC-09`; 6 màn Figma, Theme & `templates/`, `assets/` |
-| **Role 4** | Dev 2 (Backend & DB) | **Code PHP/MySQL** | `role4-backend-payment` | **`UC-10 ★`** (Trả góp SV), `UC-11`, `UC-12`; ERD, 4 bảng `wp_gf_*`, `includes/`, Sandbox, S/N, PDF |
+| Role | Thành viên & MSSV | Chức danh | Mức Code | Nhánh GitHub | Cụm Use Case & Tài liệu chính |
+| :--- | :--- | :--- | :---: | :--- | :--- |
+| **Role 1** | **Trịnh Duy Long** (`24521021`) | PO / Nhóm trưởng / BA | **0% Code** | `role1-data-catalog` | `UC-01`, **`UC-02 ★`** (Compare Specs), `UC-03`; CSV ≥ 500 SP; Chương 1–2, 3.1, 3.4, 6.1–6.2 |
+| **Role 2** | **Ngô Trọng Đạt** (`24520275`) | SM / Architect / QA | **0–5% Code** | `role2-security-qa` | `UC-04`, **`UC-05 ★`** (RBAC/NĐ 13/Fraud), `UC-06`; Kiến trúc, Class, State, 16 Test Cases, Nhật ký Scrum; **Giữ quyền merge vào `main`** |
+| **Role 3** | **Nguyễn Thanh Trí** (`24521838`) | Dev 1 (UI/UX & FE) | **Ít Code** (Figma/CSS) | `role3-ui-frontend` | `UC-07`, **`UC-08 ★`** (Checkout & OMS), `UC-09`; 6 màn Figma, Theme & `templates/`, `assets/` |
+| **Role 4** | **Lê Lưu Luân** (`24521027`) | Dev 2 (Backend & DB) | **Code PHP/MySQL** | `role4-backend-payment` | **`UC-10 ★`** (Trả góp SV), `UC-11`, `UC-12`; ERD, 4 bảng `wp_gf_*`, `includes/`, Sandbox, S/N, PDF |
+
+> **Quy tắc nhánh (2026-11-18):** Nhánh `main` lưu đầy đủ toàn bộ khung tài liệu dùng chung; mỗi nhánh `role1..role4` chỉ giữ đúng file **Hướng dẫn Role X** (`.md` & `.docx`), `README.md` riêng của thành viên đó và `.gitignore` để thành viên tập trung đúng phần việc của mình.

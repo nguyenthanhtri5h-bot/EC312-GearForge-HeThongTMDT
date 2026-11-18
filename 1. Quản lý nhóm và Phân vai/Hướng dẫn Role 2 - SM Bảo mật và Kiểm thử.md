@@ -8,6 +8,7 @@
 
 | Hạng mục | Quy định dành riêng cho Role 2 |
 | :--- | :--- |
+| **Thành viên đảm nhận (Nhóm 7)** | **Ngô Trọng Đạt** — MSSV: `24520275` |
 | **Chức danh** | Scrum Master (SM) / System Architect / Security & QA Lead |
 | **Mức độ Code** | **0% – 5% Code** (Chủ yếu cài môi trường Docker/Hosting, bật plugin bảo mật/RBAC, viết 2 file kiểm soát nhẹ `class-gf-rbac.php` & `class-gf-fraud-guard.php`) |
 | **Nhánh GitHub độc quyền** | `role2-security-qa` *(Issue `#2`)* — **Giữ quyền duyệt & bấm Merge Pull Request vào `main`** |

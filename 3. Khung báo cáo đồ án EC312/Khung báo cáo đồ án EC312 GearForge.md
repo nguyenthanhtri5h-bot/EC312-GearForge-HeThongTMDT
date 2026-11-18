@@ -13,16 +13,17 @@
 - **Môn học:** Thiết kế Hệ thống Thương mại điện tử (**EC312**)
 - **Tên đề tài:** **Xây dựng Hệ thống Thương mại điện tử kinh doanh Laptop, PC và Phụ kiện – GearForge**
 - **Giảng viên hướng dẫn:** ThS. Trình Trọng Tín
+- **Nhóm thực hiện:** **Nhóm 7**
 - **Ngày nộp:** *[dd/mm/yyyy]*
 
 ### BẢNG THÔNG TIN NHÓM & PHÂN CÔNG ĐỒ ÁN
 
 | STT | Họ và tên | MSSV | Vai trò Scrum | Chức danh chuyên môn | Phân hệ phụ trách phân tích & thiết kế |
 | :-: | :--- | :--- | :--- | :--- | :--- |
-| 1 | *[Họ tên 1]* | *[MSSV 1]* | **Product Owner (PO)** | Nhóm trưởng / BA | Use Case tổng thể, **UC-02** (Compare Specs), Dữ liệu ≥ 500 SP, Pháp lý |
-| 2 | *[Họ tên 2]* | *[MSSV 2]* | **Scrum Master (SM)** | System Architect / QA | Kiến trúc, Class, State Machine, **UC-05** (RBAC/NĐ 13/2023/Blacklist), QA |
-| 3 | *[Họ tên 3]* | *[MSSV 3]* | **Developer 1 (Dev 1)** | UI/UX & Frontend | Bộ Mockup Figma, Storefront UI, **UC-08** (Checkout & OMS Tracking) |
-| 4 | *[Họ tên 4]* | *[MSSV 4]* | **Developer 2 (Dev 2)** | Backend, DB & Payment | ERD & MySQL Schema, **UC-10/UC-11** (Trả góp SV & Sandbox), S/N & PDF |
+| 1 | **Trịnh Duy Long** | `24521021` | **Product Owner (PO)** | Nhóm trưởng / BA | Use Case tổng thể, **UC-02** (Compare Specs), Dữ liệu ≥ 500 SP, Pháp lý |
+| 2 | **Ngô Trọng Đạt** | `24520275` | **Scrum Master (SM)** | System Architect / QA | Kiến trúc, Class, State Machine, **UC-05** (RBAC/NĐ 13/2023/Blacklist), QA |
+| 3 | **Nguyễn Thanh Trí** | `24521838` | **Developer 1 (Dev 1)** | UI/UX & Frontend | Bộ Mockup Figma, Storefront UI, **UC-08** (Checkout & OMS Tracking) |
+| 4 | **Lê Lưu Luân** | `24521027` | **Developer 2 (Dev 2)** | Backend, DB & Payment | ERD & MySQL Schema, **UC-10/UC-11** (Trả góp SV & Sandbox), S/N & PDF |
 
 ---
 

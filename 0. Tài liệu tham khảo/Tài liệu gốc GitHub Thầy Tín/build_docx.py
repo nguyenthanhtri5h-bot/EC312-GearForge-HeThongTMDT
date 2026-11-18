@@ -175,7 +175,8 @@ def build():
 
     add_rich_para(doc, [
         ("Môn học: ", True, False), ("Thiết kế Hệ thống Thương mại điện tử (EC312)   |   ", False, False),
-        ("Giảng viên hướng dẫn: ", True, False), ("ThS. Trình Trọng Tín", False, False),
+        ("Giảng viên hướng dẫn: ", True, False), ("ThS. Trình Trọng Tín   |   ", False, False),
+        ("Nhóm thực hiện: ", True, False), ("Nhóm 7", False, False),
     ])
 
     # Team Table
@@ -194,7 +195,7 @@ def build():
         rows=[
             [
                 "1",
-                [("[Họ và tên 1]\n", False, True), ("MSSV: [MSSV 1]", False, True)],
+                [("Trịnh Duy Long\n", True, False), ("MSSV: 24521021", False, False)],
                 [("Product Owner (PO)", True, False)],
                 "Nhóm trưởng / Business Analyst",
                 "role1-data-catalog",
@@ -202,7 +203,7 @@ def build():
             ],
             [
                 "2",
-                [("[Họ và tên 2]\n", False, True), ("MSSV: [MSSV 2]", False, True)],
+                [("Ngô Trọng Đạt\n", True, False), ("MSSV: 24520275", False, False)],
                 [("Scrum Master (SM)", True, False)],
                 "Kiến trúc sư hệ thống / Security & QA Lead",
                 "role2-security-qa",
@@ -210,7 +211,7 @@ def build():
             ],
             [
                 "3",
-                [("[Họ và tên 3]\n", False, True), ("MSSV: [MSSV 3]", False, True)],
+                [("Nguyễn Thanh Trí\n", True, False), ("MSSV: 24521838", False, False)],
                 [("Developer (Dev 1)", True, False)],
                 "UI/UX Designer & Frontend WooCommerce",
                 "role3-ui-frontend",
@@ -218,7 +219,7 @@ def build():
             ],
             [
                 "4",
-                [("[Họ và tên 4]\n", False, True), ("MSSV: [MSSV 4]", False, True)],
+                [("Lê Lưu Luân\n", True, False), ("MSSV: 24521027", False, False)],
                 [("Developer (Dev 2)", True, False)],
                 "Backend, Database & Payment Engineer",
                 "role4-backend-payment",
@@ -308,7 +309,7 @@ def build():
 
     members = [
         (
-            "Thành viên 1 – Product Owner (PO) (Kiêm Nhóm trưởng / Business Analyst)",
+            "Thành viên 1: Trịnh Duy Long (24521021) – Product Owner (PO) (Kiêm Nhóm trưởng / Business Analyst)",
             [
                 ("Trách nhiệm theo Scrum:", "Sở hữu tầm nhìn sản phẩm GearForge, xây dựng và sắp xếp độ ưu tiên Product Backlog theo giá trị MVP; viết User Stories và tiêu chí chấp nhận (Acceptance Criteria); làm đầu mối trao đổi với GVHD và nghiệm thu đầu ra cuối mỗi Sprint."),
                 ("Phân tích yêu cầu (EC312 Mục 1 & 2):", "Khảo sát nhu cầu mua sắm/trả góp của sinh viên ĐHQG TP.HCM; hoàn thiện bài toán, mục tiêu, phạm vi, KPIs, bảng TCO, danh sách Functional Requirements (FR) & Non-Functional Requirements (NFR)."),
@@ -317,7 +318,7 @@ def build():
             ],
         ),
         (
-            "Thành viên 2 – Scrum Master (SM) (Kiêm Kiến trúc sư hệ thống & Security/QA Lead)",
+            "Thành viên 2: Ngô Trọng Đạt (24520275) – Scrum Master (SM) (Kiêm Kiến trúc sư hệ thống & Security/QA Lead)",
             [
                 ("Trách nhiệm theo Scrum:", "Điều phối các sự kiện Scrum (Sprint Planning, Daily Standup, Sprint Review, Sprint Retrospective); quản lý tiến độ trên Jira/Trello/GitHub; tháo gỡ vướng mắc kỹ thuật và ghi chép Nhật ký làm việc nhóm (Phụ lục EC312)."),
                 ("Kiến trúc & Bảo mật (EC312 Mục 4.1 & Phần 4):", "Thiết kế Sơ đồ Kiến trúc hệ thống (Layered / Microkernel trên WordPress/WooCommerce + Custom Plugin + Payment Sandbox); thiết kế cơ chế tuân thủ Nghị định 13/2023/NĐ-CP (mã hóa CCCD/Thẻ SV, phân quyền RBAC Admin) và chống gian lận (Rate Limiting, Blacklist IP/Account)."),
@@ -326,7 +327,7 @@ def build():
             ],
         ),
         (
-            "Thành viên 3 – Developer 1 (UI/UX Designer & Frontend WooCommerce Specialist)",
+            "Thành viên 3: Nguyễn Thanh Trí (24521838) – Developer 1 (UI/UX Designer & Frontend WooCommerce Specialist)",
             [
                 ("Trách nhiệm theo Scrum:", "Tham gia ước lượng Story Points trong Sprint Planning; chuyển hóa các User Story thành giao diện trực quan, tối ưu trải nghiệm mua sắm và so sánh cấu hình cho sinh viên trên cả Mobile và Desktop."),
                 ("Thiết kế UI/UX (EC312 Mục 4.3):", "Thiết kế bộ Wireframe & Mockup trên Figma cho: Trang chủ, Danh mục & Bộ lọc thông số kỹ thuật, Chi tiết sản phẩm, Bảng so sánh 2-3 Laptop/PC, Form tính toán & đăng ký trả góp, Giỏ hàng, Checkout, Tra cứu đơn hàng & Admin Dashboard."),
@@ -335,7 +336,7 @@ def build():
             ],
         ),
         (
-            "Thành viên 4 – Developer 2 (Backend, Database & Payment/Installment Engineer)",
+            "Thành viên 4: Lê Lưu Luân (24521027) – Developer 2 (Backend, Database & Payment/Installment Engineer)",
             [
                 ("Trách nhiệm theo Scrum:", "Tham gia ước lượng kỹ thuật và hiện thực hóa các logic nghiệp vụ lõi ở tầng Backend, cơ sở dữ liệu và tích hợp API thanh toán đảm bảo tính toàn vẹn dữ liệu."),
                 ("Thiết kế CSDL (EC312 Mục 4.2):", "Xây dựng Mô hình ERD và ánh xạ sang CSDL quan hệ (MySQL) mở rộng trên WooCommerce (wp_gf_installment_plans, wp_gf_installment_applications, wp_gf_order_serials, wp_gf_fraud_blacklist)."),

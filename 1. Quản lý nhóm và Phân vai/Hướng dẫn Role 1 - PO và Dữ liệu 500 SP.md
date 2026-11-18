@@ -8,6 +8,7 @@
 
 | Hạng mục | Quy định dành riêng cho Role 1 |
 | :--- | :--- |
+| **Thành viên đảm nhận (Nhóm 7)** | **Trịnh Duy Long** — MSSV: `24521021` |
 | **Chức danh** | Product Owner (PO) / Nhóm trưởng / Business Analyst (BA) |
 | **Mức độ Code** | **0% Code** (Chỉ dùng Word, Excel/CSV, Google Forms, Mermaid Live và bấm chuột Admin WordPress) |
 | **Nhánh GitHub độc quyền** | `role1-data-catalog` *(Issue `#1`)* — Tuyệt đối không push thẳng vào `main` |

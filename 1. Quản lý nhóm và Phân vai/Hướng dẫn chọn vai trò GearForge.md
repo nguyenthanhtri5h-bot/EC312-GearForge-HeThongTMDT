@@ -84,12 +84,12 @@
 
 *(Sau khi họp nhóm thống nhất, điền thông tin vào bảng dưới đây và cập nhật đồng bộ sang `Bản mô tả dự án GearForge.docx`)*
 
-| Role | Vai trò Scrum | Nhánh GitHub | Họ và tên | MSSV | Email / Zalo / GitHub | Trạng thái nhận việc |
+| Role | Vai trò Scrum | Nhánh GitHub | Họ và tên | MSSV | Tình trạng | Trạng thái nhận việc |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Role 1** | PO / BA | `role1-data-catalog` | *[Điền họ tên]* | *[MSSV]* | *[Liên hệ]* | `[ ] Đã nhận` |
-| **Role 2** | SM / Architect / QA | `role2-security-qa` | *[Điền họ tên]* | *[MSSV]* | *[Liên hệ]* | `[ ] Đã nhận` |
-| **Role 3** | Dev 1 (UI/UX & FE) | `role3-ui-frontend` | *[Điền họ tên]* | *[MSSV]* | *[Liên hệ]* | `[ ] Đã nhận` |
-| **Role 4** | Dev 2 (BE, DB & Pay) | `role4-backend-payment` | *[Điền họ tên]* | *[MSSV]* | *[Liên hệ]* | `[ ] Đã nhận` |
+| **Role 1** | PO / BA | `role1-data-catalog` | **Trịnh Duy Long** | `24521021` | Nhóm trưởng / PO | `[x] Đã nhận` |
+| **Role 2** | SM / Architect / QA | `role2-security-qa` | **Ngô Trọng Đạt** | `24520275` | Scrum Master / QA | `[x] Đã nhận` |
+| **Role 3** | Dev 1 (UI/UX & FE) | `role3-ui-frontend` | **Nguyễn Thanh Trí** | `24521838` | Developer 1 (UI/UX) | `[x] Đã nhận` |
+| **Role 4** | Dev 2 (BE, DB & Pay) | `role4-backend-payment` | **Lê Lưu Luân** | `24521027` | Developer 2 (Backend) | `[x] Đã nhận` |
 
 ---
 

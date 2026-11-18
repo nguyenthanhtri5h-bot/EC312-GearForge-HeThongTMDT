@@ -5,6 +5,7 @@
 **Trường:** Đại học Công nghệ Thông tin (UIT) – ĐHQG TP.HCM  
 **Môn học:** Thiết kế Hệ thống Thương mại điện tử (EC312)  
 **Giảng viên hướng dẫn:** ThS. Trình Trọng Tín  
+**Nhóm thực hiện:** Nhóm 7  
 
 ---
 
@@ -14,10 +15,10 @@
 
 | STT | Họ và tên | MSSV | Vai trò Scrum (Scrum Role) | Chức danh chuyên môn kiêm nhiệm | Nhánh Git | Phân hệ phụ trách chính (EC312 & MVP) |
 | :-: | :--- | :--- | :--- | :--- | :--- | :--- |
-| 1 | *[Họ và tên 1]* | *[MSSV 1]* | **Product Owner (PO)** | Nhóm trưởng / Business Analyst (BA) | `role1-data-catalog` | Nghiệp vụ tổng thể, Danh mục, Bộ lọc chuyên sâu & So sánh cấu hình (Compare Specs), Dữ liệu ≥ 500 sản phẩm |
-| 2 | *[Họ và tên 2]* | *[MSSV 2]* | **Scrum Master (SM)** | Kiến trúc sư hệ thống / Security & QA Lead | `role2-security-qa` | Kiến trúc hệ thống, Xác thực & Phân quyền (RBAC), Bảo mật NĐ 13/2023 & Chống gian lận, Hạ tầng & Kiểm thử (QA) |
-| 3 | *[Họ và tên 3]* | *[MSSV 3]* | **Developer (Dev 1)** | UI/UX Designer & Frontend WooCommerce | `role3-ui-frontend` | Thiết kế UI/UX (Figma), Giao diện Storefront, Giỏ hàng, Đặt hàng & Quản lý đơn hàng (OMS) |
-| 4 | *[Họ và tên 4]* | *[MSSV 4]* | **Developer (Dev 2)** | Backend, Database & Payment Engineer | `role4-backend-payment` | Thiết kế CSDL (ERD), Custom Plugin Trả góp sinh viên (3-6-12 tháng), Duyệt hồ sơ 2 lớp, Tích hợp VNPay/MoMo/Fundiin Sandbox, Quản lý S/N & Hóa đơn PDF |
+| 1 | **Trịnh Duy Long** | `24521021` | **Product Owner (PO)** | Nhóm trưởng / Business Analyst (BA) | `role1-data-catalog` | Nghiệp vụ tổng thể, Danh mục, Bộ lọc chuyên sâu & So sánh cấu hình (Compare Specs), Dữ liệu ≥ 500 sản phẩm |
+| 2 | **Ngô Trọng Đạt** | `24520275` | **Scrum Master (SM)** | Kiến trúc sư hệ thống / Security & QA Lead | `role2-security-qa` | Kiến trúc hệ thống, Xác thực & Phân quyền (RBAC), Bảo mật NĐ 13/2023 & Chống gian lận, Hạ tầng & Kiểm thử (QA) |
+| 3 | **Nguyễn Thanh Trí** | `24521838` | **Developer (Dev 1)** | UI/UX Designer & Frontend WooCommerce | `role3-ui-frontend` | Thiết kế UI/UX (Figma), Giao diện Storefront, Giỏ hàng, Đặt hàng & Quản lý đơn hàng (OMS) |
+| 4 | **Lê Lưu Luân** | `24521027` | **Developer (Dev 2)** | Backend, Database & Payment Engineer | `role4-backend-payment` | Thiết kế CSDL (ERD), Custom Plugin Trả góp sinh viên (3-6-12 tháng), Duyệt hồ sơ 2 lớp, Tích hợp VNPay/MoMo/Fundiin Sandbox, Quản lý S/N & Hóa đơn PDF |
 
 ---
 
@@ -95,7 +96,7 @@
 
 ### 1. Mô tả chi tiết Vai trò Scrum & Công việc dự kiến của từng thành viên
 
-#### Thành viên 1 – **Product Owner (PO)** *(Kiêm Nhóm trưởng / Business Analyst)*
+#### Thành viên 1: Trịnh Duy Long (`24521021`) – **Product Owner (PO)** *(Kiêm Nhóm trưởng / Business Analyst)*
 - **Trách nhiệm cốt lõi theo Scrum:**
   - Sở hữu tầm nhìn sản phẩm **GearForge**, xây dựng và sắp xếp độ ưu tiên cho **Product Backlog** dựa trên giá trị mang lại cho người dùng sinh viên và tiêu chí MVP.
   - Viết **User Stories** và tiêu chí chấp nhận (**Acceptance Criteria**) cho các tính năng cốt lõi; làm đầu mối trao đổi với Giảng viên hướng dẫn (Stakeholder) và nghiệm thu kết quả cuối mỗi Sprint.
@@ -104,7 +105,7 @@
   2. **Mô hình hóa hệ thống (EC312 Mục 3):** Chủ trì vẽ **Biểu đồ Use Case tổng thể** toàn hệ thống; trực tiếp đặc tả Use Case và vẽ **Activity Diagram + Sequence Diagram** cho cụm chức năng **Tìm kiếm, Bộ lọc thông số chuyên sâu & So sánh cấu hình (Compare Specs)**.
   3. **Dữ liệu sản phẩm & Nội dung pháp lý (Demo):** Thiết kế bộ thuộc tính kỹ thuật chuẩn (Nhu cầu, CPU, RAM, GPU, Khoảng giá); thu thập, làm sạch và import tối thiểu **500 sản phẩm** (Laptop, PC, Phụ kiện) lên WooCommerce; soạn thảo trang Chính sách bảo hành, Đổi trả, Điều khoản và thông tin chuẩn bị hồ sơ Bộ Công Thương.
 
-#### Thành viên 2 – **Scrum Master (SM)** *(Kiêm Kiến trúc sư hệ thống & Security/QA Lead)*
+#### Thành viên 2: Ngô Trọng Đạt (`24520275`) – **Scrum Master (SM)** *(Kiêm Kiến trúc sư hệ thống & Security/QA Lead)*
 - **Trách nhiệm cốt lõi theo Scrum:**
   - Tổ chức và điều phối các sự kiện Scrum (**Sprint Planning, Daily Standup, Sprint Review, Sprint Retrospective**); cập nhật tiến độ trên Jira/Trello/GitHub Projects và tháo gỡ vướng mắc kỹ thuật cho cả nhóm.
   - Ghi chép đầy đủ **Nhật ký làm việc nhóm** (Phụ lục bắt buộc của EC312) và đảm bảo các thành viên tuân thủ chuẩn thiết kế/chất lượng (Definition of Done).
@@ -113,7 +114,7 @@
   2. **Mô hình hóa hệ thống (EC312 Mục 3):** Chủ trì thống nhất **Class Diagram** toàn hệ thống và **State Machine Diagram** (vòng đời Đơn hàng & Trạng thái duyệt hồ sơ trả góp); viết đặc tả Use Case + **Sequence Diagram** cho cụm chức năng **Xác thực người dùng, Phân quyền & Kiểm soát gian lận/Bảo mật**.
   3. **Hạ tầng, Kiểm thử & Hoàn thiện tài liệu (Demo & QA):** Triển khai môi trường **Cloud Hosting/VPS, Domain, SSL**, thiết lập bảo mật WAF/Rate Limit; lập **Test Plan & Test Cases** kiểm thử toàn diện luồng đặt hàng, bộ lọc, upload hồ sơ trả góp, thanh toán Sandbox; tổng hợp, rà soát định dạng báo cáo (`.docx` & `.pdf`).
 
-#### Thành viên 3 – **Developer 1** *(UI/UX Designer & Frontend WooCommerce Specialist)*
+#### Thành viên 3: Nguyễn Thanh Trí (`24521838`) – **Developer 1** *(UI/UX Designer & Frontend WooCommerce Specialist)*
 - **Trách nhiệm cốt lõi theo Scrum:**
   - Tham gia ước lượng độ phức tạp (Story Points) trong Sprint Planning; chịu trách nhiệm chuyển hóa các User Story thành giao diện trực quan, thân thiện trên cả Mobile và Desktop.
   - Phối hợp chặt chẽ với PO để đảm bảo giao diện bám sát hành vi so sánh cấu hình và săn khuyến mãi của sinh viên.
@@ -122,7 +123,7 @@
   2. **Mô hình hóa hệ thống (EC312 Mục 3):** Viết đặc tả Use Case + **Activity Diagram + Sequence Diagram** cho cụm chức năng **Giỏ hàng, Đặt hàng & Theo dõi trạng thái đơn hàng (OMS)**.
   3. **Triển khai giao diện WooCommerce (Demo):** Cài đặt và tùy biến **Theme / Child Theme WordPress**; hiện thực hóa giao diện **Bộ lọc đa tiêu chí (Filter theo CPU, RAM, GPU, Nhu cầu, Giá)** và bảng **So sánh cấu hình (Compare Specs)**; tích hợp hộp thoại xác nhận đồng ý xử lý dữ liệu cá nhân (**Consent Banner** theo NĐ 13/2023) khi upload hồ sơ trả góp; tối ưu tốc độ tải trang (NFR Performance < 3 giây).
 
-#### Thành viên 4 – **Developer 2** *(Backend, Database & Payment/Installment Engineer)*
+#### Thành viên 4: Lê Lưu Luân (`24521027`) – **Developer 2** *(Backend, Database & Payment/Installment Engineer)*
 - **Trách nhiệm cốt lõi theo Scrum:**
   - Tham gia ước lượng kỹ thuật và phát triển các thành phần xử lý nghiệp vụ phía Backend, cơ sở dữ liệu và tích hợp API bên thứ ba.
   - Đảm bảo tính toàn vẹn dữ liệu đơn hàng, hồ sơ định danh và quy trình thanh toán an toàn.
