@@ -65,7 +65,7 @@ class GF_Activator {
                 updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 INDEX idx_gf_app_order (order_id),
                 INDEX idx_gf_app_user (user_id),
-                INDEX idx_gf_app_status (status),
+                INDEX idx_gf_app_status_id (status, app_id),
                 INDEX idx_gf_app_cccd_hash (cccd_hash),
                 CONSTRAINT fk_gf_app_plan FOREIGN KEY (plan_id) REFERENCES {$prefix}gf_installment_plans(plan_id)
             ) ENGINE=InnoDB {$charset_collate};",
@@ -81,7 +81,7 @@ class GF_Activator {
                 assigned_by BIGINT UNSIGNED NOT NULL,
                 assigned_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 UNIQUE KEY uk_gf_serial_number (serial_number),
-                INDEX idx_gf_serial_order (order_id)
+                INDEX idx_gf_serial_order_item (order_id, order_item_id)
             ) ENGINE=InnoDB {$charset_collate};",
 
             "CREATE TABLE IF NOT EXISTS {$prefix}gf_fraud_blacklist (

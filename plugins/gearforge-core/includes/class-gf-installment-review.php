@@ -2,8 +2,10 @@
 /**
  * Student Installment Application & 2-Layer Review Service (UC-10 & UC-11).
  *
- * Enforces sequential state transitions:
- * SUBMITTED -> L1_DOCS_VERIFIED -> APPROVED_WAITING_DOWNPAYMENT (or REJECTED / BLACKLISTED).
+ * Security & Concurrency Hardening:
+ * - Uses HMAC-SHA256 with server pepper for cccd_hash (prevents brute-force/rainbow tables).
+ * - Uses Atomic Conditional Updates (WHERE app_id = ? AND status = ?) to prevent race conditions.
+ * - Uses MySQL Transactions (START TRANSACTION/COMMIT/ROLLBACK) when rejecting & blacklisting.
  */
 
 if (!defined('ABSPATH')) {
@@ -34,7 +36,7 @@ class GF_Installment_Review {
             return new WP_Error('gf_invalid_cccd', 'Số CCCD gắn chip phải gồm đúng 12 chữ số.');
         }
 
-        $cccd_hash = hash('sha256', $cccd_number);
+        $cccd_hash = self::hash_cccd($cccd_number);
         if (self::is_blacklisted('CCCD_HASH', $cccd_hash) || self::is_blacklisted('USER', (string) ($data['user_id'] ?? 0))) {
             return new WP_Error('gf_blacklisted', 'Hồ sơ hoặc tài khoản nằm trong danh sách hạn chế gian lận.');
         }
@@ -78,75 +80,26 @@ class GF_Installment_Review {
     }
 
     /**
-     * Layer 1 Review: Verify encrypted CCCD & Student Card images (SUBMITTED -> L1_DOCS_VERIFIED).
+     * Layer 1 Review (Atomic): SUBMITTED -> L1_DOCS_VERIFIED.
      *
      * @return true|WP_Error
      */
     public static function review_layer_1(int $app_id, int $reviewer_id) {
-        global $wpdb;
-
-        $app = self::get_application($app_id);
-        if (!$app) {
-            return new WP_Error('gf_not_found', 'Không tìm thấy hồ sơ trả góp.');
-        }
-
-        if ($app['status'] !== 'SUBMITTED') {
-            return new WP_Error('gf_invalid_state', 'Chỉ có thể Duyệt Lớp 1 khi hồ sơ ở trạng thái SUBMITTED.');
-        }
-
-        $updated = $wpdb->update(
-            "{$wpdb->prefix}gf_installment_applications",
-            [
-                'status'         => 'L1_DOCS_VERIFIED',
-                'reviewer_id'    => $reviewer_id,
-                'l1_verified_at' => current_time('mysql'),
-            ],
-            ['app_id' => $app_id],
-            ['%s', '%d', '%s'],
-            ['%d']
-        );
-
-        return $updated !== false ? true : new WP_Error('gf_update_failed', 'Cập nhật Duyệt Lớp 1 thất bại.');
+        return self::atomic_transition($app_id, 'SUBMITTED', 'L1_DOCS_VERIFIED', $reviewer_id, 'l1_verified_at');
     }
 
     /**
-     * Layer 2 Review: Confirm phone & .edu.vn email (L1_DOCS_VERIFIED -> APPROVED_WAITING_DOWNPAYMENT).
-     * Blocks skipping Layer 1 (TC-13).
+     * Layer 2 Review (Atomic): L1_DOCS_VERIFIED -> APPROVED_WAITING_DOWNPAYMENT.
+     * Blocks skipping Layer 1 (TC-13) and prevents concurrent double-approval race conditions.
      *
      * @return true|WP_Error
      */
     public static function review_layer_2(int $app_id, int $reviewer_id) {
-        global $wpdb;
-
-        $app = self::get_application($app_id);
-        if (!$app) {
-            return new WP_Error('gf_not_found', 'Không tìm thấy hồ sơ trả góp.');
-        }
-
-        if ($app['status'] !== 'L1_DOCS_VERIFIED') {
-            return new WP_Error(
-                'gf_invalid_state',
-                'Vi phạm quy trình 2 lớp: Phải hoàn tất Duyệt Lớp 1 (L1_DOCS_VERIFIED) trước khi Duyệt Lớp 2.'
-            );
-        }
-
-        $updated = $wpdb->update(
-            "{$wpdb->prefix}gf_installment_applications",
-            [
-                'status'         => 'APPROVED_WAITING_DOWNPAYMENT',
-                'reviewer_id'    => $reviewer_id,
-                'l2_verified_at' => current_time('mysql'),
-            ],
-            ['app_id' => $app_id],
-            ['%s', '%d', '%s'],
-            ['%d']
-        );
-
-        return $updated !== false ? true : new WP_Error('gf_update_failed', 'Cập nhật Duyệt Lớp 2 thất bại.');
+        return self::atomic_transition($app_id, 'L1_DOCS_VERIFIED', 'APPROVED_WAITING_DOWNPAYMENT', $reviewer_id, 'l2_verified_at');
     }
 
     /**
-     * Reject an application or flag as fraud into wp_gf_fraud_blacklist.
+     * Reject an application or flag as fraud into wp_gf_fraud_blacklist inside a DB transaction.
      *
      * @return true|WP_Error
      */
@@ -164,29 +117,45 @@ class GF_Installment_Review {
         }
 
         $new_status = $blacklist ? 'BLACKLISTED' : 'REJECTED';
-        $wpdb->update(
-            "{$wpdb->prefix}gf_installment_applications",
-            [
-                'status'        => $new_status,
-                'reviewer_id'   => $reviewer_id,
-                'reject_reason' => $clean_reason,
-            ],
-            ['app_id' => $app_id],
-            ['%s', '%d', '%s'],
-            ['%d']
-        );
 
-        if ($blacklist && !empty($app['cccd_hash'])) {
-            $wpdb->replace(
-                "{$wpdb->prefix}gf_fraud_blacklist",
-                [
-                    'target_type'  => 'CCCD_HASH',
-                    'target_value' => $app['cccd_hash'],
-                    'reason'       => $clean_reason,
-                    'created_by'   => $reviewer_id,
-                ],
-                ['%s', '%s', '%s', '%d']
+        $wpdb->query('START TRANSACTION');
+        try {
+            $updated = $wpdb->query(
+                $wpdb->prepare(
+                    "UPDATE {$wpdb->prefix}gf_installment_applications
+                     SET status = %s, reviewer_id = %d, reject_reason = %s
+                     WHERE app_id = %d AND status IN ('SUBMITTED', 'L1_DOCS_VERIFIED', 'APPROVED_WAITING_DOWNPAYMENT')",
+                    $new_status,
+                    $reviewer_id,
+                    $clean_reason,
+                    $app_id
+                )
             );
+
+            if ($updated !== 1) {
+                throw new RuntimeException('Chỉ có thể từ chối hồ sơ đang chờ duyệt (không thể hủy hồ sơ đã ACTIVE_INSTALLMENT/CLOSED).');
+            }
+
+            if ($blacklist && !empty($app['cccd_hash'])) {
+                $bl_res = $wpdb->replace(
+                    "{$wpdb->prefix}gf_fraud_blacklist",
+                    [
+                        'target_type'  => 'CCCD_HASH',
+                        'target_value' => $app['cccd_hash'],
+                        'reason'       => $clean_reason,
+                        'created_by'   => $reviewer_id,
+                    ],
+                    ['%s', '%s', '%s', '%d']
+                );
+                if ($bl_res === false) {
+                    throw new RuntimeException('Ghi danh sách đen thất bại.');
+                }
+            }
+
+            $wpdb->query('COMMIT');
+        } catch (Throwable $e) {
+            $wpdb->query('ROLLBACK');
+            return new WP_Error('gf_tx_failed', $e->getMessage());
         }
 
         if (function_exists('wc_get_order')) {
@@ -197,6 +166,17 @@ class GF_Installment_Review {
         }
 
         return true;
+    }
+
+    /**
+     * Compute a keyed HMAC-SHA256 hash for 12-digit CCCD numbers (resists brute-force/rainbow tables).
+     */
+    public static function hash_cccd(string $cccd_number): string {
+        $pepper = getenv('GF_VAULT_ENCRYPTION_KEY');
+        if (!$pepper || $pepper === 'replace_with_32_byte_hex_key_in_env') {
+            $pepper = wp_salt('auth');
+        }
+        return hash_hmac('sha256', $cccd_number, $pepper);
     }
 
     public static function get_application(int $app_id): ?array {
@@ -215,6 +195,44 @@ class GF_Installment_Review {
             ARRAY_A
         );
         return is_array($row) ? $row : null;
+    }
+
+    /**
+     * Execute an atomic conditional state transition to prevent race conditions.
+     *
+     * @return true|WP_Error
+     */
+    private static function atomic_transition(int $app_id, string $expected_status, string $next_status, int $reviewer_id, string $timestamp_col) {
+        global $wpdb;
+
+        $table = "{$wpdb->prefix}gf_installment_applications";
+        $now   = current_time('mysql');
+
+        $sql = $wpdb->prepare(
+            "UPDATE {$table}
+             SET status = %s, reviewer_id = %d, {$timestamp_col} = %s
+             WHERE app_id = %d AND status = %s",
+            $next_status,
+            $reviewer_id,
+            $now,
+            $app_id,
+            $expected_status
+        );
+
+        $affected = $wpdb->query($sql);
+        if ($affected === 1) {
+            return true;
+        }
+
+        $exists = self::get_application($app_id);
+        if (!$exists) {
+            return new WP_Error('gf_not_found', 'Không tìm thấy hồ sơ trả góp.');
+        }
+
+        return new WP_Error(
+            'gf_invalid_state',
+            sprintf('Không thể chuyển trạng thái: Hồ sơ #%d hiện đang ở trạng thái %s (yêu cầu %s).', $app_id, $exists['status'], $expected_status)
+        );
     }
 
     private static function is_blacklisted(string $type, string $value): bool {

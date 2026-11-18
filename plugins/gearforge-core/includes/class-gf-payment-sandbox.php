@@ -1,9 +1,11 @@
 <?php
 /**
- * Sandbox Payment Gateway Adapter (VNPay, MoMo, Fundiin) with 3D-Secure OTP & HMAC IPN.
+ * Sandbox Payment Gateway Adapter (VNPay, MoMo, Fundiin) with 3D-Secure OTP, TTL & Idempotent IPN.
  *
- * Handles downpayment checkout after 2-layer approval (APPROVED_WAITING_DOWNPAYMENT)
- * and transitions orders to PROCESSING / ACTIVE_INSTALLMENT upon verified IPN callback.
+ * Security & Reliability Hardening:
+ * - Adds expiration timestamp (exp, 15 min TTL) into HMAC-SHA256 signature.
+ * - Enforces idempotency check in finalize_verified_payment() to prevent IPN replay attacks.
+ * - Enforces ownership check (anti-IDOR) on /oms-status/{order_id}.
  */
 
 if (!defined('ABSPATH')) {
@@ -13,6 +15,7 @@ if (!defined('ABSPATH')) {
 class GF_Payment_Sandbox {
 
     private const SANDBOX_OTP       = '123456';
+    private const SESSION_TTL_SEC   = 900; // 15 minutes
     private const SUPPORTED_GATEWAY = ['vnpay', 'momo', 'fundiin'];
 
     public static function init(): void {
@@ -34,9 +37,6 @@ class GF_Payment_Sandbox {
         ]);
     }
 
-    /**
-     * Prevent IDOR on /oms-status/{order_id}: allow only the order owner or store operators.
-     */
     public static function check_order_access_permission(WP_REST_Request $request): bool {
         if (!is_user_logged_in()) {
             return false;
@@ -60,7 +60,7 @@ class GF_Payment_Sandbox {
     }
 
     /**
-     * Build a signed Sandbox 3D-Secure checkout URL for an order or installment downpayment.
+     * Build a time-limited, HMAC-signed Sandbox 3D-Secure checkout URL.
      *
      * @return string|WP_Error
      */
@@ -75,7 +75,8 @@ class GF_Payment_Sandbox {
             return $amount;
         }
 
-        $nonce_sig = self::compute_hmac_signature($order_id, $amount, $provider, $mode);
+        $exp       = time() + self::SESSION_TTL_SEC;
+        $nonce_sig = self::compute_hmac_signature('3ds', $order_id, $amount, $provider, $mode, $exp);
 
         return add_query_arg(
             [
@@ -84,15 +85,13 @@ class GF_Payment_Sandbox {
                 'provider'       => $provider,
                 'mode'           => $mode,
                 'amount'         => $amount,
+                'exp'            => $exp,
                 'sig'            => $nonce_sig,
             ],
             home_url('/')
         );
     }
 
-    /**
-     * Render interactive Sandbox 3D-Secure OTP verification page when ?gf_sandbox_3ds=1.
-     */
     public static function handle_sandbox_3ds_page(): void {
         if (empty($_GET['gf_sandbox_3ds'])) {
             return;
@@ -102,15 +101,16 @@ class GF_Payment_Sandbox {
         $provider = sanitize_key($_GET['provider'] ?? 'vnpay');
         $mode     = sanitize_key($_GET['mode'] ?? 'downpayment');
         $amount   = (int) ($_GET['amount'] ?? 0);
-        $sig      = sanitize_text_field($_GET['sig'] ?? '');
+        $exp      = (int) ($_GET['exp'] ?? 0);
+        $sig      = sanitize_text_field(wp_unslash($_GET['sig'] ?? ''));
 
-        if (!self::verify_hmac_signature($order_id, $amount, $provider, $mode, $sig)) {
-            wp_die('Chữ ký phiên thanh toán Sandbox không hợp lệ (HMAC mismatch).', '403 Forbidden', ['response' => 403]);
+        if (!self::verify_hmac_signature('3ds', $order_id, $amount, $provider, $mode, $exp, $sig)) {
+            wp_die('Phiên thanh toán Sandbox đã hết hạn hoặc chữ ký HMAC không hợp lệ.', '403 Forbidden', ['response' => 403]);
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gf_otp_code'])) {
             check_admin_referer('gf_3ds_submit_' . $order_id);
-            $otp = sanitize_text_field($_POST['gf_otp_code']);
+            $otp = sanitize_text_field(wp_unslash($_POST['gf_otp_code']));
 
             if ($otp !== self::SANDBOX_OTP) {
                 $error_msg = 'Mã OTP 3D-Secure không chính xác (Mã test hợp lệ: 123456).';
@@ -143,20 +143,18 @@ class GF_Payment_Sandbox {
         exit;
     }
 
-    /**
-     * REST IPN Webhook handler verifying HMAC signature before updating order & installment states.
-     */
     public static function handle_ipn_callback(WP_REST_Request $request) {
         $params   = $request->get_json_params() ?: $request->get_params();
         $order_id = (int) ($params['order_id'] ?? 0);
         $amount   = (int) ($params['amount'] ?? 0);
         $provider = sanitize_key($params['provider'] ?? 'vnpay');
         $mode     = sanitize_key($params['mode'] ?? 'downpayment');
+        $exp      = (int) ($params['exp'] ?? 0);
         $txn_ref  = sanitize_text_field($params['transaction_ref'] ?? '');
         $sig      = sanitize_text_field($params['signature'] ?? '');
 
-        if (!self::verify_hmac_signature($order_id, $amount, $provider, $mode, $sig)) {
-            return new WP_REST_Response(['code' => 'gf_invalid_hmac', 'message' => 'Chữ ký IPN không hợp lệ.'], 403);
+        if ($txn_ref === '' || !self::verify_hmac_signature('ipn', $order_id, $amount, $provider, $mode, $exp, $sig, $txn_ref)) {
+            return new WP_REST_Response(['code' => 'gf_invalid_hmac', 'message' => 'Chữ ký IPN không hợp lệ hoặc đã hết hạn.'], 403);
         }
 
         $result = self::finalize_verified_payment($order_id, $amount, $provider, $mode, $txn_ref);
@@ -167,9 +165,6 @@ class GF_Payment_Sandbox {
         return rest_ensure_response(['status' => 'success', 'order_id' => $order_id, 'transaction_ref' => $txn_ref]);
     }
 
-    /**
-     * REST OMS Status endpoint combining OrderStatus, InstallmentApplicationStatus & Serial Numbers.
-     */
     public static function handle_oms_status_request(WP_REST_Request $request) {
         global $wpdb;
 
@@ -195,54 +190,75 @@ class GF_Payment_Sandbox {
     }
 
     /**
-     * Update WooCommerce Order to PROCESSING and Installment Application to ACTIVE_INSTALLMENT.
+     * Idempotent payment finalizer with MySQL advisory lock to prevent concurrent double-processing.
      *
      * @return true|WP_Error
      */
     public static function finalize_verified_payment(int $order_id, int $amount, string $provider, string $mode, string $txn_ref) {
         global $wpdb;
 
-        $order = function_exists('wc_get_order') ? wc_get_order($order_id) : null;
-        if (!$order) {
-            return new WP_Error('gf_order_not_found', 'Không tìm thấy đơn hàng WooCommerce.');
+        $lock_name = "gf_pay_{$order_id}";
+        $locked    = (int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 5)', $lock_name));
+        if ($locked !== 1) {
+            return new WP_Error('gf_lock_timeout', 'Giao dịch đang được xử lý, vui lòng thử lại.');
         }
 
-        if ($mode === 'downpayment') {
-            $app = GF_Installment_Review::get_application_by_order($order_id);
-            if (!$app || $app['status'] !== 'APPROVED_WAITING_DOWNPAYMENT') {
-                return new WP_Error('gf_app_not_approved', 'Hồ sơ trả góp chưa được duyệt qua 2 lớp để thanh toán tiền cọc.');
+        try {
+            $order = function_exists('wc_get_order') ? wc_get_order($order_id) : null;
+            if (!$order) {
+                return new WP_Error('gf_order_not_found', 'Không tìm thấy đơn hàng WooCommerce.');
             }
 
-            $wpdb->update(
-                "{$wpdb->prefix}gf_installment_applications",
-                ['status' => 'ACTIVE_INSTALLMENT'],
-                ['app_id' => (int) $app['app_id']],
-                ['%s'],
-                ['%d']
-            );
+            $existing_txn = (string) $order->get_meta('_gf_transaction_ref');
+            if ($existing_txn !== '' || $order->is_paid()) {
+                return new WP_Error('gf_already_paid', 'Đơn hàng đã được ghi nhận thanh toán trước đó (Idempotency guard).');
+            }
+
+            if ($mode === 'downpayment') {
+                $app = GF_Installment_Review::get_application_by_order($order_id);
+                if (!$app || $app['status'] !== 'APPROVED_WAITING_DOWNPAYMENT') {
+                    return new WP_Error('gf_app_not_approved', 'Hồ sơ trả góp chưa được duyệt qua 2 lớp để thanh toán tiền cọc.');
+                }
+
+                $affected = $wpdb->query(
+                    $wpdb->prepare(
+                        "UPDATE {$wpdb->prefix}gf_installment_applications
+                         SET status = 'ACTIVE_INSTALLMENT'
+                         WHERE app_id = %d AND status = 'APPROVED_WAITING_DOWNPAYMENT'",
+                        (int) $app['app_id']
+                    )
+                );
+                if ($affected !== 1) {
+                    return new WP_Error('gf_concurrent_payment', 'Trạng thái hồ sơ đã thay đổi trong lúc thanh toán.');
+                }
+            }
+
+            $order->update_meta_data('_gf_transaction_ref', $txn_ref);
+            $order->update_meta_data('_gf_payment_provider', strtoupper($provider));
+            $order->update_meta_data('_gf_paid_amount', $amount);
+            $order->payment_complete($txn_ref);
+            $order->add_order_note(sprintf('GearForge Sandbox (%s): Đã nhận %s VNĐ. Mã GD: %s', strtoupper($provider), number_format($amount), $txn_ref));
+            $order->save();
+
+            return true;
+        } finally {
+            $wpdb->query($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock_name));
         }
-
-        $order->update_meta_data('_gf_transaction_ref', $txn_ref);
-        $order->update_meta_data('_gf_payment_provider', strtoupper($provider));
-        $order->update_meta_data('_gf_paid_amount', $amount);
-        $order->payment_complete($txn_ref);
-        $order->add_order_note(sprintf('GearForge Sandbox (%s): Đã nhận %s VNĐ. Mã GD: %s', strtoupper($provider), number_format($amount), $txn_ref));
-        $order->save();
-
-        return true;
     }
 
-    public static function compute_hmac_signature(int $order_id, int $amount, string $provider, string $mode): string {
+    public static function compute_hmac_signature(string $context, int $order_id, int $amount, string $provider, string $mode, int $exp, string $txn_ref = ''): string {
         $secret  = self::get_hmac_secret();
-        $payload = "{$order_id}|{$amount}|{$provider}|{$mode}";
+        $payload = $context === 'ipn'
+            ? "ipn|{$order_id}|{$amount}|{$provider}|{$mode}|{$exp}|{$txn_ref}"
+            : "3ds|{$order_id}|{$amount}|{$provider}|{$mode}|{$exp}";
         return hash_hmac('sha256', $payload, $secret);
     }
 
-    public static function verify_hmac_signature(int $order_id, int $amount, string $provider, string $mode, string $sig): bool {
-        if ($order_id <= 0 || $amount <= 0 || $sig === '') {
+    public static function verify_hmac_signature(string $context, int $order_id, int $amount, string $provider, string $mode, int $exp, string $sig, string $txn_ref = ''): bool {
+        if ($order_id <= 0 || $amount <= 0 || $sig === '' || $exp < time()) {
             return false;
         }
-        $expected = self::compute_hmac_signature($order_id, $amount, $provider, $mode);
+        $expected = self::compute_hmac_signature($context, $order_id, $amount, $provider, $mode, $exp, $txn_ref);
         return hash_equals($expected, $sig);
     }
 
@@ -264,7 +280,10 @@ class GF_Payment_Sandbox {
 
     private static function get_hmac_secret(): string {
         $key = getenv('GF_VAULT_ENCRYPTION_KEY');
-        return $key ? $key : wp_salt('auth');
+        if (!$key || $key === 'replace_with_32_byte_hex_key_in_env') {
+            return wp_salt('auth');
+        }
+        return $key;
     }
 }
 

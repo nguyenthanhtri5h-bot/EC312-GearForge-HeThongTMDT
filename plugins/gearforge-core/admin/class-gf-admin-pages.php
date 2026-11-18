@@ -46,7 +46,7 @@ class GF_Admin_Pages {
         } elseif ($action === 'layer2') {
             $result = GF_Installment_Review::review_layer_2($app_id, $reviewer_id);
         } elseif ($action === 'reject' || $action === 'blacklist') {
-            $reason = sanitize_textarea_field($_POST['reject_reason'] ?? '');
+            $reason = sanitize_textarea_field(wp_unslash($_POST['reject_reason'] ?? ''));
             $result = GF_Installment_Review::reject_application($app_id, $reviewer_id, $reason, $action === 'blacklist');
         }
 
@@ -94,7 +94,18 @@ class GF_Admin_Pages {
     public static function render_installments_page(): void {
         global $wpdb;
 
-        $status_filter = sanitize_text_field($_GET['status'] ?? '');
+        $allowed_statuses = [
+            ''                           => 'Tất cả',
+            'SUBMITTED'                  => 'Chờ duyệt L1 (SUBMITTED)',
+            'L1_DOCS_VERIFIED'           => 'Đã duyệt L1 (L1_DOCS_VERIFIED)',
+            'APPROVED_WAITING_DOWNPAYMENT' => 'Chờ trả trước (APPROVED)',
+            'ACTIVE_INSTALLMENT'         => 'Đang góp (ACTIVE)',
+            'REJECTED'                   => 'Từ chối (REJECTED)',
+            'BLACKLISTED'                => 'Danh sách đen (BLACKLISTED)',
+        ];
+
+        $raw_status    = sanitize_text_field($_GET['status'] ?? '');
+        $status_filter = array_key_exists($raw_status, $allowed_statuses) ? $raw_status : '';
         $table         = "{$wpdb->prefix}gf_installment_applications";
 
         if ($status_filter !== '') {
@@ -107,6 +118,17 @@ class GF_Admin_Pages {
         }
 
         echo '<div class="wrap"><h1>Quản lý Hồ sơ Trả góp Sinh viên (Duyệt 2 lớp)</h1>';
+        echo '<ul class="subsubsub" style="margin-bottom:12px;">';
+        $idx   = 0;
+        $total = count($allowed_statuses);
+        foreach ($allowed_statuses as $key => $label) {
+            $idx++;
+            $url   = $key === '' ? admin_url('admin.php?page=gf-installments') : admin_url('admin.php?page=gf-installments&status=' . urlencode($key));
+            $class = $status_filter === $key ? 'current' : '';
+            $sep   = $idx < $total ? ' | ' : '';
+            echo '<li><a href="' . esc_url($url) . '" class="' . esc_attr($class) . '">' . esc_html($label) . '</a>' . $sep . '</li>';
+        }
+        echo '</ul><div class="clear"></div>';
 
         if (!empty($_GET['gf_msg'])) {
             echo '<div class="notice notice-success"><p>' . esc_html(wp_unslash($_GET['gf_msg'])) . '</p></div>';

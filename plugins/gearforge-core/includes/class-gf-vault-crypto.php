@@ -86,6 +86,7 @@ class GF_Vault_Crypto {
             return new WP_Error('gf_vault_write_failed', 'Không thể ghi tệp vào vùng lưu trữ bảo mật.');
         }
 
+        @chmod($full_path, 0600);
         return $filename;
     }
 

@@ -229,7 +229,7 @@ class GF_Serial_Manager {
         check_admin_referer('gf_assign_serial_' . $order_id);
 
         $item_id = (int) ($_POST['order_item_id'] ?? 0);
-        $serial  = sanitize_text_field($_POST['serial_number'] ?? '');
+        $serial  = sanitize_text_field(wp_unslash($_POST['serial_number'] ?? ''));
         $order   = wc_get_order($order_id);
         $item    = $order ? $order->get_item($item_id) : null;
 
