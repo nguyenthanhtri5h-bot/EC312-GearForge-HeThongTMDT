@@ -30,6 +30,12 @@ class GF_Payment_Sandbox {
             'permission_callback' => '__return_true',
         ]);
 
+        register_rest_route('gearforge/v1', '/payment-sandbox/query/(?P<order_id>\d+)', [
+            'methods'             => WP_REST_Server::READABLE,
+            'callback'            => [self::class, 'handle_query_dr'],
+            'permission_callback' => [self::class, 'check_order_access_permission'],
+        ]);
+
         register_rest_route('gearforge/v1', '/oms-status/(?P<order_id>\d+)', [
             'methods'             => WP_REST_Server::READABLE,
             'callback'            => [self::class, 'handle_oms_status_request'],
@@ -61,6 +67,7 @@ class GF_Payment_Sandbox {
 
     /**
      * Build a time-limited, HMAC-signed Sandbox 3D-Secure checkout URL.
+     * Blocks creating a second payment session if the order is already paid.
      *
      * @return string|WP_Error
      */
@@ -68,6 +75,10 @@ class GF_Payment_Sandbox {
         $provider = strtolower($provider);
         if (!in_array($provider, self::SUPPORTED_GATEWAY, true)) {
             return new WP_Error('gf_unsupported_gateway', 'Cổng thanh toán Sandbox chỉ hỗ trợ vnpay, momo hoặc fundiin.');
+        }
+
+        if (self::is_order_already_paid($order_id)) {
+            return new WP_Error('gf_already_paid', 'Đơn hàng này đã thanh toán thành công, không thể tạo phiên thanh toán lần 2.');
         }
 
         $amount = self::resolve_payable_amount($order_id, $mode);
@@ -80,13 +91,14 @@ class GF_Payment_Sandbox {
 
         return add_query_arg(
             [
-                'gf_sandbox_3ds' => '1',
-                'order_id'       => $order_id,
-                'provider'       => $provider,
-                'mode'           => $mode,
-                'amount'         => $amount,
-                'exp'            => $exp,
-                'sig'            => $nonce_sig,
+                'gf_sandbox_3ds'  => '1',
+                'order_id'        => $order_id,
+                'provider'        => $provider,
+                'mode'            => $mode,
+                'amount'          => $amount,
+                'idempotency_key' => "GF_{$order_id}_{$mode}",
+                'exp'             => $exp,
+                'sig'             => $nonce_sig,
             ],
             home_url('/')
         );
@@ -106,6 +118,21 @@ class GF_Payment_Sandbox {
 
         if (!self::verify_hmac_signature('3ds', $order_id, $amount, $provider, $mode, $exp, $sig)) {
             wp_die('Phiên thanh toán Sandbox đã hết hạn hoặc chữ ký HMAC không hợp lệ.', '403 Forbidden', ['response' => 403]);
+        }
+
+        // Prevent double charge if IPN already settled the order while customer lost internet
+        if (self::is_order_already_paid($order_id)) {
+            $order   = function_exists('wc_get_order') ? wc_get_order($order_id) : null;
+            $txn_ref = $order ? (string) $order->get_meta('_gf_transaction_ref') : '';
+            header('Content-Type: text/html; charset=utf-8');
+            echo '<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><title>Đã thanh toán thành công</title></head>';
+            echo '<body style="font-family:sans-serif;max-width:480px;margin:48px auto;padding:24px;border:1px solid #28a745;border-radius:8px;background:#f4fbf6;">';
+            echo '<h2 style="color:#1e7e34;">Đơn hàng #' . $order_id . ' đã thanh toán thành công!</h2>';
+            echo '<p>Hệ thống đã nhận xác nhận giao dịch qua kênh đối soát IPN (Mã GD: <code>' . esc_html($txn_ref ?: 'N/A') . '</code>).</p>';
+            echo '<p>Phiên thanh toán này đã được khóa tự động để đảm bảo bạn <strong>không bị trừ tiền lần 2</strong>.</p>';
+            echo '<a href="' . esc_url(home_url('/')) . '" style="display:inline-block;margin-top:12px;padding:10px 16px;background:#1e7e34;color:#fff;text-decoration:none;border-radius:4px;">Quay về Trang chủ GearForge</a>';
+            echo '</body></html>';
+            exit;
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gf_otp_code'])) {
@@ -163,6 +190,34 @@ class GF_Payment_Sandbox {
         }
 
         return rest_ensure_response(['status' => 'success', 'order_id' => $order_id, 'transaction_ref' => $txn_ref]);
+    }
+
+    /**
+     * Active Reconciliation (QueryDR): allows frontend/admin to verify real payment status after network drop.
+     */
+    public static function handle_query_dr(WP_REST_Request $request) {
+        $order_id = (int) $request->get_param('order_id');
+        $order    = function_exists('wc_get_order') ? wc_get_order($order_id) : null;
+
+        if (!$order) {
+            return new WP_REST_Response(['code' => 'gf_order_not_found', 'message' => 'Không tìm thấy đơn hàng.'], 404);
+        }
+
+        $app     = class_exists('GF_Installment_Review') ? GF_Installment_Review::get_application_by_order($order_id) : null;
+        $txn_ref = (string) $order->get_meta('_gf_transaction_ref');
+        $is_paid = self::is_order_already_paid($order_id);
+
+        return rest_ensure_response([
+            'order_id'           => $order_id,
+            'payment_state'      => $is_paid ? 'PAID' : 'PENDING',
+            'can_retry_payment'  => !$is_paid,
+            'idempotency_key'    => 'GF_' . $order_id . '_' . ($app ? 'downpayment' : 'full'),
+            'transaction_ref'    => $txn_ref ?: null,
+            'provider'           => $order->get_meta('_gf_payment_provider') ?: null,
+            'paid_amount'        => $is_paid ? (int) $order->get_meta('_gf_paid_amount') : 0,
+            'order_status'       => $order->get_status(),
+            'installment_status' => $app ? $app['status'] : null,
+        ]);
     }
 
     public static function handle_oms_status_request(WP_REST_Request $request) {
@@ -260,6 +315,14 @@ class GF_Payment_Sandbox {
         }
         $expected = self::compute_hmac_signature($context, $order_id, $amount, $provider, $mode, $exp, $txn_ref);
         return hash_equals($expected, $sig);
+    }
+
+    public static function is_order_already_paid(int $order_id): bool {
+        $order = function_exists('wc_get_order') ? wc_get_order($order_id) : null;
+        if (!$order) {
+            return false;
+        }
+        return (string) $order->get_meta('_gf_transaction_ref') !== '' || $order->is_paid();
     }
 
     private static function resolve_payable_amount(int $order_id, string $mode) {

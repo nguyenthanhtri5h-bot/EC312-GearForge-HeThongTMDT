@@ -390,6 +390,7 @@ CREATE TABLE IF NOT EXISTS wp_gf_fraud_blacklist (
 - **MySQL Transaction & Advisory Lock (`FIX-03`, `FIX-10`):** Đảm bảo tính ACID khi từ chối/blacklist và Idempotency chống Replay Attack khi nhận IPN.
 - **Composite Index MySQL 8.0 (`FIX-05`):** Nâng cấp `(status, app_id)` và `(order_id, order_item_id)` tối ưu hiệu năng truy vấn.
 - **Domain-Separated HMAC (`FIX-08`):** Tách biệt chữ ký `3ds` và `ipn` ngăn chặn 3DS OTP Bypass.
+- **Chống Double Charge khi mất mạng & Active Reconciliation `QueryDR` (`FIX-12`):** Tách biệt Server-to-Server IPN với Browser Return, khóa form thanh toán ngay từ bước tạo phiên & màn hình 3DS nếu IPN đã chốt đơn (`is_order_already_paid()`), gắn `idempotency_key` (`GF_{order_id}_{mode}`) và cung cấp API đối soát chủ động `GET /wp-json/gearforge/v1/payment-sandbox/query/{order_id}`.
 
 ---
 
