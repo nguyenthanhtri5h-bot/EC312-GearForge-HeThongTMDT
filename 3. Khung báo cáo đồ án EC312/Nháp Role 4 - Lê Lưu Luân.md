@@ -360,15 +360,36 @@ CREATE TABLE IF NOT EXISTS wp_gf_fraud_blacklist (
 
 ---
 
-## MỤC 5.2.3 – 5.2.4: KẾT QUẢ DEMO CÁC CHỨC NĂNG BACKEND & CSDL *(Chờ chèn ảnh thực tế sau Bước 2–4)*
+## MỤC 5.2.3 – 5.2.4: KẾT QUẢ DEMO CÁC CHỨC NĂNG BACKEND, BẢO MẬT & CSDL
 
-- **5.2.3. Tính toán, Upload CCCD/Thẻ SV (AES-256), Duyệt 2 lớp & Thanh toán Sandbox 3DS:**
-  - *(Chèn ảnh phpMyAdmin kiểm tra 4 bảng `wp_gf_*` + 3 gói seed)*
-  - *(Chèn ảnh test Postman REST API `/wp-json/gearforge/v1/installment-calc`)*
-  - *(Chèn ảnh giao diện Admin duyệt Lớp 1 -> Lớp 2 và Thanh toán Sandbox 3D-Secure OTP `123456`)*
-- **5.2.4. Gán mã Serial Number (S/N) xuất kho & Xuất Hóa đơn PDF chuẩn dữ liệu T-VAN:**
-  - *(Chèn ảnh thông báo chặn chuyển `SHIPPING` khi thiếu S/N)*
-  - *(Chèn ảnh file Hóa đơn PDF mẫu hiển thị S/N, MST giả lập và thuế VAT 8%–10%)*
+### 5.2.3. Công cụ tính Trả góp Động, Mã hóa AES-256, Duyệt 2 lớp & Sandbox 3D-Secure
+1. **Nguồn tham chiếu thiết kế thực tế:**
+   - **Bảng tính trả góp 3–6–12 tháng:** Tham khảo từ **TGDĐ**, **CellphoneS**, **GearVN**, **Xgear** và **MemoryZone** (chọn % trả trước 20–50%, kỳ hạn 3/6/12 tháng); mô hình hiển thị ước tính trả góp tham khảo từ **Affirm / Klarna / JD Baitiao**.
+   - **Định danh sinh viên & Duyệt hồ sơ 2 lớp:** Tham khảo từ **CellphoneS (S-Student)**, **zShop** (kiểm duyệt CCCD + Thẻ SV) và **UNiDAYS / SheerID** (xác thực email `.edu.vn`).
+   - **Thanh toán Sandbox 3D-Secure:** Tham khảo kiến trúc tích hợp từ **VNPay Sandbox**, **MoMo Developers** và **Fundiin BNPL** (chữ ký HMAC & OTP 3D-Secure).
+2. **Minh chứng REST API tính toán trả góp (`TC-12`):**
+   - Endpoint `GET /wp-json/gearforge/v1/installment-calc?price=20000000&down_pct=30&months=6` trả về JSON chính xác (`downpayment_amount: 6000000`, `loan_principal: 14000000`, `total_interest: 1008000`, `monthly_amount: 2501000`).
+   - *(Ảnh minh chứng: `Ảnh minh chứng Role 4/1_REST_API_Installment_Calc.png`)*
+3. **Minh chứng Màn hình Quản trị Duyệt 2 lớp & Bảo mật NĐ 13/2023 (`TC-06`, `TC-13`):**
+   - Trang WP Admin **Trả góp SV** tích hợp thanh lọc nhanh theo trạng thái, xem ảnh CCCD/Thẻ SV giải mã từ vùng bảo mật `/var/www/gf-vault/` (mã hóa `AES-256-CBC` + `HMAC-SHA256`, ghi Audit Log) và thao tác **Duyệt Lớp 1 $\rightarrow$ Duyệt Lớp 2** sử dụng Atomic Conditional Update chống Race Condition.
+   - *(Ảnh minh chứng: `Ảnh minh chứng Role 4/2_WP_Admin_Installment_Review.png`)*
+4. **Minh chứng Cổng Thanh toán Sandbox 3D-Secure (`TC-14`):**
+   - Phiên thanh toán cọc trả trước có thời hạn TTL 15 phút và chữ ký HMAC tách biệt ngữ cảnh (`3ds|...` vs `ipn|...|txn_ref`) chống OTP Bypass; sau khi nhập OTP `123456`, đơn hàng chuyển `PROCESSING` và hồ sơ chuyển `ACTIVE_INSTALLMENT`.
+   - *(Ảnh minh chứng: `Ảnh minh chứng Role 4/3_Sandbox_3DS_Payment.png`)*
+
+### 5.2.4. Gán mã Serial Number (S/N) xuất kho & Xuất Hóa đơn PDF chuẩn dữ liệu T-VAN
+1. **Ràng buộc Serial Number chống đánh tráo linh kiện (`TC-15`):**
+   - Tham khảo mô hình tra cứu S/N / Service Tag của **Asus, Lenovo, Apple, Dell**. Meta Box trong chi tiết đơn hàng WP Admin cho phép gắn S/N duy nhất vào bảng `wp_gf_order_serials`. Hook `woocommerce_order_status_changed` tự động chặn và hoàn nguyên trạng thái nếu cố chuyển đơn Laptop/PC sang `SHIPPING` khi thiếu S/N.
+   - *(Ảnh minh chứng: `Ảnh minh chứng Role 4/4_WP_Admin_Serial_Box.png`)*
+2. **Hóa đơn PDF chuẩn dữ liệu T-VAN (`TC-16`):**
+   - Tham khảo chuẩn thông tin hóa đơn điện tử **Nghị định 123/2020/NĐ-CP** từ **MISA meInvoice** & **VNPT Invoice**. Bộ sinh `%PDF-1.4` thuần PHP xuất hóa đơn chứa đầy đủ Tên đơn vị bán (`CONG TY TNHH CONG NGHE GEARFORGE`), MST (`0312345678`), **Serial Number**, **VAT 10%**, và hình thức trả góp SV (tệp mẫu: `Ảnh minh chứng Role 4/GearForge-Invoice-20.pdf`).
+
+### 5.2.5. Tóm tắt các điểm Nâng cấp Bảo mật & Tối ưu CSDL (Senior Hardening)
+- **Atomic Conditional Update (`FIX-01`):** Chặn Race Condition khi duyệt 2 lớp.
+- **Keyed HMAC-SHA256 Pepper (`FIX-02`):** Bảo vệ `cccd_hash` chống brute-force Rainbow Table.
+- **MySQL Transaction & Advisory Lock (`FIX-03`, `FIX-10`):** Đảm bảo tính ACID khi từ chối/blacklist và Idempotency chống Replay Attack khi nhận IPN.
+- **Composite Index MySQL 8.0 (`FIX-05`):** Nâng cấp `(status, app_id)` và `(order_id, order_item_id)` tối ưu hiệu năng truy vấn.
+- **Domain-Separated HMAC (`FIX-08`):** Tách biệt chữ ký `3ds` và `ipn` ngăn chặn 3DS OTP Bypass.
 
 ---
 
