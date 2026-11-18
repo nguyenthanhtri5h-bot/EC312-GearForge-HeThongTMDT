@@ -100,10 +100,16 @@ class GF_Installment_Calc {
     }
 
     /**
-     * Fetch active plan from wp_gf_installment_plans or fallback constants.
+     * Fetch active plan from wp_gf_installment_plans (with Object Cache) or fallback constants.
      */
     public static function get_plan_by_months(int $months): ?array {
         global $wpdb;
+
+        $cache_key = 'plan_months_' . $months;
+        $cached    = wp_cache_get($cache_key, 'gearforge_plans');
+        if (is_array($cached)) {
+            return $cached;
+        }
 
         $table = "{$wpdb->prefix}gf_installment_plans";
         $row   = $wpdb->get_row(
@@ -118,6 +124,7 @@ class GF_Installment_Calc {
         );
 
         if (is_array($row)) {
+            wp_cache_set($cache_key, $row, 'gearforge_plans', 3600);
             return $row;
         }
 

@@ -106,15 +106,42 @@ class GF_Admin_Pages {
 
         $raw_status    = sanitize_text_field($_GET['status'] ?? '');
         $status_filter = array_key_exists($raw_status, $allowed_statuses) ? $raw_status : '';
+        $last_id       = max(0, (int) ($_GET['last_id'] ?? 0));
+        $page_size     = 20;
+        $fetch_limit   = $page_size + 1;
         $table         = "{$wpdb->prefix}gf_installment_applications";
 
-        if ($status_filter !== '') {
+        // Index-backed grouped status counters
+        $count_rows = $wpdb->get_results("SELECT status, COUNT(*) AS cnt FROM {$table} GROUP BY status", ARRAY_A) ?: [];
+        $counts     = array_column($count_rows, 'cnt', 'status');
+        $total_all  = array_sum(array_map('intval', $counts));
+
+        // Keyset pagination (O(log N), avoids slow OFFSET on large tables)
+        if ($status_filter !== '' && $last_id > 0) {
             $rows = $wpdb->get_results(
-                $wpdb->prepare("SELECT * FROM {$table} WHERE status = %s ORDER BY app_id DESC LIMIT 50", $status_filter),
+                $wpdb->prepare("SELECT * FROM {$table} WHERE status = %s AND app_id < %d ORDER BY app_id DESC LIMIT %d", $status_filter, $last_id, $fetch_limit),
+                ARRAY_A
+            );
+        } elseif ($status_filter !== '') {
+            $rows = $wpdb->get_results(
+                $wpdb->prepare("SELECT * FROM {$table} WHERE status = %s ORDER BY app_id DESC LIMIT %d", $status_filter, $fetch_limit),
+                ARRAY_A
+            );
+        } elseif ($last_id > 0) {
+            $rows = $wpdb->get_results(
+                $wpdb->prepare("SELECT * FROM {$table} WHERE app_id < %d ORDER BY app_id DESC LIMIT %d", $last_id, $fetch_limit),
                 ARRAY_A
             );
         } else {
-            $rows = $wpdb->get_results("SELECT * FROM {$table} ORDER BY app_id DESC LIMIT 50", ARRAY_A);
+            $rows = $wpdb->get_results(
+                $wpdb->prepare("SELECT * FROM {$table} ORDER BY app_id DESC LIMIT %d", $fetch_limit),
+                ARRAY_A
+            );
+        }
+
+        $has_more = count($rows) > $page_size;
+        if ($has_more) {
+            array_pop($rows);
         }
 
         echo '<div class="wrap"><h1>Quản lý Hồ sơ Trả góp Sinh viên (Duyệt 2 lớp)</h1>';
@@ -123,10 +150,11 @@ class GF_Admin_Pages {
         $total = count($allowed_statuses);
         foreach ($allowed_statuses as $key => $label) {
             $idx++;
+            $cnt   = $key === '' ? $total_all : (int) ($counts[$key] ?? 0);
             $url   = $key === '' ? admin_url('admin.php?page=gf-installments') : admin_url('admin.php?page=gf-installments&status=' . urlencode($key));
             $class = $status_filter === $key ? 'current' : '';
             $sep   = $idx < $total ? ' | ' : '';
-            echo '<li><a href="' . esc_url($url) . '" class="' . esc_attr($class) . '">' . esc_html($label) . '</a>' . $sep . '</li>';
+            echo '<li><a href="' . esc_url($url) . '" class="' . esc_attr($class) . '">' . esc_html($label) . ' <span class="count">(' . $cnt . ')</span></a>' . $sep . '</li>';
         }
         echo '</ul><div class="clear"></div>';
 
@@ -169,7 +197,16 @@ class GF_Admin_Pages {
                 echo '</form></td></tr>';
             }
         }
-        echo '</tbody></table></div>';
+        echo '</tbody></table>';
+        if (!empty($has_more) && !empty($rows)) {
+            $next_last_id = (int) end($rows)['app_id'];
+            $next_url     = admin_url('admin.php?page=gf-installments&last_id=' . $next_last_id);
+            if ($status_filter !== '') {
+                $next_url = add_query_arg('status', $status_filter, $next_url);
+            }
+            echo '<p style="margin-top:12px;"><a class="button" href="' . esc_url($next_url) . '">Trang tiếp theo (Keyset &lt; #' . $next_last_id . ') &rarr;</a></p>';
+        }
+        echo '</div>';
     }
 
     private static function can_review(): bool {
