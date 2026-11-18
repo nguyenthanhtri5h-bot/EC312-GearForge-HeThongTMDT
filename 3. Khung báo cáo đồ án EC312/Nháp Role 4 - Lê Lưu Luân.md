@@ -399,3 +399,15 @@ Trên nền tảng kiến trúc Microkernel (`gearforge-core`) đã chuẩn hóa
 1. **Tích hợp eKYC AI tự động (OCR & Liveness Check):** Thay thế thao tác đối chiếu ảnh CCCD/Thẻ sinh viên thủ công ở Lớp 1 bằng API OCR đọc tự động số CCCD/MSSV và so khớp khuôn mặt thời gian thực, rút ngắn thời gian duyệt xuống dưới 5 phút.
 2. **Kết nối API Hóa đơn điện tử T-VAN thời gian thực:** Nâng cấp từ xuất Hóa đơn PDF mẫu sang truyền nhận dữ liệu trực tiếp với các nhà cung cấp T-VAN (MISA meInvoice, VNPT Invoice) theo chuẩn Thông tư 78 / Nghị định 123 của Tổng cục Thuế.
 3. **Thu cũ đổi mới (Trade-in) & Build PC thông minh:** Bổ sung module định giá máy cũ dựa trên tình trạng linh kiện/S/N và công cụ kiểm tra độ tương thích phần cứng (Socket CPU, Mainboard, PSU Wattage) cho phân khúc PC lắp ráp.
+
+---
+
+## PHỤ LỤC NHANH: TÀI KHOẢN MÔI TRƯỜNG DEMO LOCAL (DÀNH CHO NHÓM TEST CHUNG)
+
+*(Chỉ sử dụng cho môi trường Docker Local trên máy phát triển, tuyệt đối không dùng cho môi trường Production)*
+
+| Hệ thống / Vai trò | Đường dẫn truy cập | Tài khoản (Username) | Mật khẩu (Password) | Mục đích sử dụng |
+| :--- | :--- | :--- | :--- | :--- |
+| **WordPress Admin** (`StoreAdmin` / `InstallmentReviewer`) | `http://localhost:8080/wp-admin` | `admin` | `admin123` | Quản lý sản phẩm, Duyệt hồ sơ trả góp 2 lớp, Gán S/N, Xuất PDF T-VAN |
+| **Tài khoản Sinh viên** (`StudentCustomer`) | `http://localhost:8080/wp-login.php` | `user` (`24521027@gm.uit.edu.vn`) | `admin123` | Đăng nhập khách hàng sinh viên test đặt hàng, trả góp, theo dõi OMS |
+| **phpMyAdmin** (MySQL 8.0) | `http://localhost:8081` | `gf_user` | `admin123` | Kiểm tra trực tiếp 4 bảng mở rộng `wp_gf_*` và dữ liệu seed |
