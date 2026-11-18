@@ -89,6 +89,41 @@ sequenceDiagram
 
 ---
 
+### 3.7.4. Biểu đồ Tuần tự Gắn Serial Number & Xuất Hóa đơn PDF T-VAN (`Sequence Diagram – UC-12`)
+
+*(File nguồn: `2. Quy ước và Sơ đồ UML/role4_diagrams/UC12_Serial_Invoice_Sequence_Role4.mmd`)*
+
+```mermaid
+sequenceDiagram
+    actor Admin as StoreAdmin
+    participant UI as WP Admin Order & MetaBox
+    participant Hook as GF_Serial_Manager
+    participant DB as MySQL (wp_gf_order_serials)
+    participant PDF as GF_Invoice_PDF
+    actor SV as StudentCustomer
+
+    Admin->>UI: Thử đổi trạng thái đơn Laptop sang SHIPPING
+    UI->>Hook: Trigger woocommerce_order_status_changed
+    Hook->>DB: Kiểm tra COUNT(serial_number) theo (order_id, order_item_id)
+    alt Chưa gắn đủ Serial Number
+        DB-->>Hook: Trả về 0 (Thiếu S/N)
+        Hook->>UI: Hoàn nguyên trạng thái cũ & hiện cảnh báo đỏ (TC-15)
+    else Đã đủ S/N hoặc Admin tiến hành gắn mới
+        Admin->>UI: Nhập mã S/N duy nhất (VD: SN-GF-2026-ROG001)
+        UI->>Hook: POST admin-post.php?action=gf_assign_serial (Nonce + RBAC)
+        Hook->>DB: INSERT wp_gf_order_serials (UNIQUE uk_gf_serial_number)
+        DB-->>Hook: Lưu thành công -> cập nhật SERIAL_ASSIGNED
+        Admin->>UI: Chuyển đơn sang SHIPPING -> DELIVERED
+        Hook-->>UI: Cho phép xuất kho thành công
+    end
+
+    SV->>PDF: Yêu cầu tải Hóa đơn PDF (Nonce + Anti-IDOR)
+    PDF->>DB: Lấy thông tin Order, Serial Number & Trạng thái Trả góp
+    PDF-->>SV: Xuất file %PDF-1.4 chuẩn T-VAN (MST, S/N, VAT 10%)
+```
+
+---
+
 ## MỤC 4.2: THIẾT KẾ CƠ SỞ DỮ LIỆU (DATABASE DESIGN)
 
 ### 4.2.1. Mô hình Thực thể Kết hợp (ERD)
@@ -360,7 +395,71 @@ CREATE TABLE IF NOT EXISTS wp_gf_fraud_blacklist (
 
 ---
 
-## MỤC 5.2.3 – 5.2.4: KẾT QUẢ DEMO CÁC CHỨC NĂNG BACKEND, BẢO MẬT & CSDL
+## MỤC 5.1 & 5.2.3 – 5.2.4: KIẾN TRÚC LỚP BACKEND & KẾT QUẢ DEMO CÁC CHỨC NĂNG CSDL
+
+### 5.1.1. Biểu đồ Lớp Chi tiết Phân hệ Backend (`gearforge-core` – Phần Role 4)
+
+*(File nguồn: `2. Quy ước và Sơ đồ UML/role4_diagrams/ClassDiagram_Backend_Role4.mmd`)*
+
+```mermaid
+classDiagram
+    class GF_Activator {
+        +activate() void
+        -create_tables() void
+        -seed_installment_plans() void
+        -ensure_vault_directory() void
+    }
+    class GF_Installment_Calc {
+        +calculate(float price, float down_pct, int months) array
+        +get_plan_by_months(int months) array
+        +handle_calc_request(WP_REST_Request req) WP_REST_Response
+    }
+    class GF_Vault_Crypto {
+        +encrypt_and_store_upload(array file) string
+        +encrypt_bytes(string plaintext, string mime) string
+        +decrypt_file(string filename) array
+        -get_encryption_key() string
+    }
+    class GF_Installment_Review {
+        +submit_application(array data, array cccd, array card) int
+        +review_layer_1(int app_id, int reviewer_id) bool
+        +review_layer_2(int app_id, int reviewer_id) bool
+        +reject_application(int app_id, int reviewer_id, string reason, bool blacklist) bool
+        +hash_cccd(string cccd_number) string
+        -atomic_transition(int app_id, string expected, string next) bool
+    }
+    class GF_Payment_Sandbox {
+        +create_sandbox_payment_session(int order_id, string provider, string mode) string
+        +handle_ipn_callback(WP_REST_Request req) WP_REST_Response
+        +handle_query_dr(WP_REST_Request req) WP_REST_Response
+        +finalize_verified_payment(int order_id, int amount, string provider, string mode, string txn_ref) bool
+        +verify_hmac_signature(string context, int order_id, int amount, string provider, string mode, int exp, string sig) bool
+        +is_order_already_paid(int order_id) bool
+    }
+    class GF_Serial_Manager {
+        +assign_serial(int order_id, int item_id, int product_id, string serial, int by) int
+        +enforce_serial_before_shipping(int order_id, string old, string next, WC_Order order) void
+        +has_all_required_serials(WC_Order order) bool
+        +get_order_serials(int order_id) array
+    }
+    class GF_Invoice_PDF {
+        +generate_tvan_invoice_pdf(int order_id) string
+        +handle_download_request() void
+        +inject_serial_into_wpo_pdf(string type, array item, WC_Order order) void
+    }
+    class GF_Admin_Pages {
+        +render_installments_page() void
+        +handle_review_action() void
+        +handle_view_vault_doc() void
+    }
+    GF_Installment_Review --> GF_Vault_Crypto : mã hóa ảnh CCCD/Thẻ SV
+    GF_Installment_Review ..> GF_Installment_Calc : sử dụng kết quả tính góp
+    GF_Payment_Sandbox --> GF_Installment_Review : chuyển ACTIVE_INSTALLMENT
+    GF_Invoice_PDF --> GF_Serial_Manager : truy vấn danh sách S/N
+    GF_Invoice_PDF ..> GF_Installment_Review : đọc trạng thái trả góp
+    GF_Admin_Pages --> GF_Installment_Review : gọi duyệt 2 lớp / từ chối
+    GF_Admin_Pages --> GF_Vault_Crypto : giải mã stream ảnh
+```
 
 ### 5.2.3. Công cụ tính Trả góp Động, Mã hóa AES-256, Duyệt 2 lớp & Sandbox 3D-Secure
 1. **Nguồn tham chiếu thiết kế thực tế:**

@@ -1,0 +1,26 @@
+sequenceDiagram
+    actor Admin as StoreAdmin
+    participant UI as WP Admin Order & MetaBox
+    participant Hook as GF_Serial_Manager
+    participant DB as MySQL (wp_gf_order_serials)
+    participant PDF as GF_Invoice_PDF
+    actor SV as StudentCustomer
+
+    Admin->>UI: Thử đổi trạng thái đơn Laptop sang SHIPPING
+    UI->>Hook: Trigger woocommerce_order_status_changed
+    Hook->>DB: Kiểm tra COUNT(serial_number) theo (order_id, order_item_id)
+    alt Chưa gắn đủ Serial Number
+        DB-->>Hook: Trả về 0 (Thiếu S/N)
+        Hook->>UI: Hoàn nguyên trạng thái cũ & hiện cảnh báo đỏ (TC-15)
+    else Đã đủ S/N hoặc Admin tiến hành gắn mới
+        Admin->>UI: Nhập mã S/N duy nhất (VD: SN-GF-2026-ROG001)
+        UI->>Hook: POST admin-post.php?action=gf_assign_serial (Nonce + RBAC)
+        Hook->>DB: INSERT wp_gf_order_serials (UNIQUE uk_gf_serial_number)
+        DB-->>Hook: Lưu thành công -> cập nhật SERIAL_ASSIGNED
+        Admin->>UI: Chuyển đơn sang SHIPPING -> DELIVERED
+        Hook-->>UI: Cho phép xuất kho thành công
+    end
+
+    SV->>PDF: Yêu cầu tải Hóa đơn PDF (Nonce + Anti-IDOR)
+    PDF->>DB: Lấy thông tin Order, Serial Number & Trạng thái Trả góp
+    PDF-->>SV: Xuất file %PDF-1.4 chuẩn T-VAN (MST, S/N, VAT 10%)
