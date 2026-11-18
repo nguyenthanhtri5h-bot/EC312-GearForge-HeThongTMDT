@@ -1,7 +1,7 @@
 # NHẬT KÝ KỸ THUẬT, BẢO MẬT & CÁC ĐIỂM TỐI ƯU HÓA – ROLE 4
 
 > **Thành viên phụ trách:** **Lê Lưu Luân** — MSSV: `24521027` (`role4-backend-payment`)  
-> **Mục đích tài liệu:** Ghi lại chi tiết các quyết định thiết kế Backend/Database và các bản vá nâng cấp bảo mật/hiệu năng để phục vụ **viết Báo cáo EC312** và **trả lời Vấn đáp trước Giảng viên**.
+> **Mục đích tài liệu:** Tổng hợp các quyết định thiết kế Backend/Database và các điểm tối ưu bảo mật, hiệu năng của phân hệ Role 4 nhằm phục vụ ghép báo cáo EC312 và để các thành viên trong nhóm tiện đối chiếu khi tích hợp hệ thống.
 
 ---
 
@@ -22,7 +22,7 @@
 
 ## 2. NHẬT KÝ CÁC BẢN VÁ BẢO MẬT & TỐI ƯU HÓA (SENIOR REVIEW HARDENING)
 
-| Mã vá | Hạng mục & File | Vấn đề trước khi vá | Cách đã vá | Tại sao phải vá? (Giải trình vấn đáp) |
+| Mã vá | Hạng mục & File | Vấn đề trước khi vá | Cách đã vá | Lý do kỹ thuật & Tác động hệ thống |
 | :-: | :--- | :--- | :--- | :--- |
 | **FIX-01** | **Race Condition khi Duyệt 2 lớp**<br>(`class-gf-installment-review.php`) | Đọc `status` bằng `SELECT` rồi mới `UPDATE ... WHERE app_id = ?`. Nếu 2 Reviewer bấm cùng lúc hoặc double-click có thể ghi đè trạng thái nhau. | Dùng **Atomic Conditional Update** (`UPDATE ... SET status = ? WHERE app_id = ? AND status = ?`) và kiểm tra `$wpdb->rows_affected === 1`. | Đảm bảo tính nhất quán dữ liệu tuyệt đối dưới tải đồng thời (Concurrency Control), chặn triệt để việc duyệt nhảy cóc hoặc duyệt trùng. |
 | **FIX-02** | **Chống Brute-Force CCCD Hash**<br>(`class-gf-installment-review.php`) | Dùng `hash('sha256', $cccd)` không có salt/pepper. Số CCCD chỉ có 12 chữ số (6 số đầu theo quy luật tỉnh/năm sinh), dễ bị dò ngược bằng Rainbow Table nếu lộ DB. | Chuyển sang `hash_hmac('sha256', $cccd, $pepper)` với `$pepper` lấy từ khóa bí mật trong `.env`. | Vẫn giữ tính tất định (deterministic) để tra cứu nhanh trong `wp_gf_fraud_blacklist`, nhưng không thể brute-force ngược lại số CCCD gốc nếu thiếu server key. |

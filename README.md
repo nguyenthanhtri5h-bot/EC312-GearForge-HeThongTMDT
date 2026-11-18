@@ -1,34 +1,42 @@
-# NHÁNH ĐỘC QUYỀN: role4-backend-payment (NHÓM 7)
+# NHÁNH ROLE 4: BACKEND, CƠ SỞ DỮ LIỆU & MODULE TRẢ GÓP (`role4-backend-payment`)
 
 > **Thành viên phụ trách:** **Lê Lưu Luân** — MSSV: `24521027`  
-> **Vai trò Scrum:** Role 4 – Developer 2 (Backend, Database & Trả góp SV) *(Issue `#4`)*  
-> **Nhánh này được dọn gọn:** Chỉ chứa đúng file **Hướng dẫn của bạn** để tránh rối mắt. Toàn bộ bộ khung tài liệu dùng chung nằm trên nhánh [`main`](https://github.com/nguyenthanhtri5h-bot/EC312-GearForge-HeThongTMDT/tree/main) và [Google Drive Nhóm 7 (MONCUATHAYTIN)](https://drive.google.com/drive/folders/17V1tjxDp0T4hoQtF4pSNsXWjcD4WRJpm).
+> **Vai trò trong nhóm (Nhóm 7 – EC312):** Role 4 – Developer 2 (Backend, Database & Trả góp Sinh viên) *(Issue `#4`)*  
+> **Mục tiêu nhánh:** Lưu trữ toàn bộ mã nguồn Custom Plugin, thiết kế CSDL, sơ đồ UML/ERD, ảnh chụp minh chứng và phần báo cáo của Role 4 trước khi ghép vào nhánh `main`.
 
 ---
 
-## 1. FILE HƯỚNG DẪN CỦA BẠN (ĐỌC KỸ TRƯỚC KHI LÀM)
+## 1. TỔNG QUAN CÁC SẢN PHẨM ĐÃ HOÀN THIỆN TRÊN NHÁNH
 
-- Bản Markdown (đọc trực tiếp trên GitHub): [Hướng dẫn Role 4 - Backend Database và Trả góp.md](<Hướng dẫn Role 4 - Backend Database và Trả góp.md>)
-- Bản Word (tải về / xem offline): [Hướng dẫn Role 4 - Backend Database và Trả góp.docx](<Hướng dẫn Role 4 - Backend Database và Trả góp.docx>)
-
----
-
-## 2. TÓM TẮT PHẦN VIỆC & PHẠM VI SỞ HỮU
-
-| Hạng mục | Chi tiết dành riêng cho bạn |
-| :--- | :--- |
-| **Mức độ Code** | Code chính (PHP 8.2 + MySQL 8.0 + REST API) |
-| **Use Case phụ trách** | **`UC-10 ★`** (Tính toán & Nộp hồ sơ trả góp SV 3–6–12 tháng), `UC-11` (Duyệt 2 lớp & Sandbox VNPay/MoMo/Fundiin), `UC-12` (Gán S/N & Xuất PDF T-VAN) |
-| **Phạm vi file / báo cáo** | ERD & 4 bảng `wp_gf_*` (4.2), Plugin `gearforge-core` (`includes/` & `admin/`), mã hóa AES-256-CBC (`gf-vault/`), Sandbox Payment, S/N & Hóa đơn PDF, Chương 3.7, 4.2, 5.2.3–5.2.4, 6.3 |
-
-> Toàn bộ 4 bảng `wp_gf_*`, logic trả góp, AES-256-CBC, Sandbox thanh toán & S/N thuộc toàn quyền xử lý của bạn.
+| Hạng mục | Đường dẫn xem nhanh | Mô tả nội dung |
+| :--- | :--- | :--- |
+| **Mã nguồn Plugin (`gearforge-core`)** | [plugins/gearforge-core/](plugins/gearforge-core/) | 8 class PHP xử lý trả góp SV 3–6–12 tháng, mã hóa AES-256-CBC, duyệt 2 lớp, Sandbox 3DS, S/N xuất kho và Hóa đơn PDF T-VAN. |
+| **Bộ 5 Sơ đồ UML & ERD** | [2. Quy ước và Sơ đồ UML/role4_diagrams/](<2. Quy ước và Sơ đồ UML/role4_diagrams/>) | Gồm mã nguồn `.mmd` và ảnh `.png`: ERD (4 bảng `wp_gf_*`), Activity `UC-10..12`, Sequence `UC-10/11`, Sequence `UC-12` và Class Diagram Backend. |
+| **Báo cáo Nháp Role 4 (Word & MD)** | [Nháp Role 4 - Lê Lưu Luân.docx](<3. Khung báo cáo đồ án EC312/Nháp Role 4 - Lê Lưu Luân.docx>) | Trình bày đầy đủ Mục 3.7 (`UC-10 ★`), Mục 4.2 (ERD & Data Dictionary), Mục 5.1/5.2.3–5.2.4 (ảnh Demo thực tế) và Mục 6.3. |
+| **Nhật ký Kỹ thuật & Bảo mật** | [Nhật ký Kỹ thuật và Bảo mật Role 4.docx](<3. Khung báo cáo đồ án EC312/Nhật ký Kỹ thuật và Bảo mật Role 4.docx>) | Ghi nhận chi tiết 12 điểm tối ưu bảo mật & hiệu năng (`FIX-01..FIX-12`) kèm nguyên nhân và cách xử lý. |
+| **Ảnh minh chứng & PDF mẫu** | [Ảnh minh chứng Role 4/](<3. Khung báo cáo đồ án EC312/Ảnh minh chứng Role 4/>) | Ảnh chụp REST API, WP Admin duyệt 2 lớp, Sandbox 3DS, Meta Box S/N và file Hóa đơn PDF mẫu `GearForge-Invoice-20.pdf`. |
+| **Tài liệu hướng dẫn gốc** | [Hướng dẫn Role 4 - Backend Database và Trả góp.md](<Hướng dẫn Role 4 - Backend Database và Trả góp.md>) | Đề cương phân công ban đầu của Role 4. |
 
 ---
 
-## 3. TÀI LIỆU DÙNG CHUNG TRÊN `main` (TRA CỨU KHI CẦN)
+## 2. PHẠM VI NGHIỆP VỤ & CÁC API CUNG CẤP CHO NHÓM
 
-Khi cần tra cứu tên Actor, mã `UC-01..UC-12`, tên 4 bảng `wp_gf_*`, Sơ đồ Mermaid, Khung Báo cáo hoặc `docker-compose.skeleton.yml`, mở trực tiếp trên nhánh **`main`** (không cần copy vào nhánh này):
-- [Bộ tài liệu dùng chung trên nhánh `main`](https://github.com/nguyenthanhtri5h-bot/EC312-GearForge-HeThongTMDT/tree/main)
-- [Google Drive chung `MONCUATHAYTIN` (bản `.docx`)](https://drive.google.com/drive/folders/17V1tjxDp0T4hoQtF4pSNsXWjcD4WRJpm)
+* **Cụm Use Case phụ trách:** `UC-10 ★` (Tính & nộp hồ sơ trả góp SV 3–6–12 tháng), `UC-11` (Duyệt 2 lớp & Sandbox VNPay/MoMo/Fundiin 3D-Secure), `UC-12` (Gắn Serial Number xuất kho & Xuất Hóa đơn PDF chuẩn T-VAN).
+* **4 bảng MySQL mở rộng (`wp_gf_*`):** `wp_gf_installment_plans`, `wp_gf_installment_applications`, `wp_gf_order_serials`, `wp_gf_fraud_blacklist`.
+* **REST API Endpoints phục vụ Frontend (Role 3) & Kiểm thử (Role 2):**
+  * `GET /wp-json/gearforge/v1/installment-calc?price=...&down_pct=...&months=...` — Tính trả trước, gốc vay, lãi và tiền góp hàng tháng.
+  * `GET /wp-json/gearforge/v1/oms-status/{order_id}` — Tra cứu trạng thái đơn hàng + hồ sơ trả góp + Serial Number *(yêu cầu đăng nhập đúng chủ đơn hoặc Admin/Reviewer)*.
+  * `POST /wp-json/gearforge/v1/payment-sandbox/ipn` — Nhận Webhook IPN xác thực chữ ký HMAC-SHA256.
+  * `GET /wp-json/gearforge/v1/payment-sandbox/query/{order_id}` — Đối soát chủ động `QueryDR` chống thanh toán trùng khi rớt mạng.
 
-> **Lưu ý Git khi nộp bài vào `main`:** Vì nhánh này đã xóa bớt các thư mục dùng chung để giữ gọn, tuyệt đối **không merge trực tiếp toàn bộ lịch sử xóa của nhánh này vào `main`**. Khi hoàn thành bài làm, commit đúng các file sản phẩm của bạn; **Role 2 (SM)** sẽ cherry-pick các commit bài làm đó (hoặc tạo nhánh sạch từ `main` để ghép vào).
+---
+
+## 3. LƯU Ý KHI GHÉP CODE & TÀI LIỆU VÀO `main`
+
+* Nhánh này đã lược bỏ các thư mục tài liệu dùng chung (`0.`, `1.`, `4.`) để tránh chỉnh sửa nhầm phần việc của các thành viên khác; khi cần tra cứu quy ước chung có thể xem trực tiếp trên nhánh [`main`](https://github.com/nguyenthanhtri5h-bot/EC312-GearForge-HeThongTMDT/tree/main) hoặc [Google Drive Nhóm 7 (`MONCUATHAYTIN`)](https://drive.google.com/drive/folders/17V1tjxDp0T4hoQtF4pSNsXWjcD4WRJpm).
+* **Nhờ Role 2 (SM) khi tích hợp lên `main`:** Không merge toàn bộ lịch sử xóa thư mục của nhánh này, mà chỉ kéo đúng các thư mục sản phẩm của Role 4 sang `main`:
+  ```bash
+  git checkout main
+  git checkout origin/role4-backend-payment -- plugins/ "2. Quy ước và Sơ đồ UML/role4_diagrams/" "3. Khung báo cáo đồ án EC312/"
+  ```
+* Trong file `plugins/gearforge-core/gearforge-core.php` đã cấu hình cơ chế nạp module an toàn (`file_exists`), chỉ cần bổ sung tên file của Role 1 & Role 2 (`class-gf-compare-specs.php`, `class-gf-rbac.php`, `class-gf-fraud-guard.php`) vào mảng `$modules` khi ghép đủ 4 phân hệ.
