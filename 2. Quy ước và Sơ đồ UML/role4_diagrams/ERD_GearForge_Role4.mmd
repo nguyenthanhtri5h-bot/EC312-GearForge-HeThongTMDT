@@ -1,0 +1,99 @@
+erDiagram
+    wp_users ||--o{ wp_wc_orders : places
+    wp_users ||--o{ wp_gf_installment_applications : submits
+    wp_users ||--o{ wp_gf_fraud_blacklist : creates_rule
+    wp_posts ||--o{ wp_wc_order_items : ordered_in
+    wp_posts ||--o{ wp_gf_order_serials : identified_by
+    wp_wc_orders ||--|{ wp_wc_order_items : contains
+    wp_wc_orders ||--o| wp_gf_installment_applications : finances
+    wp_wc_orders ||--o{ wp_gf_order_serials : tracks
+    wp_wc_order_items ||--o{ wp_gf_order_serials : assigns
+    wp_gf_installment_plans ||--o{ wp_gf_installment_applications : defines_terms
+
+    wp_users {
+        bigint ID PK
+        varchar user_login
+        varchar user_email
+        varchar student_edu_email
+        tinyint is_edu_verified
+        varchar role_code
+    }
+
+    wp_posts {
+        bigint ID PK
+        varchar post_title
+        varchar post_type
+        varchar sku
+        decimal price
+    }
+
+    wp_wc_orders {
+        bigint id PK
+        bigint customer_id FK
+        decimal total_amount
+        varchar payment_method
+        varchar status
+        datetime date_created_gmt
+    }
+
+    wp_wc_order_items {
+        bigint order_item_id PK
+        bigint order_id FK
+        bigint product_id FK
+        int quantity
+        decimal subtotal
+    }
+
+    wp_gf_installment_plans {
+        bigint plan_id PK
+        varchar plan_name
+        tinyint duration_months
+        decimal min_downpayment_pct
+        decimal monthly_interest_pct
+        decimal admin_fee
+        tinyint is_active
+        datetime created_at
+    }
+
+    wp_gf_installment_applications {
+        bigint app_id PK
+        bigint order_id FK
+        bigint user_id FK
+        bigint plan_id FK
+        bigint reviewer_id FK
+        varchar student_code
+        varchar student_edu_email
+        char cccd_hash
+        varchar cccd_encrypted_path
+        varchar student_card_encrypted_path
+        decimal downpayment_amount
+        decimal monthly_amount
+        tinyint consent_nd13_accepted
+        datetime consent_accepted_at
+        varchar status
+        datetime l1_verified_at
+        datetime l2_verified_at
+        text reject_reason
+    }
+
+    wp_gf_order_serials {
+        bigint serial_id PK
+        bigint order_id FK
+        bigint order_item_id FK
+        bigint product_id FK
+        varchar serial_number UK
+        smallint warranty_months
+        date warranty_end_date
+        bigint assigned_by FK
+        datetime assigned_at
+    }
+
+    wp_gf_fraud_blacklist {
+        bigint blacklist_id PK
+        enum target_type
+        varchar target_value
+        text reason
+        bigint created_by FK
+        datetime blocked_until
+        datetime created_at
+    }

@@ -1,0 +1,32 @@
+sequenceDiagram
+    actor SV as StudentCustomer
+    participant UI as Storefront & Consent UI
+    participant FG as FraudGuardMiddleware
+    participant Plugin as StudentInstallment Module
+    participant Vault as Encrypted ID Vault (AES-256)
+    participant DB as MySQL (wp_gf_installment_applications)
+    actor Rev as InstallmentReviewer
+    participant GW as PaymentGateway Sandbox (3DS)
+
+    SV->>UI: Chọn máy, kỳ hạn (3/6/12 tháng) & tick Consent NĐ 13/2023
+    SV->>UI: Upload ảnh CCCD + Thẻ sinh viên
+    UI->>FG: POST /installment/submit (IP, UserID, Files)
+    FG->>DB: Kiểm tra Rate Limit & wp_gf_fraud_blacklist
+    alt Vi phạm Rate Limit hoặc nằm trong Blacklist
+        FG-->>UI: Trả lỗi 429 / 403 Từ chối tiếp nhận
+    else Hợp lệ
+        FG->>Plugin: Chuyển tiếp xử lý hồ sơ
+        Plugin->>Vault: Mã hóa AES-256-CBC & lưu tệp ngoài webroot
+        Plugin->>DB: Tạo bản ghi trạng thái SUBMITTED
+        Plugin-->>UI: Hiển thị mã hồ sơ & thông báo chờ duyệt 2 lớp
+
+        Rev->>DB: Duyệt Lớp 1 - Giải mã kiểm tra CCCD & Thẻ SV
+        DB-->>Rev: Cập nhật L1_DOCS_VERIFIED
+        Rev->>SV: Duyệt Lớp 2 - Xác nhận SĐT & Email .edu.vn
+        Rev->>DB: Cập nhật APPROVED_WAITING_DOWNPAYMENT
+        DB-->>SV: Gửi thông báo thanh toán khoản trả trước
+
+        SV->>GW: Thanh toán tiền trả trước (3D-Secure Sandbox)
+        GW-->>Plugin: Callback IPN xác nhận giao dịch hợp lệ (HMAC)
+        Plugin->>DB: Chuyển trạng thái ACTIVE_INSTALLMENT & PROCESSING
+    end
