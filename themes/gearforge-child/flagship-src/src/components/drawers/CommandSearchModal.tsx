@@ -55,7 +55,7 @@ export function CommandSearchModal() {
         <div className="gf-drawer-head">
           <div>
             <h3>Tìm nhanh cấu hình</h3>
-            <span style={{ fontSize: 12.5, color: '#94a3b8' }}>Gõ tên máy, CPU, RTX hoặc nhấn Esc để đóng</span>
+            <span style={{ fontSize: 12.5, color: '#475569' }}>Gõ tên máy, CPU, RTX hoặc nhấn Esc để đóng</span>
           </div>
           <button type="button" className="gf-drawer-close" aria-label="Đóng tìm kiếm" onClick={() => setSearchOpen(false)}>
             &times;
@@ -122,7 +122,7 @@ export function CommandSearchModal() {
                   <div style={{ fontSize: 13.5, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.name}</div>
                   <div style={{ fontSize: 12, color: '#475569', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{[m.specs.cpu, m.specs.ram, m.specs.gpu].filter(Boolean).join(' · ')}</div>
                 </div>
-                <strong style={{ color: '#2563eb', fontSize: 13.5, flexShrink: 0, whiteSpace: 'nowrap' }}>{formatVnd(m.price)}</strong>
+                <strong style={{ color: '#D13639', fontSize: 13.5, flexShrink: 0, whiteSpace: 'nowrap' }}>{formatVnd(m.price)}</strong>
               </button>
             ))}
           </div>

@@ -5,9 +5,9 @@ import type { OmsOrder } from '../../types/gearforge';
 export function OmsWarrantyCard({ order }: { order: OmsOrder }) {
   const { boot } = useGearForgeStore();
   const serialList = order.serials || [];
-  const defaultSn = serialList[0]?.serial_number || `GF-SN-${order.orderId}`;
+  const firstSn = serialList[0]?.serial_number || `GF-SN-${order.orderId}`;
 
-  const [serialNumber, setSerialNumber] = useState(defaultSn);
+  const [serialNumber, setSerialNumber] = useState(firstSn);
   const [requestType, setRequestType] = useState<'WARRANTY' | 'EXCHANGE' | 'RETURN'>('WARRANTY');
   const [reason, setReason] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -15,10 +15,10 @@ export function OmsWarrantyCard({ order }: { order: OmsOrder }) {
   const [showInvoice, setShowInvoice] = useState(false);
 
   useEffect(() => {
-    setSerialNumber(serialList[0]?.serial_number || `GF-SN-${order.orderId}`);
+    setSerialNumber(firstSn);
     setRmaFeedback(null);
     setShowInvoice(false);
-  }, [order.orderId, serialList]);
+  }, [order.orderId, firstSn]);
 
   const handleWarrantySubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -100,12 +100,12 @@ export function OmsWarrantyCard({ order }: { order: OmsOrder }) {
             </button>
           ))
         ) : (
-          <code className="gf-oms-sn">{defaultSn}</code>
+          <code className="gf-oms-sn">{firstSn}</code>
         )}
         <button
           type="button"
           className="gf-oms-chip-btn"
-          style={{ marginLeft: 'auto', background: '#eff6ff', color: '#1d4ed8', borderColor: '#bfdbfe' }}
+          style={{ marginLeft: 'auto', background: '#FEF2F2', color: '#B91C1C', borderColor: '#FECACA' }}
           onClick={() => setShowInvoice((v) => !v)}
         >
           {showInvoice ? 'Ẩn hóa đơn VAT' : 'Xem hóa đơn điện tử'}
@@ -128,7 +128,7 @@ export function OmsWarrantyCard({ order }: { order: OmsOrder }) {
                 href={order.invoiceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ color: '#2563eb', fontWeight: 700, textDecoration: 'underline' }}
+                style={{ color: '#D13639', fontWeight: 700, textDecoration: 'underline' }}
               >
                 Mở bản in / Tải PDF Hóa đơn →
               </a>

@@ -23,6 +23,7 @@ export function vibeUrl(relPath: string): string {
 
 export const VIBE_VIDEOS = {
   heroShowcase: vibeUrl('videos/gf-hero-showcase-1080p.mp4'),
+  heroRiotCinematic: vibeUrl('videos/gf-hero-riot-1080p.mp4?v=4'),
   labPc: vibeUrl('videos/gf-lab-pc-1080p.mp4'),
   campusLaptop: vibeUrl('videos/gf-campus-laptop-1080p.mp4'),
   deskOrbit: vibeUrl('videos/gf-desk-orbit-1080p.mp4'),
@@ -36,6 +37,7 @@ export const VIBE_VIDEOS = {
   reelTour: vibeUrl('videos/gf-reel-tour-1080p.mp4'),
   reelMacro: vibeUrl('videos/gf-reel-macro-1080p.mp4'),
   posterHeroShowcase: vibeUrl('videos/gf-hero-showcase-poster.jpg'),
+  posterHeroRiot: vibeUrl('videos/gf-hero-riot-poster.jpg?v=4'),
   posterLab: vibeUrl('videos/gf-lab-pc-poster.jpg'),
   posterCampus: vibeUrl('videos/gf-campus-laptop-poster.jpg'),
   posterDeskOrbit: vibeUrl('videos/gf-desk-orbit-poster.jpg'),
@@ -119,5 +121,17 @@ export const VIBE_PORTFOLIO_CARDS = {
     campusBkCad: vibeUrl('hardware/campus-bk-cad.jpg'),
     gearBundle: vibeUrl('hardware/gear-peripherals.jpg'),
     galleryEsportsDesk: vibeUrl('hardware/gallery-esports-desk.jpg'),
+    riotPcTitan: vibeUrl('riot-card-rtx-pc.jpg'),
+    riotGamingLaptop: vibeUrl('riot-card-gaming-laptop.jpg'),
+    riotUltrabook: vibeUrl('riot-card-ultrabook.jpg'),
+    riotGearArena: vibeUrl('riot-card-gear.jpg'),
+    riotSplitStatue: vibeUrl('riot-split-statue.jpg'),
+    riotP1ApexPc: vibeUrl('riot-p1-apex-pc.jpg'),
+    riotP2Valkyrie: vibeUrl('riot-p2-valkyrie-laptop.jpg'),
+    riotP3Cipher: vibeUrl('riot-p3-cipher-ultrabook.jpg'),
+    riotP4Titan: vibeUrl('riot-p4-titan-workstation.jpg'),
+    riotP5Strike: vibeUrl('riot-p5-strike-gear.jpg'),
+    riotNewsLead: vibeUrl('riot-news-lead.jpg'),
+    riotNewsBooth: vibeUrl('riot-news-booth.jpg'),
   },
 } as const;

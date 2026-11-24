@@ -93,11 +93,11 @@ body.gf-cosmic-secondary .gf-subheading {
 }
 
 body.gf-cosmic-secondary a {
-  color: #2563eb;
+  color: #D13639;
 }
 
 body.gf-cosmic-secondary a:hover {
-  color: #1d4ed8;
+  color: #B91C1C;
 }
 
 /* ==========================================================================
@@ -108,12 +108,10 @@ body.gf-cosmic-secondary a:hover {
   top: 0;
   left: 0;
   right: 0;
-  height: 64px;
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid #e2e8f0;
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+  height: 78px;
+  background: #111111;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
   z-index: 950;
   font-family: 'Inter', 'Be Vietnam Pro', system-ui, sans-serif;
 }
@@ -181,11 +179,13 @@ body.admin-bar .gf-sec-hd {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 11px;
-  border-radius: 9px;
-  font-size: 13.5px;
-  font-weight: 600;
-  color: #334155 !important;
+  padding: 7px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #E4E4E7 !important;
   text-decoration: none !important;
   white-space: nowrap;
   transition: color 0.18s ease, background 0.18s ease;
@@ -193,8 +193,8 @@ body.admin-bar .gf-sec-hd {
 
 .gf-sec-nav-link:hover,
 .gf-sec-nav-link.is-active {
-  color: #0f172a !important;
-  background: #f1f5f9;
+  color: #FFFFFF !important;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .gf-sec-pill-badge {
@@ -202,7 +202,7 @@ body.admin-bar .gf-sec-hd {
   font-weight: 800;
   padding: 2px 6px;
   border-radius: 999px;
-  background: #2563eb;
+  background: #D13639;
   color: #ffffff;
 }
 
@@ -217,13 +217,13 @@ body.admin-bar .gf-sec-hd {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: 36px;
+  min-height: 34px;
   padding: 0 12px;
-  border-radius: 10px;
-  border: 1px solid #cbd5e1;
-  background: #f8fafc;
-  color: #0f172a !important;
-  font-size: 12.5px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF !important;
+  font-size: 12px;
   font-weight: 700;
   text-decoration: none !important;
   white-space: nowrap;
@@ -231,20 +231,20 @@ body.admin-bar .gf-sec-hd {
 }
 
 .gf-sec-action-btn:hover {
-  border-color: #2563eb;
-  background: #eff6ff;
-  color: #1d4ed8 !important;
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.16);
+  color: #FFFFFF !important;
   transform: translateY(-1px);
 }
 
 .gf-sec-action-btn.is-primary {
-  background: #2563eb;
-  border-color: #2563eb;
+  background: #D13639;
+  border-color: #D13639;
   color: #ffffff !important;
 }
 
 .gf-sec-action-btn.is-primary:hover {
-  background: #1d4ed8;
+  background: #EB0029;
   color: #ffffff !important;
 }
 
@@ -255,8 +255,8 @@ body.admin-bar .gf-sec-hd {
   min-width: 19px;
   height: 19px;
   padding: 0 5px;
-  border-radius: 6px;
-  background: #0f172a;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
   color: #ffffff;
   font-size: 11px;
   font-weight: 800;
@@ -264,7 +264,7 @@ body.admin-bar .gf-sec-hd {
 
 .gf-sec-action-btn.is-primary .gf-sec-count {
   background: #ffffff;
-  color: #2563eb;
+  color: #D13639;
 }
 
 .gf-sec-burger {
@@ -274,9 +274,9 @@ body.admin-bar .gf-sec-hd {
   width: 38px;
   height: 38px;
   border-radius: 10px;
-  border: 1px solid #cbd5e1;
-  background: #f8fafc;
-  color: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
   cursor: pointer;
 }
 

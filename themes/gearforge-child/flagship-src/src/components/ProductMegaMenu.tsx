@@ -70,7 +70,7 @@ export function ProductMegaMenu() {
                   <span className="n">
                     {item.name}
                     {item.domain && (
-                      <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 500, color: '#645c7a' }}>
+                      <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 500, color: '#A1A1AA' }}>
                         {item.domain}
                       </span>
                     )}

@@ -29,13 +29,13 @@ export function ContactSection() {
           style={{
             height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center',
             justifyContent: 'center', padding: '24px 20px 140px', textAlign: 'center', color: '#ffffff',
-            background: 'radial-gradient(circle at 50% 40%, #1e293b 0%, #0f172a 75%)',
+            background: 'radial-gradient(circle at 50% 40%, #1F1F1F 0%, #0A0A0A 75%)',
           }}
         >
           <span
             style={{
-              padding: '4px 12px', borderRadius: 6, background: '#1e293b',
-              border: '1px solid rgba(255, 255, 255, 0.18)', color: '#93c5fd', fontSize: 12, fontWeight: 700,
+              padding: '4px 12px', borderRadius: 6, background: '#1F1F1F',
+              border: '1px solid rgba(255, 255, 255, 0.18)', color: '#FCA5A5', fontSize: 12, fontWeight: 700,
             }}
           >
             CAMPUS HUB · ĐHQG-HCM THỦ ĐỨC
@@ -127,7 +127,7 @@ export function ContactSection() {
                     <button
                       type="button"
                       className="gf-act-btn"
-                      style={{ background: '#f5f2fc', color: '#141018', borderColor: '#d8d0e8' }}
+                      style={{ background: '#F1F0EC', color: '#0A0A0A', borderColor: '#DFDEDC' }}
                       onClick={() => openDrawer('compare')}
                     >
                       Xem khay So sánh 3 thiết bị
@@ -137,8 +137,8 @@ export function ContactSection() {
 
                 {activeTab === 'build' && (
                   <form onSubmit={handleSubmit}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '10px 12px', marginBottom: 12, borderRadius: 12, background: '#f4efff' }}>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: '#4b0a8c' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '10px 12px', marginBottom: 12, borderRadius: 12, background: '#FEF2F2', border: '1px solid #FECACA' }}>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#B91C1C' }}>
                         Mã SV ĐHQG: <code>BACKTOSCHOOL</code> (-5%)
                       </span>
                       <button type="button" className="gf-hd-pill is-primary" onClick={() => void applyCoupon('BACKTOSCHOOL')}>

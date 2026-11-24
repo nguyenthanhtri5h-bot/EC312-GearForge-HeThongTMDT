@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { VIBE_PORTFOLIO_CARDS, VIBE_VIDEOS } from '../data/vibeAssets';
 import { useHoloTilt } from '../hooks/useHoloTilt';
 import { useGearForgeStore } from '../hooks/useGearForgeStore';
-import { ContactSection } from './ContactSection';
 import './ecosystem/ecosystem.css';
 
 interface SetupShowcase {
@@ -49,8 +48,8 @@ export function SetupGalleryPageView() {
   });
 
   return (
-    <main className="tc" id="tc-gallery" style={{ paddingTop: 64, background: '#f8fafc', color: '#0f172a' }}>
-      <section className="gf-eco-hero tc-navy" style={{ position: 'relative', overflow: 'hidden', paddingBottom: 32 }}>
+    <main className="tc" id="tc-gallery" style={{ paddingTop: 78, background: '#F1F0EC', color: '#0A0A0A' }}>
+      <section className="gf-eco-hero" style={{ position: 'relative', overflow: 'hidden', paddingBottom: 32 }}>
         <video
           src={VIBE_VIDEOS.deskOrbit}
           poster={VIBE_VIDEOS.posterDeskOrbit}
@@ -70,9 +69,9 @@ export function SetupGalleryPageView() {
           }}
         />
         <div className="tc-wrap" style={{ position: 'relative', zIndex: 2 }}>
-          <div style={{ fontSize: 13, color: '#a1a1aa', marginBottom: 10 }}>
+          <div style={{ fontSize: 13, color: '#A1A1AA', marginBottom: 10 }}>
             <button type="button" onClick={() => navigateToPage('showcase')} style={{ background: 'none', border: 0, color: '#ffffff', fontWeight: 700, cursor: 'pointer', padding: 0 }}>
-              ← Trang chủ
+              &larr; Trang chủ
             </button> / Góc Máy Thực Tế Sinh Viên ĐHQG-HCM
           </div>
           <h1 className="tc-h1" style={{ color: '#fff', fontSize: 'clamp(28px, 3.5vw, 44px)' }}>
@@ -80,16 +79,16 @@ export function SetupGalleryPageView() {
           </h1>
           <div className="gf-kpi-strip">
             {KPIS.map((k) => (
-              <div key={k.l} className="gf-kpi-tile" style={{ background: '#1e293b', borderColor: 'rgba(255,255,255,0.16)', color: '#cbd5e1' }}>
+              <div key={k.l} className="gf-kpi-tile" style={{ background: '#1F1F1F', borderColor: 'rgba(255,255,255,0.12)', color: '#D4D4D8' }}>
                 <strong style={{ color: '#ffffff' }}>{k.v}</strong>
-                <span style={{ fontSize: 12.5, color: '#cbd5e1' }}>{k.l}</span>
+                <span style={{ fontSize: 12.5, color: '#A1A1AA' }}>{k.l}</span>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="tc-sec" style={{ paddingBlock: 36, background: '#f8fafc' }}>
+      <section className="tc-sec" style={{ paddingBlock: 36, background: '#F1F0EC' }}>
         <div className="tc-wrap">
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
@@ -102,49 +101,63 @@ export function SetupGalleryPageView() {
             <input
               type="search"
               className="gf-cat-input"
-              style={{ width: 290, minHeight: 42, padding: '0 14px', borderRadius: 10, background: '#ffffff', color: '#0f172a', border: '1px solid #cbd5e1' }}
+              style={{ width: 290, minHeight: 42, padding: '0 14px', borderRadius: 10, background: '#ffffff', color: '#0A0A0A', border: '1px solid #DFDEDC' }}
               placeholder="Tìm góc máy theo trường, RTX, M4..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
           </div>
 
-          <div className="gf-cat-grid">
-            {visible.map((s) => (
-              <article
-                key={s.id}
-                className="gf-chrome-card gf-holo-card"
-                style={tiltStyle}
-                onMouseMove={handleMouseMove}
-                onMouseLeave={handleMouseLeave}
+          {visible.length === 0 ? (
+            <div style={{ padding: 40, borderRadius: 14, background: '#1F1F1F', color: '#FFFFFF', textAlign: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <p style={{ margin: '0 0 14px', fontSize: 15, color: '#D4D4D8' }}>
+                Không tìm thấy góc máy phù hợp với từ khóa "{query}".
+              </p>
+              <button
+                type="button"
+                className="gf-riot-red-pill"
+                style={{ height: 40, padding: '0 20px', fontSize: 13 }}
+                onClick={() => { setFilterTag('Tất cả'); setQuery(''); }}
               >
-                <div style={{ position: 'relative' }}>
-                  <img src={s.img} alt={s.title} style={{ width: '100%', aspectRatio: '16/10', objectFit: 'cover', display: 'block' }} />
-                  <span style={{ position: 'absolute', top: 12, left: 12, fontSize: 11.5, fontWeight: 700, padding: '4px 9px', borderRadius: 6, background: 'rgba(15, 23, 42, 0.88)', color: '#fff' }}>
-                    {s.tag}
-                  </span>
-                </div>
-                <div style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: '#64748b' }}>{s.campus}</span>
-                  <h2 style={{ margin: 0, fontFamily: "'Be Vietnam Pro', sans-serif", fontSize: 18, fontWeight: 800, color: '#0f172a' }}>{s.title}</h2>
-                  <div style={{ fontSize: 13, color: '#334155', fontWeight: 600 }}>{s.specs}</div>
-                  <p style={{ margin: 0, fontSize: 13.5, color: '#475569', lineHeight: 1.5 }}>&ldquo;{s.quote}&rdquo;</p>
-                  <button
-                    type="button"
-                    className="gf-act-btn is-primary"
-                    style={{ marginTop: 'auto' }}
-                    onClick={() => navigateToPage('shop', { category: s.cat })}
-                  >
-                    Tìm cấu hình tương tự →
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
+                Đặt lại bộ lọc
+              </button>
+            </div>
+          ) : (
+            <div className="gf-cat-grid">
+              {visible.map((s) => (
+                <article
+                  key={s.id}
+                  className="gf-chrome-card gf-holo-card"
+                  style={{ ...tiltStyle, background: '#1F1F1F', borderColor: 'rgba(255,255,255,0.1)', color: '#F4F4F5' }}
+                  onMouseMove={handleMouseMove}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <div style={{ position: 'relative' }}>
+                    <img src={s.img} alt={s.title} style={{ width: '100%', aspectRatio: '16/10', objectFit: 'cover', display: 'block' }} />
+                    <span style={{ position: 'absolute', top: 12, left: 12, fontSize: 11.5, fontWeight: 700, padding: '4px 9px', borderRadius: 6, background: 'rgba(10, 10, 12, 0.88)', color: '#FFFFFF' }}>
+                      {s.tag}
+                    </span>
+                  </div>
+                  <div style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#F87171', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{s.campus}</span>
+                    <h2 style={{ margin: 0, fontFamily: "'Be Vietnam Pro', sans-serif", fontSize: 18, fontWeight: 800, color: '#FFFFFF' }}>{s.title}</h2>
+                    <div style={{ fontSize: 13, color: '#D4D4D8', fontWeight: 600 }}>{s.specs}</div>
+                    <p style={{ margin: 0, fontSize: 13.5, color: '#A1A1AA', lineHeight: 1.5 }}>&ldquo;{s.quote}&rdquo;</p>
+                    <button
+                      type="button"
+                      className="gf-act-btn is-primary"
+                      style={{ marginTop: 'auto' }}
+                      onClick={() => navigateToPage('shop', { category: s.cat })}
+                    >
+                      Tìm cấu hình tương tự →
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
         </div>
       </section>
-
-      <ContactSection />
     </main>
   );
 }

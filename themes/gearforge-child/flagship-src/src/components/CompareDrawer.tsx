@@ -75,7 +75,7 @@ export function CompareDrawer() {
         <div className="gf-drawer-head">
           <div>
             <h3 id="gf-compare-drawer-title">So sánh cấu hình ({compareItems.length}/3)</h3>
-            <span style={{ fontSize: 12.5, color: '#cbd5e1' }}>
+            <span style={{ fontSize: 12.5, color: '#475569' }}>
               Đối chiếu trực quan thông số kỹ thuật &amp; ước tính trả góp 0%
             </span>
           </div>
@@ -90,7 +90,7 @@ export function CompareDrawer() {
               Khay so sánh đang trống. Hãy chọn tối đa 3 Laptop hoặc PC trong{' '}
               <a
                 href="/shop/"
-                style={{ color: '#2563eb', fontWeight: 800, textDecoration: 'underline' }}
+                style={{ color: '#D13639', fontWeight: 800, textDecoration: 'underline' }}
                 onClick={closeDrawer}
               >
                 Cửa hàng sản phẩm
@@ -105,7 +105,7 @@ export function CompareDrawer() {
                     type="checkbox"
                     checked={diffOnly}
                     onChange={(e) => setDiffOnly(e.target.checked)}
-                    style={{ width: 18, height: 18, accentColor: '#2563eb' }}
+                    style={{ width: 18, height: 18, accentColor: '#D13639' }}
                   />
                   <span>Chỉ hiện điểm khác biệt</span>
                 </label>
@@ -147,7 +147,7 @@ export function CompareDrawer() {
                               key={idx}
                               style={
                                 row.label.startsWith('Giá') || row.label.startsWith('Trả trước')
-                                  ? { fontFamily: "'JetBrains Mono', monospace", fontWeight: 800, color: '#2563eb' }
+                                  ? { fontFamily: "'JetBrains Mono', monospace", fontWeight: 800, color: '#D13639' }
                                   : undefined
                               }
                             >
@@ -188,7 +188,7 @@ export function CompareDrawer() {
         </div>
 
         <div className="gf-drawer-foot" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-          <span style={{ fontSize: 12.5, color: '#cbd5e1' }}>Hỗ trợ tối đa 3 thiết bị cùng lúc</span>
+          <span style={{ fontSize: 12.5, color: '#475569' }}>Hỗ trợ tối đa 3 thiết bị cùng lúc</span>
           <a href={boot.routes.compare} className="gf-act-btn is-active" style={{ display: 'inline-flex', alignItems: 'center' }}>
             Mở bảng toàn trang →
           </a>

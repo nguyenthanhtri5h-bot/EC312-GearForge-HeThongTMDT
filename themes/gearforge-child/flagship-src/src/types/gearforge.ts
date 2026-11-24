@@ -94,7 +94,7 @@ export interface FilterParams {
   perPage: number;
 }
 
-export type DrawerKind = 'compare' | 'installment' | 'cart' | null;
+export type DrawerKind = 'compare' | 'installment' | 'cart' | 'oms' | null;
 export type FlagshipPageMode = 'showcase' | 'shop' | 'ecosystem' | 'gallery';
 
 export interface GearForgeContextValue {

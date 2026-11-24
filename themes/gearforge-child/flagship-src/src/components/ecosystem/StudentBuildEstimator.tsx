@@ -100,10 +100,10 @@ export function StudentBuildEstimator() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 16, padding: 20, borderRadius: 14, background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 16, padding: 20, borderRadius: 14, background: '#F1F0EC', border: '1px solid #DFDEDC' }}>
         <div>
-          <span style={{ fontSize: 12, fontWeight: 700, color: '#2563eb' }}>GỢI Ý CẤU HÌNH ({major.label})</span>
-          <div style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', marginTop: 4 }}>{major.specHint}</div>
+          <span style={{ fontSize: 12, fontWeight: 800, color: '#D13639', letterSpacing: '0.04em' }}>GỢI Ý CẤU HÌNH ({major.label})</span>
+          <div style={{ fontSize: 15, fontWeight: 700, color: '#0A0A0A', marginTop: 4 }}>{major.specHint}</div>
         </div>
 
         <div className="gf-inst-summary">

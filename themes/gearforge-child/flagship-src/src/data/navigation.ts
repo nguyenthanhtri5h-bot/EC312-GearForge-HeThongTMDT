@@ -1,9 +1,10 @@
-import { VIBE_BEAR_GUIDE, VIBE_PORTFOLIO_CARDS } from './vibeAssets';
+import { VIBE_PORTFOLIO_CARDS } from './vibeAssets';
 
 export interface NavSubItem {
   label: string;
   href: string;
   category?: string;
+  drawer?: 'oms' | 'installment' | 'compare';
   icon?: string;
 }
 
@@ -20,25 +21,19 @@ export interface TopNavItem {
 
 export const SIMPLE_DROPDOWNS: Record<string, NavSubItem[]> = {
   ecosystem: [
-    { label: 'Laptop Gaming RTX', href: '/shop/?category=laptop-gaming', category: 'laptop-gaming', icon: VIBE_PORTFOLIO_CARDS.hardware.laptopGaming },
-    { label: 'Laptop Đồ họa & Studio', href: '/shop/?category=laptop-ultrabook', category: 'laptop-ultrabook', icon: VIBE_PORTFOLIO_CARDS.hardware.laptopCreator },
-    { label: 'PC Workstation & Custom', href: '/shop/?category=pc-workstation', category: 'pc-workstation', icon: VIBE_PORTFOLIO_CARDS.hardware.pcWatercool },
-    { label: 'Gaming Gear & Màn hình', href: '/shop/?category=gear', category: 'gear', icon: VIBE_PORTFOLIO_CARDS.hardware.gearPeripherals },
+    { label: 'AI Builder Chọn Cấu Hình Ngành Học', href: '/he-sinh-thai/', icon: VIBE_PORTFOLIO_CARDS.hardware.laptopRogRgb },
+    { label: 'Quy Trình Test Stress Nhiệt & FPS', href: '/he-sinh-thai/', icon: VIBE_PORTFOLIO_CARDS.hardware.campusBkCad },
+    { label: 'Góc Máy Thực Tế SV ĐHQG-HCM', href: '/cau-hinh-mau/', icon: VIBE_PORTFOLIO_CARDS.hardware.campusUitAi },
+    { label: 'Ước Tính Trả Góp 0% Thẻ Sinh Viên', href: '#gf-installment', drawer: 'installment', icon: VIBE_PORTFOLIO_CARDS.hardware.galleryEsportsDesk },
   ],
   support: [
-    { label: 'Tra cứu đơn hàng & Vận chuyển', href: '/tra-cuu-don-hang/' },
-    { label: 'So sánh cấu hình (tối đa 3 máy)', href: '/so-sanh-cau-hinh/' },
-    { label: 'Chính sách bảo hành & Trả góp 0%', href: '#gf-oms-contact' },
+    { label: 'Tra cứu nhanh đơn hàng (OMS)', href: '/tra-cuu-don-hang/', drawer: 'oms' },
+    { label: 'So sánh cấu hình (tối đa 3 máy)', href: '/so-sanh-cau-hinh/', drawer: 'compare' },
+    { label: 'Ước tính Trả góp 0% (.edu.vn)', href: '#gf-installment', drawer: 'installment' },
   ],
 };
 
 export const TOP_NAV_ITEMS: TopNavItem[] = [
-  {
-    id: 'showcase',
-    label: 'Trang chủ',
-    href: '/',
-    icon: VIBE_BEAR_GUIDE.avatar,
-  },
   {
     id: 'catalog',
     label: 'Sản phẩm',
@@ -60,16 +55,9 @@ export const TOP_NAV_ITEMS: TopNavItem[] = [
     icon: VIBE_PORTFOLIO_CARDS.hardware.laptopGaming,
   },
   {
-    id: 'installment',
-    label: 'Trả góp 0%',
-    href: '#gf-installment',
-    icon: VIBE_BEAR_GUIDE.aiBadge,
-    isAiPulse: true,
-  },
-  {
     id: 'oms',
     label: 'Tra cứu đơn',
-    href: '#gf-oms-contact',
+    href: '/tra-cuu-don-hang/',
     icon: VIBE_PORTFOLIO_CARDS.hardware.gearPeripherals,
     dropdownKey: 'support',
   },

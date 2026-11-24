@@ -94,7 +94,7 @@ export function InstallmentDrawer() {
         <div className="gf-drawer-head">
           <div>
             <h3 id="gf-installment-drawer-title">Trả góp 0% Sinh viên ĐHQG-HCM</h3>
-            <span style={{ fontSize: 12.5, color: '#cbd5e1' }}>
+            <span style={{ fontSize: 12.5, color: '#475569' }}>
               Ước tính khoản góp minh bạch &amp; duyệt hồ sơ qua email .edu.vn
             </span>
           </div>
@@ -166,7 +166,7 @@ export function InstallmentDrawer() {
             <div className="gf-inst-stat">
               <span>Lãi suất · Tổng thanh toán</span>
               <strong>{ratePct === 0 ? '0% lãi' : `${ratePct}%/th`}</strong>
-              <span style={{ marginTop: 4, fontFamily: "'JetBrains Mono', monospace", color: '#e2e8f0' }}>
+              <span style={{ marginTop: 4, fontFamily: "'JetBrains Mono', monospace", color: '#0f172a', fontWeight: 700 }}>
                 {formatVnd(totalPayable)}
               </span>
             </div>

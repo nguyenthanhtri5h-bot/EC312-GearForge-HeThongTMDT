@@ -4,7 +4,7 @@ import { CatalogFilterBar } from './drawers/CatalogFilterBar';
 import { StorefrontProductCard } from './storefront/StorefrontProductCard';
 import './drawers/drawers-extra.css';
 
-export function CatalogSection() {
+export function CatalogSection({ hideCategoryTabs = false }: { hideCategoryTabs?: boolean }) {
   const {
     products,
     totalProducts,
@@ -67,6 +67,7 @@ export function CatalogSection() {
         <CatalogFilterBar
           filters={filters}
           searchInput={searchInput}
+          hideCategoryTabs={hideCategoryTabs}
           onSearchChange={setSearchInput}
           onUpdate={(patch) => void fetchCatalog(patch)}
         />

@@ -1,3 +1,4 @@
+import type React from 'react';
 import { useEffect, useState } from 'react';
 import { SIMPLE_DROPDOWNS, TOP_NAV_ITEMS } from '../data/navigation';
 import { useGearForgeStore } from '../hooks/useGearForgeStore';
@@ -5,141 +6,155 @@ import { BrandLogo } from './BrandLogo';
 import { ProductMegaMenu } from './ProductMegaMenu';
 
 export function Header() {
-  const { boot, cart, compareIds, openDrawer, setSearchOpen, pageMode, navigateToPage } = useGearForgeStore();
+  const { boot, cart, openDrawer, setSearchOpen, pageMode, navigateToPage } = useGearForgeStore();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [hidden, setHidden] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string, href: string) => {
-    if (id === 'showcase' || href === '/') {
-      e.preventDefault();
-      setMobileOpen(false);
-      navigateToPage('showcase');
-    } else if (id === 'catalog' || href.startsWith('/shop')) {
-      e.preventDefault();
-      setMobileOpen(false);
-      navigateToPage('shop');
-    } else if (id === 'services' || href.startsWith('/he-sinh-thai')) {
-      e.preventDefault();
-      setMobileOpen(false);
-      navigateToPage('ecosystem');
-    } else if (id === 'gallery' || href.startsWith('/cau-hinh-mau')) {
-      e.preventDefault();
-      setMobileOpen(false);
-      navigateToPage('gallery');
-    } else if (href.startsWith('#') && pageMode !== 'showcase') {
-      e.preventDefault();
-      setMobileOpen(false);
-      navigateToPage('showcase', undefined, href);
-    }
+    if (id === 'catalog') { e.preventDefault(); navigateToPage('shop'); return; }
+    if (id === 'services') { e.preventDefault(); navigateToPage('ecosystem'); return; }
+    if (id === 'gallery') { e.preventDefault(); navigateToPage('gallery'); return; }
+    if (id === 'oms') { e.preventDefault(); openDrawer('oms'); return; }
+    if (href.startsWith('#')) { e.preventDefault(); navigateToPage('showcase', undefined, href); }
   };
 
   useEffect(() => {
-    let lastY = window.scrollY;
-    const onScroll = () => {
-      const y = window.scrollY;
-      if (y > 140 && y > lastY + 4) setHidden(true);
-      else if (y < lastY - 4 || y <= 80) setHidden(false);
-      lastY = y;
-    };
+    const onScroll = () => setScrolled(window.scrollY > 36);
+    onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  const isTransparent = pageMode === 'showcase' && !scrolled && !mobileOpen;
+
   return (
     <>
-      <header className={`header header-height small out ${hidden && !mobileOpen ? 'hd-hide' : ''}`}>
-      <div className="header-ctn">
-        <div className="header-left">
-          <div className="header-logo">
+      <header className={`header gf-riot-header${isTransparent ? ' is-transparent' : ' is-solid'}`}>
+        <div className="container-fluid gf-riot-header-in">
+          <div className="gf-hd-left">
             <BrandLogo
-              subLabel="ĐHQG-HCM"
-              height={42}
+              height={30}
+              tone="light"
+              stacked={false}
               onClick={(e) => {
                 e.preventDefault();
                 navigateToPage('showcase');
               }}
             />
           </div>
-        </div>
 
-        <div className="header-mid">
-          <div className="header-mid-flex">
-            <nav className="header-menu" aria-label="Menu chính">
-              <div className="menu-list">
-                {TOP_NAV_ITEMS.map((item) => {
-                  const subItems = item.dropdownKey ? SIMPLE_DROPDOWNS[item.dropdownKey] : null;
-                  const isActive =
-                    (item.id === 'showcase' && pageMode === 'showcase') ||
-                    (item.id === 'catalog' && pageMode === 'shop') ||
-                    (item.id === 'services' && pageMode === 'ecosystem') ||
-                    (item.id === 'gallery' && pageMode === 'gallery');
-                  return (
-                    <div key={item.id} className="menu-item">
-                      <a
-                        className="menu-item-link"
-                        href={item.href}
-                        onClick={(e) => handleNavClick(e, item.id, item.href)}
-                        style={isActive ? { color: '#09090b', background: '#f4f4f5', fontWeight: 700 } : undefined}
-                      >
-                        <span className="txt">{item.label}</span>
-                      </a>
-
-                      {item.isProductMega && <ProductMegaMenu />}
-
-                      {subItems && (
-                        <ul className="submenu-simple">
+          <nav className="menu gf-riot-nav" aria-label="Điều hướng chính">
+            <ul className="menu-list gf-riot-nav-list">
+              {TOP_NAV_ITEMS.map((item) => {
+                const subItems = item.dropdownKey ? SIMPLE_DROPDOWNS[item.dropdownKey] : null;
+                const hasDropdown = Boolean(item.isProductMega || subItems);
+                const isActive =
+                  (item.id === 'catalog' && pageMode === 'shop') ||
+                  (item.id === 'services' && pageMode === 'ecosystem') ||
+                  (item.id === 'gallery' && pageMode === 'gallery');
+                return (
+                  <li key={item.id} className={`menu-item${hasDropdown ? ' has-dropdown' : ''}`}>
+                    <a
+                      href={item.href}
+                      className={`nav-item${isActive ? ' is-active' : ''}`}
+                      onClick={(e) => handleNavClick(e, item.id, item.href)}
+                    >
+                      <span>{item.label}</span>
+                      {hasDropdown && <span className="gf-nav-caret" aria-hidden="true">&#9662;</span>}
+                    </a>
+                    {item.isProductMega && <ProductMegaMenu />}
+                    {subItems && (
+                      <div className="dropdown">
+                        <div className="dropdown-content">
                           {subItems.map((sub) => (
-                            <li key={sub.label}>
-                              <a
-                                href={sub.href}
-                                onClick={(e) => {
-                                  if (sub.category) {
-                                    e.preventDefault();
-                                    navigateToPage('shop', { category: sub.category });
-                                  }
-                                }}
-                              >
-                                {sub.icon && (
-                                  <img
-                                    src={sub.icon}
-                                    alt=""
-                                    style={{ width: 22, height: 22, objectFit: 'cover', borderRadius: 6 }}
-                                  />
-                                )}
-                                <span>{sub.label}</span>
-                              </a>
-                            </li>
+                            <a
+                              key={sub.label}
+                              href={sub.href}
+                              className="dropdown-item"
+                              onClick={(e) => {
+                                if (sub.drawer) {
+                                  e.preventDefault();
+                                  openDrawer(sub.drawer);
+                                } else if (sub.href === '/he-sinh-thai/') {
+                                  e.preventDefault();
+                                  navigateToPage('ecosystem');
+                                } else if (sub.href === '/cau-hinh-mau/') {
+                                  e.preventDefault();
+                                  navigateToPage('gallery');
+                                }
+                              }}
+                            >
+                              {sub.label}
+                            </a>
                           ))}
-                        </ul>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </nav>
+                        </div>
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+
+          <div className="gf-hd-right">
+            <button
+              type="button"
+              className="gf-riot-icon-btn hide-mob"
+              onClick={() => openDrawer('oms')}
+              aria-label="Tra cứu đơn hàng và bảo hành ĐHQG"
+              title="Tra cứu OMS ĐHQG-HCM"
+            >
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
+                <circle cx="12" cy="12" r="9.5" />
+                <path d="M2.5 12h19M12 2.5a14.5 14.5 0 0 1 0 19M12 2.5a14.5 14.5 0 0 0 0 19" />
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              className="gf-riot-search-pill hide-mob"
+              onClick={() => setSearchOpen(true)}
+              aria-label="Tìm kiếm cấu hình và linh kiện"
+            >
+              <span>TÌM KIẾM</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                <circle cx="11" cy="11" r="7" />
+                <path d="M20 20l-3.5-3.5" />
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              className="gf-riot-cart-btn"
+              onClick={() => openDrawer('cart')}
+              aria-label="Mở giỏ hàng"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1">
+                <circle cx="9" cy="20" r="1.5" />
+                <circle cx="18" cy="20" r="1.5" />
+                <path d="M2 3h3l2.4 12.2a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L22 7H6" />
+              </svg>
+              {cart.count > 0 && <span className="gf-hd-badge">{cart.count}</span>}
+            </button>
+
+            <button
+              type="button"
+              className="gf-riot-cta-pill hide-mob"
+              onClick={() => openDrawer('installment')}
+            >
+              TRẢ GÓP 0%
+            </button>
+
+            <button
+              type="button"
+              className="menu-toggle"
+              aria-label="Mở thực đơn di động"
+              onClick={() => setMobileOpen((v) => !v)}
+            >
+              {mobileOpen ? '\u2715' : '\u2630'}
+            </button>
           </div>
         </div>
-
-        <div className="header-right">
-          <button type="button" className="gf-hd-pill hide-mob" onClick={() => setSearchOpen(true)} aria-label="Tìm kiếm nhanh (Ctrl+K)" title="Tìm kiếm nhanh (Ctrl+K)">
-            <span>Tìm nhanh</span>
-            <span className="gf-hd-badge" style={{ background: '#f4f4f5', color: '#09090b', border: '1px solid #d4d4d8', fontSize: 10 }}>⌘K</span>
-          </button>
-          <button type="button" className="gf-hd-pill hide-mob" onClick={() => openDrawer('compare')} aria-label="Mở khay so sánh cấu hình">
-            <span>So sánh</span>
-            <span className="gf-hd-badge">{compareIds.length}</span>
-          </button>
-          <button type="button" className="gf-hd-pill is-primary hide-mob" onClick={() => openDrawer('installment')}>Trả góp 0%</button>
-          <button type="button" className="gf-hd-pill" onClick={() => openDrawer('cart')} aria-label="Mở giỏ hàng">
-            <span>Giỏ hàng</span>
-            <span className="gf-hd-badge">{cart.count}</span>
-          </button>
-          <a href={boot.routes.myAccount} className="gf-hd-pill hide-mob">{boot.user.loggedIn ? boot.user.name || 'Tài khoản' : 'Tài khoản'}</a>
-        </div>
-        <button type="button" className="hd-burger" aria-label={mobileOpen ? 'Đóng menu' : 'Mở menu'} onClick={() => setMobileOpen((v) => !v)}>
-          {mobileOpen ? '✕' : '☰'}
-        </button>
-      </div>
       </header>
 
       {mobileOpen && (
@@ -157,47 +172,18 @@ export function Header() {
               <span>{item.label}</span>
             </a>
           ))}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 18 }}>
-            <button
-              type="button"
-              className="gf-hd-pill"
-              style={{ minHeight: 44, justifyContent: 'center' }}
-              onClick={() => {
-                setMobileOpen(false);
-                setSearchOpen(true);
-              }}
-            >
+          <div className="gf-mob-actions">
+            <button type="button" className="gf-hd-pill" onClick={() => { setMobileOpen(false); setSearchOpen(true); }}>
               Tìm kiếm nhanh sản phẩm
             </button>
-            <button
-              type="button"
-              className="gf-hd-pill"
-              style={{ minHeight: 44, justifyContent: 'space-between' }}
-              onClick={() => {
-                setMobileOpen(false);
-                openDrawer('compare');
-              }}
-            >
-              <span>So sánh cấu hình</span>
-              <span className="gf-hd-badge">{compareIds.length}/3</span>
+            <button type="button" className="gf-hd-pill" onClick={() => { setMobileOpen(false); openDrawer('compare'); }}>
+              So sánh cấu hình (3 máy)
             </button>
-            <button
-              type="button"
-              className="gf-hd-pill is-primary"
-              style={{ minHeight: 44, justifyContent: 'center' }}
-              onClick={() => {
-                setMobileOpen(false);
-                openDrawer('installment');
-              }}
-            >
-              Đăng ký Trả góp 0%
+            <button type="button" className="gf-riot-cta-pill" onClick={() => { setMobileOpen(false); openDrawer('installment'); }}>
+              TRẢ GÓP 0% SINH VIÊN
             </button>
-            <a
-              href={boot.routes.myAccount}
-              className="gf-hd-pill"
-              style={{ minHeight: 44, justifyContent: 'center' }}
-            >
-              Tài khoản
+            <a href={boot.routes.myAccount} className="gf-hd-pill">
+              Tài khoản sinh viên
             </a>
           </div>
         </div>

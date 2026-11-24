@@ -1,79 +1,53 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { CartCheckoutDrawer } from './components/CartCheckoutDrawer';
 import { CompareDrawer } from './components/CompareDrawer';
 import { CommandSearchModal } from './components/drawers/CommandSearchModal';
+import { OmsLookupDrawer } from './components/drawers/OmsLookupDrawer';
 import { QuickViewModal } from './components/drawers/QuickViewModal';
-import { ContactSection } from './components/ContactSection';
-import { CtaSection } from './components/CtaSection';
 import { EcosystemPageView } from './components/EcosystemPageView';
 import { FloatingWidgets } from './components/FloatingWidgets';
 import { FooterSection } from './components/FooterSection';
-import { GuideBearNav } from './components/GuideBearNav';
 import { Header } from './components/Header';
 import { HeroSection } from './components/HeroSection';
 import { InstallmentDrawer } from './components/InstallmentDrawer';
-import { KhaAiSection } from './components/KhaAiSection';
-import { MarqueeRibbon } from './components/MarqueeRibbon';
-import { PartnersSection } from './components/PartnersSection';
-import { ReelsSection } from './components/ReelsSection';
-import { ResultsSection } from './components/ResultsSection';
-import { ServicesSection } from './components/ServicesSection';
+import { RiotDealsBento } from './components/riot/RiotDealsBento';
+import { RiotEcosystemStrip, RiotStudentSplit } from './components/riot/RiotEcosystemAndSplit';
+import { RiotProductsShowcase } from './components/riot/RiotProductsShowcase';
 import { SetupGalleryPageView } from './components/SetupGalleryPageView';
 import { ShopPageView } from './components/ShopPageView';
-import { CategoryShelvesSection } from './components/storefront/CategoryShelvesSection';
-import { FlashDealsShelf } from './components/storefront/FlashDealsShelf';
 import { MobileBottomBar } from './components/storefront/MobileBottomBar';
-import { XgearCategoryStrip } from './components/storefront/XgearCategoryStrip';
-import { StatsSection } from './components/StatsSection';
-import { SystemVideoSection } from './components/SystemVideoSection';
-import { TeamSection } from './components/TeamSection';
-import { TestimonialsSection } from './components/TestimonialsSection';
 import { VideoModal } from './components/VideoModal';
 import { GearForgeProvider, useGearForgeStore } from './hooks/useGearForgeStore';
-import { useHomeScroll } from './hooks/useHomeScroll';
 
 function ShowcaseMain() {
-  const mainRef = useRef<HTMLElement>(null);
-  useHomeScroll(mainRef);
-
   return (
-    <>
-      <main ref={mainRef} className="tc" id="tc">
-        <HeroSection />
-        <MarqueeRibbon />
-        <XgearCategoryStrip />
-        <FlashDealsShelf />
-        <CategoryShelvesSection />
-        <ServicesSection />
-        <ResultsSection />
-        <SystemVideoSection />
-        <KhaAiSection />
-        <TeamSection />
-        <StatsSection />
-        <TestimonialsSection />
-        <ReelsSection />
-        <PartnersSection />
-        <CtaSection />
-        <GuideBearNav rootRef={mainRef} />
-      </main>
-      <ContactSection />
-    </>
+    <main className="tc tc-riot-home" id="tc">
+      <HeroSection />
+      <RiotDealsBento />
+      <RiotProductsShowcase />
+      <RiotEcosystemStrip />
+      <RiotStudentSplit />
+    </main>
   );
 }
 
 function FlagshipShell() {
-  const { toast, pageMode, navigateToPage, closeDrawer } = useGearForgeStore();
+  const { toast, pageMode, navigateToPage, closeDrawer, openDrawer } = useGearForgeStore();
 
   useEffect(() => {
     const onDocClick = (e: MouseEvent) => {
       const a = (e.target as HTMLElement | null)?.closest?.('a');
       if (!a || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey) return;
       const href = a.getAttribute('href') || '';
-      if (href === '#gf-catalog' || href === '/shop/' || href.startsWith('/shop?')) {
+      if (href === '/') {
+        e.preventDefault();
+        closeDrawer();
+        navigateToPage('showcase');
+      } else if (href === '#gf-catalog' || href === '/shop/' || href.startsWith('/shop?') || href.startsWith('/shop/?')) {
         e.preventDefault();
         closeDrawer();
         const q = href.includes('?') ? new URLSearchParams(href.split('?')[1]).get('category') || '' : '';
-        navigateToPage('shop', q ? { category: q } : undefined);
+        navigateToPage('shop', q ? { category: q } : {});
       } else if (href === '/he-sinh-thai/') {
         e.preventDefault();
         closeDrawer();
@@ -82,22 +56,24 @@ function FlagshipShell() {
         e.preventDefault();
         closeDrawer();
         navigateToPage('gallery');
-      } else if (href === '#gf-installment' || href === '#gf-partners' || href === '#gf-services' || href === '#gf-team' || href === '#gf-testimonials') {
+      } else if (href === '#gf-installment') {
         e.preventDefault();
         closeDrawer();
-        navigateToPage('showcase', undefined, href);
+        openDrawer('installment');
       } else if (href === '#gf-oms-contact') {
+        e.preventDefault();
         const target = document.getElementById('gf-oms-contact');
         if (target) {
-          e.preventDefault();
           closeDrawer();
           target.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          openDrawer('oms');
         }
       }
     };
     document.addEventListener('click', onDocClick);
     return () => document.removeEventListener('click', onDocClick);
-  }, [closeDrawer, navigateToPage]);
+  }, [closeDrawer, navigateToPage, openDrawer]);
 
   return (
     <>
@@ -116,6 +92,7 @@ function FlagshipShell() {
       <CompareDrawer />
       <InstallmentDrawer />
       <CartCheckoutDrawer />
+      <OmsLookupDrawer />
       <QuickViewModal />
       <CommandSearchModal />
 

@@ -1,146 +1,79 @@
-import {
-  FOOTER_BOTTOM_COLUMNS,
-  FOOTER_TOP_COLUMNS,
-  GEARFORGE_ENTITIES,
-} from '../data/footerData';
-import { VIBE_PARTNERS } from '../data/vibeAssets';
 import { useGearForgeStore } from '../hooks/useGearForgeStore';
 import { BrandLogo } from './BrandLogo';
 
+const FOOTER_LINKS = [
+  { label: 'KHO SẢN PHẨM', mode: 'shop' as const },
+  { label: 'TRẢ GÓP 0%', drawer: 'installment' as const },
+  { label: 'TRA CỨU ĐƠN OMS', drawer: 'oms' as const },
+  { label: 'GÓC MÁY SV ĐHQG', mode: 'gallery' as const },
+  { label: 'HỆ SINH THÁI AI', mode: 'ecosystem' as const },
+  { label: 'SO SÁNH CẤU HÌNH', drawer: 'compare' as const },
+  { label: 'BẢO HÀNH ĐIỆN TỬ', drawer: 'oms' as const },
+  { label: 'LIÊN HỆ ĐHQG 1900 6868', mode: 'ecosystem' as const },
+];
+
 export function FooterSection() {
-  const { openDrawer } = useGearForgeStore();
+  const { navigateToPage, openDrawer } = useGearForgeStore();
 
   return (
-    <footer className="ft">
-      <div className="container">
-        <div className="ft-grid">
-          {FOOTER_TOP_COLUMNS.map((col) => (
-            <div key={col.title}>
-              <div className="ft-col-title">{col.title}</div>
-              <ul className="ft-links">
-                {col.links.map((lk) => (
-                  <li key={lk.label}>
-                    <a href={lk.href}>{lk.label}</a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-
-        <div className="ft-grid-bottom">
-          {FOOTER_BOTTOM_COLUMNS.map((col) => (
-            <div key={col.title}>
-              <div className="ft-col-title">{col.title}</div>
-              <ul className="ft-links">
-                {col.links.map((lk) => (
-                  <li key={lk.label}>
-                    <a href={lk.href}>{lk.label}</a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-
-          <div>
-            <div className="ft-col-title">Liên hệ Campus Hub</div>
-            <div className="ft-contact-item">
-              <div>
-                <span className="label">Email hỗ trợ &amp; bảo hành</span>
-                <a className="val" href="mailto:support@gearforge.vn">
-                  support@gearforge.vn
-                </a>
-              </div>
-            </div>
-            <div className="ft-contact-item">
-              <div>
-                <span className="label">Địa chỉ</span>
-                <span className="val">
-                  Khu phố 6, P. Linh Trung, TP. Thủ Đức (Làng Đại học ĐHQG-HCM)
-                </span>
-              </div>
-            </div>
+    <footer className="footer gf-riot-ft" id="lien-he">
+      <div className="gf-riot-ft-wrap">
+        <div className="gf-riot-ft-top">
+          <div className="gf-riot-ft-mark">
+            <BrandLogo
+              height={30}
+              tone="light"
+              stacked={false}
+              onClick={(e) => {
+                e.preventDefault();
+                navigateToPage('showcase');
+              }}
+            />
           </div>
 
-          <div className="ft-hl-block">
-            <div style={{ fontSize: 12, fontWeight: 800, opacity: 0.9, letterSpacing: '0.06em' }}>
-              HOTLINE SINH VIÊN 8H–22H
-            </div>
-            <div style={{ marginTop: 8, fontSize: 28, fontWeight: 800, letterSpacing: '-0.02em' }}>
-              1900 6868 07
-            </div>
-            <p style={{ margin: '8px 0 14px', fontSize: 13.5, lineHeight: 1.5, opacity: 0.92 }}>
-              Hỗ trợ trả góp 0% .edu.vn, kích hoạt bảo hành S/N &amp; giao KTX trong 2 giờ.
-            </p>
-            <button
-              type="button"
-              className="gf-hd-pill"
-              onClick={() => openDrawer('installment')}
-            >
-              Đăng ký Trả góp 0% →
-            </button>
-          </div>
-        </div>
-
-        <div className="ft-if">
-          <div className="ft-if-row">
-            <div className="ft-if-head">
-              <span>Đơn vị vận hành</span>
-            </div>
-            {GEARFORGE_ENTITIES.map((ent) => (
-              <div key={ent.name}>
-                <p className="ft-if-name">{ent.name}</p>
-                <span className="ft-if-code">{ent.code}</span>
-                <div className="ft-if-acc" style={{ marginTop: 4 }}>
-                  {ent.account}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="ft-corp">
-        <div className="container ft-corp-inner">
-          <BrandLogo subLabel="ĐHQG-HCM" height={44} />
-
-          <div className="ft-badge-partners">
-            {[VIBE_PARTNERS[0], VIBE_PARTNERS[1], VIBE_PARTNERS[4], VIBE_PARTNERS[10]].map((p) => (
-              <a key={p.id} href="#gf-partners" className="ft-partner-chip">
-                <img src={p.src} alt={p.alt} style={{ height: 22, width: 'auto' }} loading="lazy" />
-                <span className="sub">{p.name}</span>
-              </a>
-            ))}
-          </div>
-
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }} aria-label="Phương thức thanh toán">
-            {['VNPay-QR', 'MoMo 0%', 'Fundiin', 'VISA / Master', 'COD Giao KTX 2h'].map((pm) => (
-              <span
-                key={pm}
-                style={{
-                  padding: '5px 10px',
-                  borderRadius: 8,
-                  background: '#ffffff',
-                  border: '1px solid #d8d0e8',
-                  fontSize: 11.5,
-                  fontWeight: 700,
-                  color: '#2b2438',
+          <nav className="gf-riot-ft-nav" aria-label="Điều hướng chân trang">
+            {FOOTER_LINKS.map((item) => (
+              <button
+                key={item.label}
+                type="button"
+                className="gf-riot-ft-link"
+                onClick={() => {
+                  if (item.mode) navigateToPage(item.mode);
+                  if (item.drawer) openDrawer(item.drawer);
                 }}
               >
-                {pm}
-              </span>
+                {item.label}
+              </button>
             ))}
+          </nav>
+
+          <div className="gf-riot-ft-socials" aria-label="Kênh cộng đồng GearForge">
+            <a href="#diem-nong" onClick={(e) => { e.preventDefault(); navigateToPage('showcase', undefined, '#diem-nong'); }} aria-label="Tin tức">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+            <a href="/he-sinh-thai/" onClick={(e) => { e.preventDefault(); navigateToPage('ecosystem'); }} aria-label="Instagram ĐHQG">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
+            </a>
+            <a href="/cau-hinh-mau/" onClick={(e) => { e.preventDefault(); navigateToPage('gallery'); }} aria-label="TikTok Setup">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.81a8.26 8.26 0 0 0 4.76 1.52V6.89a4.84 4.84 0 0 1-1-.2z"/></svg>
+            </a>
+            <a href="/shop/" onClick={(e) => { e.preventDefault(); navigateToPage('shop'); }} aria-label="YouTube Review">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.38.55A3.02 3.02 0 0 0 .5 6.19 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.81 3.02 3.02 0 0 0 2.12 2.14c1.88.55 9.38.55 9.38.55s7.5 0 9.38-.55a3.02 3.02 0 0 0 2.12-2.14A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-5.81zM9.6 15.6V8.4l6.27 3.6-6.27 3.6z"/></svg>
+            </a>
           </div>
         </div>
-      </div>
 
-      <div className="container ft-license">
-        <div className="ft-license-left">
-          <p className="reserved">© 2026 GearForge Vietnam — Trung tâm Laptop, PC &amp; Gear Sinh viên ĐHQG-HCM</p>
-        </div>
-        <div className="ft-license-right">
-          <a className="policy-link" href="/tra-cuu-don-hang/">Tra cứu đơn &amp; Bảo hành</a>
-          <a className="policy-link" href="/my-account/">Tài khoản SV</a>
+        <div className="gf-riot-ft-bottom">
+          <p className="gf-riot-ft-copy">
+            KTX Khu A/B ĐHQG-HCM &nbsp;|&nbsp; &copy; năm 2026 bởi GearForge Việt Nam. Đã đăng ký bản quyền.
+          </p>
+          <button
+            type="button"
+            className="gf-riot-ft-top-btn"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          >
+            TỚI ĐẦU TRANG &#9650;
+          </button>
         </div>
       </div>
     </footer>

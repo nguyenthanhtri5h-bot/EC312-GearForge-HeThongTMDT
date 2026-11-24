@@ -29,9 +29,12 @@ export function CartCheckoutDrawer() {
   const submitCoupon = async (code: string) => {
     if (!code.trim() || applying) return;
     setApplying(true);
-    const ok = await applyCoupon(code);
-    if (ok) setCouponInput('');
-    setApplying(false);
+    try {
+      const ok = await applyCoupon(code);
+      if (ok) setCouponInput('');
+    } finally {
+      setApplying(false);
+    }
   };
 
   const handleFormCoupon = (e: FormEvent) => {
@@ -53,7 +56,7 @@ export function CartCheckoutDrawer() {
         <div className="gf-drawer-head">
           <div>
             <h3 id="gf-cart-drawer-title">Giỏ hàng ({cart.count})</h3>
-            <span style={{ fontSize: 12.5, color: '#cbd5e1' }}>
+            <span style={{ fontSize: 12.5, color: '#475569' }}>
               Giao hỏa tốc KTX ĐHQG trong 2h · Hỗ trợ trả góp 0%
             </span>
           </div>
@@ -68,7 +71,7 @@ export function CartCheckoutDrawer() {
               Giỏ hàng đang trống. Chọn Laptop hoặc PC trong{' '}
               <a
                 href="/shop/"
-                style={{ color: '#2563eb', fontWeight: 800, textDecoration: 'underline' }}
+                style={{ color: '#D13639', fontWeight: 800, textDecoration: 'underline' }}
                 onClick={closeDrawer}
               >
                 Cửa hàng sản phẩm
@@ -152,7 +155,7 @@ export function CartCheckoutDrawer() {
             {cart.coupons.length > 0 && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {cart.coupons.map((c) => (
-                  <span key={c} className="gf-spec-chip" style={{ background: 'rgba(16,185,129,0.2)', color: '#a7f3d0' }}>
+                  <span key={c} className="gf-spec-chip" style={{ background: '#ecfdf5', color: '#047857', borderColor: '#a7f3d0' }}>
                     Đã áp mã: {c.toUpperCase()}
                   </span>
                 ))}
@@ -166,7 +169,7 @@ export function CartCheckoutDrawer() {
               <strong style={{ fontFamily: "'JetBrains Mono', monospace" }}>{formatVnd(cart.subtotal)}</strong>
             </div>
             {cart.discount > 0 && (
-              <div className="gf-cart-line" style={{ color: '#6ee7b7' }}>
+              <div className="gf-cart-line" style={{ color: '#047857', fontWeight: 700 }}>
                 <span>Giảm giá ưu đãi</span>
                 <strong style={{ fontFamily: "'JetBrains Mono', monospace" }}>−{formatVnd(cart.discount)}</strong>
               </div>

@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { formatVnd, useGearForgeStore } from '../hooks/useGearForgeStore';
 import type { OmsOrder, OmsStep } from '../types/gearforge';
 import { OmsWarrantyCard } from './drawers/OmsWarrantyCard';
@@ -40,18 +40,26 @@ export function OmsLookupPanel({ initialOrderId = 542 }: { initialOrderId?: numb
   });
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const reqSeqRef = useRef(0);
 
   const runLookup = async (id: number) => {
-    if (!id || id <= 0) return;
+    if (!id || id <= 0) {
+      setErrorMsg('Vui lòng nhập mã đơn hàng hợp lệ.');
+      return;
+    }
+    const seq = ++reqSeqRef.current;
     setLoading(true);
     setErrorMsg(null);
-    const res = await lookupOmsOrder(id);
-    if (res) {
-      setOrder(res);
-    } else {
-      setErrorMsg(`Không tìm thấy đơn #${id} hoặc bạn cần đăng nhập đúng tài khoản đặt hàng.`);
+    try {
+      const res = await lookupOmsOrder(id);
+      if (seq !== reqSeqRef.current) return;
+      if (res) setOrder(res);
+      else setErrorMsg(`Không tìm thấy đơn #${id} hoặc bạn cần đăng nhập đúng tài khoản đặt hàng.`);
+    } catch {
+      if (seq === reqSeqRef.current) setErrorMsg('Lỗi kết nối khi tra cứu đơn hàng.');
+    } finally {
+      if (seq === reqSeqRef.current) setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -63,7 +71,12 @@ export function OmsLookupPanel({ initialOrderId = 542 }: { initialOrderId?: numb
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
-    void runLookup(Number(queryId || initialOrderId));
+    const parsed = Number(queryId.trim());
+    if (!queryId.trim() || Number.isNaN(parsed) || parsed <= 0) {
+      setErrorMsg('Vui lòng nhập mã đơn hàng hợp lệ (ví dụ: 542).');
+      return;
+    }
+    void runLookup(parsed);
   };
 
   const activeIdx = (() => {
@@ -111,7 +124,7 @@ export function OmsLookupPanel({ initialOrderId = 542 }: { initialOrderId?: numb
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
               <span className="gf-oms-badge">{STATUS_VI[order.status] || order.status}</span>
               {order.installment?.status && (
-                <span className="gf-oms-badge" style={{ background: '#eff6ff', color: '#1e3a8a', borderColor: '#93c5fd' }}>
+                <span className="gf-oms-badge" style={{ background: '#fef2f2', color: '#991b1b', borderColor: '#fca5a5' }}>
                   {STATUS_VI[order.installment.status] || order.installment.status}
                 </span>
               )}

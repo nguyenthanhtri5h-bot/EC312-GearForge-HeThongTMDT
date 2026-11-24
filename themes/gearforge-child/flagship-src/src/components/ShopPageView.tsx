@@ -1,10 +1,15 @@
 import { useEffect, useRef } from 'react';
-import { VIBE_BEAR_GUIDE, VIBE_VIDEOS } from '../data/vibeAssets';
 import { useGearForgeStore } from '../hooks/useGearForgeStore';
 import { CatalogSection } from './CatalogSection';
-import { ContactSection } from './ContactSection';
-import { PartnersSection } from './PartnersSection';
 import './drawers/drawers-extra.css';
+
+const SHOP_TABS = [
+  { label: 'TẤT CẢ', slug: '' },
+  { label: 'LAPTOP GAMING', slug: 'laptop-gaming' },
+  { label: 'ULTRABOOK & ĐỒ HỌA', slug: 'laptop-ultrabook' },
+  { label: 'PC WORKSTATION', slug: 'pc-workstation' },
+  { label: 'GEAR & PHỤ KIỆN', slug: 'gear' },
+];
 
 function resolveInitialCategoryFromUrl(): string {
   if (typeof window === 'undefined') return '';
@@ -20,93 +25,99 @@ function resolveInitialCategoryFromUrl(): string {
 }
 
 export function ShopPageView() {
-  const { openDrawer, navigateToPage, fetchCatalog } = useGearForgeStore();
+  const { openDrawer, navigateToPage, fetchCatalog, filters } = useGearForgeStore();
   const syncedUrlRef = useRef(false);
 
   useEffect(() => {
     if (syncedUrlRef.current) return;
     syncedUrlRef.current = true;
     const initCat = resolveInitialCategoryFromUrl();
-    if (initCat) {
+    if (initCat && filters.category !== initCat) {
       void fetchCatalog({ category: initCat, page: 1 });
     }
-  }, [fetchCatalog]);
+  }, [fetchCatalog, filters.category]);
 
   return (
-    <main className="tc" id="tc-shop" style={{ paddingTop: 64, background: '#f8fafc', color: '#0f172a' }}>
+    <main className="tc" id="tc-shop" style={{ paddingTop: 78, background: '#F1F0EC', color: '#0A0A0A' }}>
       <section
-        className="tc-navy tc-vu-tru"
+        className="gf-riot-topo"
         style={{
-          position: 'relative',
-          overflow: 'hidden',
-          padding: '28px 0 22px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
-          background: 'radial-gradient(75% 85% at 78% 35%, #1e293b 0%, #0f172a 72%)',
+          backgroundColor: '#0A0A0A',
+          color: '#FFFFFF',
+          padding: '44px 0 34px',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
         }}
       >
-        <video
-          src={VIBE_VIDEOS.shopShowcase}
-          poster={VIBE_VIDEOS.posterShopShowcase}
-          autoPlay
-          muted
-          loop
-          playsInline
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            opacity: 0.24,
-            pointerEvents: 'none',
-          }}
-        />
-        <div className="tc-wrap" style={{ position: 'relative', zIndex: 2 }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 18 }}>
-            <div style={{ flex: '1 1 420px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#cbd5e1', marginBottom: 8 }}>
+        <div className="tc-wrap">
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between', gap: 18 }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, color: '#A1A1AA', marginBottom: 10 }}>
                 <button
                   type="button"
                   onClick={() => navigateToPage('showcase')}
-                  style={{ background: 'none', border: 0, color: '#ffffff', fontWeight: 700, cursor: 'pointer', padding: 0 }}
+                  style={{ background: 'none', border: 0, color: '#FFFFFF', fontWeight: 700, cursor: 'pointer', padding: 0 }}
                 >
-                  ← Trang chủ
+                  &larr; Trang chủ
                 </button>
                 <span>/</span>
-                <span style={{ color: '#cbd5e1', fontWeight: 600 }}>Cửa hàng</span>
+                <span>Kho Sản Phẩm</span>
               </div>
-              <h1 style={{ margin: 0, fontFamily: "'Be Vietnam Pro', 'Inter', sans-serif", fontSize: 'clamp(24px, 3vw, 36px)', fontWeight: 800, lineHeight: 1.24, color: '#fff', letterSpacing: '-0.02em' }}>
-                Laptop, PC Workstation &amp; Gaming Gear Chính Hãng
+              <h1
+                style={{
+                  margin: 0,
+                  fontFamily: "'Be Vietnam Pro', 'Inter', sans-serif",
+                  fontSize: 'clamp(2.1rem, 3.6vw, 3.25rem)',
+                  fontWeight: 900,
+                  lineHeight: 1.08,
+                  letterSpacing: '-0.03em',
+                  color: '#FFFFFF',
+                }}
+              >
+                Kho Cấu Hình ĐHQG
               </h1>
-              <p style={{ margin: '8px 0 0', fontSize: 14.5, color: '#cbd5e1', maxWidth: 680 }}>
-                So sánh tối đa 3 máy song song, ước tính trả góp 0% sinh viên và áp mã <strong style={{ color: '#ffffff' }}>BACKTOSCHOOL (-500.000đ)</strong>.
-              </p>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <img
-                src={VIBE_BEAR_GUIDE.shopRig}
-                alt="Cyber Bear Showroom GearForge"
-                className="gf-shop-mascot"
-                style={{ width: 96, height: 112, objectFit: 'contain', filter: 'drop-shadow(0 12px 24px rgba(15, 23, 42, 0.45))' }}
-              />
-              <button
-                type="button"
-                className="tc-btn tc-btn-cam"
-                style={{ border: 0, cursor: 'pointer' }}
-                onClick={() => openDrawer('installment')}
-              >
-                Trả góp 0% ngay →
-              </button>
-            </div>
+            <button
+              type="button"
+              className="gf-riot-red-pill"
+              style={{ height: 46, padding: '0 24px', fontSize: 14 }}
+              onClick={() => openDrawer('installment')}
+            >
+              Trả góp 0% · Duyệt .edu.vn
+            </button>
+          </div>
+
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 22, marginTop: 28 }}>
+            {SHOP_TABS.map((t) => {
+              const isOn = (filters.category || '') === t.slug;
+              return (
+                <button
+                  key={t.label}
+                  type="button"
+                  onClick={() => void fetchCatalog({ category: t.slug, page: 1 })}
+                  style={{
+                    background: 'none',
+                    border: 0,
+                    padding: '6px 0',
+                    borderBottom: isOn ? '2px solid #EB0029' : '2px solid transparent',
+                    color: isOn ? '#FFFFFF' : '#A1A1AA',
+                    fontSize: 12,
+                    fontWeight: 800,
+                    letterSpacing: '0.1em',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      <CatalogSection />
-      <PartnersSection />
-      <ContactSection />
+      <div style={{ background: '#F1F0EC', paddingBlock: 16 }}>
+        <CatalogSection hideCategoryTabs />
+      </div>
     </main>
   );
 }

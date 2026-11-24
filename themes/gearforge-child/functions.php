@@ -245,7 +245,7 @@ add_action('wp_enqueue_scripts', static function (): void {
     if (gf_is_flagship_front_request()) {
         wp_enqueue_style(
             'gearforge-flagship-fonts',
-            'https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=Space+Grotesk:wght@600;700&display=swap',
+            'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap',
             [],
             null
         );
@@ -267,7 +267,7 @@ add_action('wp_enqueue_scripts', static function (): void {
 
     wp_enqueue_style(
         'gearforge-fonts',
-        'https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap',
+        'https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap',
         [],
         null
     );
@@ -395,20 +395,27 @@ add_filter('body_class', static function (array $classes): array {
     return $classes;
 }, 20);
 
+function gf_render_canonical_logo_svg(int $size = 28): string {
+    return '<svg width="' . $size . '" height="' . $size . '" viewBox="0 0 120 120" fill="none" aria-hidden="true" style="display:block;flex-shrink:0">'
+        . '<polygon points="60,6 108,24 100,79 60,114 20,79 12,24" fill="#D13639"/>'
+        . '<polygon points="60,15 99,30 92,75 60,104 28,75 21,30" fill="#0B0B0E"/>'
+        . '<path d="M60 24L86 36L82 49H54V59H79L73 82L60 94L37 74L34 37L60 24Z" fill="#FFFFFF"/>'
+        . '<polygon points="56,64 72,64 67,79 58,86" fill="#EB0029"/>'
+        . '</svg>';
+}
+
 add_action('wp_head', static function (): void {
-    if (gf_is_flagship_front_request() || is_admin()) {
+    if (is_admin()) {
         return;
     }
-    $icon = get_stylesheet_directory_uri() . '/assets/flagship/vibe/gearforge-emblem-128.png';
-    echo '<link rel="icon" type="image/png" href="' . esc_url($icon) . '" />' . "\n";
+    $svg_icon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cpolygon points='60,6 108,24 100,79 60,114 20,79 12,24' fill='%23D13639'/%3E%3Cpolygon points='60,15 99,30 92,75 60,104 28,75 21,30' fill='%230B0B0E'/%3E%3Cpath d='M60 24L86 36L82 49H54V59H79L73 82L60 94L37 74L34 37L60 24Z' fill='%23FFFFFF'/%3E%3Cpolygon points='56,64 72,64 67,79 58,86' fill='%23EB0029'/%3E%3C/svg%3E";
+    echo '<link rel="icon" type="image/svg+xml" href="' . esc_attr($svg_icon) . '" />' . "\n";
 }, 5);
 
 add_action('wp_body_open', static function (): void {
     if (gf_is_flagship_front_request() || is_admin()) {
         return;
     }
-    $asset_vibe   = get_stylesheet_directory_uri() . '/assets/flagship/vibe/';
-    $wordmark_url = $asset_vibe . 'gearforge-wordmark-3d.png';
     $cart_url     = function_exists('wc_get_cart_url') ? wc_get_cart_url() : home_url('/cart/');
     $account_url  = (function_exists('wc_get_page_permalink') && wc_get_page_permalink('myaccount')) ? wc_get_page_permalink('myaccount') : home_url('/my-account/');
     $compare_url  = home_url('/so-sanh-cau-hinh/');
@@ -426,9 +433,9 @@ add_action('wp_body_open', static function (): void {
     ?>
     <header class="gf-sec-hd" role="banner">
         <div class="gf-sec-hd-inner">
-            <a class="gf-sec-brand" href="<?php echo esc_url(home_url('/')); ?>" aria-label="GearForge Trang chủ">
-                <img class="gf-sec-logo-img" src="<?php echo esc_url($wordmark_url); ?>" alt="GearForge 3D Wordmark" />
-                <span class="gf-sec-brand-pill">ĐHQG-HCM</span>
+            <a class="gf-sec-brand" href="<?php echo esc_url(home_url('/')); ?>" aria-label="GearForge Trang chủ" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;">
+                <?php echo gf_render_canonical_logo_svg(28); ?>
+                <span style="font-family:'Barlow Condensed','Be Vietnam Pro',sans-serif;font-size:18px;font-weight:900;letter-spacing:0.06em;color:#FFFFFF;line-height:1;">GEARFORGE</span>
             </a>
 
             <nav class="gf-sec-nav" aria-label="Điều hướng chính">
@@ -482,13 +489,13 @@ add_action('wp_footer', static function (): void {
     if (gf_is_flagship_front_request() || is_admin()) {
         return;
     }
-    $wordmark_url = get_stylesheet_directory_uri() . '/assets/flagship/vibe/gearforge-wordmark-3d.png';
     ?>
     <footer class="gf-sec-ft" role="contentinfo">
         <div class="gf-sec-ft-inner">
             <div class="gf-sec-ft-brand">
-                <a class="gf-sec-brand" href="<?php echo esc_url(home_url('/')); ?>">
-                    <img class="gf-sec-logo-img" src="<?php echo esc_url($wordmark_url); ?>" alt="GearForge" />
+                <a class="gf-sec-brand" href="<?php echo esc_url(home_url('/')); ?>" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;">
+                    <?php echo gf_render_canonical_logo_svg(28); ?>
+                    <span style="font-family:'Barlow Condensed','Be Vietnam Pro',sans-serif;font-size:18px;font-weight:900;letter-spacing:0.06em;color:#FFFFFF;line-height:1;">GEARFORGE</span>
                 </a>
                 <p>Hệ thống Laptop, PC Workstation &amp; Gaming Gear dành cho Sinh viên ĐHQG TP.HCM — Trả góp 0% kỳ hạn 3 tháng qua email .edu.vn, giao KTX trong 2 giờ &amp; bảo hành điện tử theo Serial.</p>
             </div>

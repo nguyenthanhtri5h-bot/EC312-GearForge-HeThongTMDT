@@ -115,18 +115,22 @@ export function GearForgeProvider({ children }: { children: React.ReactNode }) {
       setCart((prev) => recalcLocalCart(prev.items.map((it) => (it.key === cartItemKey ? { ...it, qty, lineTotal: it.price * qty } : it)).filter((it) => it.qty > 0), prev));
       return;
     }
-    const json = await apiPostCart(boot.ajaxUrl, boot.ajaxNonce, { mode: 'update', cart_item_key: cartItemKey, qty });
-    if (json?.success && json.data?.cart) setCart(json.data.cart);
-  }, [boot.ajaxNonce, boot.ajaxUrl]);
+    try {
+      const json = await apiPostCart(boot.ajaxUrl, boot.ajaxNonce, { mode: 'update', cart_item_key: cartItemKey, qty });
+      if (json?.success && json.data?.cart) setCart(json.data.cart);
+    } catch { showToast('Không thể cập nhật số lượng.'); }
+  }, [boot.ajaxNonce, boot.ajaxUrl, showToast]);
 
   const removeCartItem = useCallback(async (cartItemKey: string) => {
     if (!boot.ajaxUrl) {
       setCart((prev) => recalcLocalCart(prev.items.filter((it) => it.key !== cartItemKey), prev));
       return;
     }
-    const json = await apiPostCart(boot.ajaxUrl, boot.ajaxNonce, { mode: 'remove', cart_item_key: cartItemKey });
-    if (json?.success && json.data?.cart) setCart(json.data.cart);
-  }, [boot.ajaxNonce, boot.ajaxUrl]);
+    try {
+      const json = await apiPostCart(boot.ajaxUrl, boot.ajaxNonce, { mode: 'remove', cart_item_key: cartItemKey });
+      if (json?.success && json.data?.cart) setCart(json.data.cart);
+    } catch { showToast('Không thể xóa sản phẩm khỏi giỏ.'); }
+  }, [boot.ajaxNonce, boot.ajaxUrl, showToast]);
 
   const applyCoupon = useCallback(async (code: string): Promise<boolean> => {
     const clean = code.trim().toUpperCase();
@@ -137,10 +141,12 @@ export function GearForgeProvider({ children }: { children: React.ReactNode }) {
       showToast(`Đã áp dụng mã ${clean} (-5% SV ĐHQG).`);
       return true;
     }
-    const json = await apiPostCart(boot.ajaxUrl, boot.ajaxNonce, { mode: 'apply_coupon', coupon_code: clean });
-    if (json?.success && json.data?.cart) { setCart(json.data.cart); showToast(json.data.message || `Đã áp dụng mã ${clean}.`); return true; }
-    showToast(json?.data?.message || 'Không áp dụng được mã ưu đãi.');
-    return false;
+    try {
+      const json = await apiPostCart(boot.ajaxUrl, boot.ajaxNonce, { mode: 'apply_coupon', coupon_code: clean });
+      if (json?.success && json.data?.cart) { setCart(json.data.cart); showToast(json.data.message || `Đã áp dụng mã ${clean}.`); return true; }
+      showToast(json?.data?.message || 'Không áp dụng được mã ưu đãi.');
+      return false;
+    } catch { showToast('Lỗi kết nối khi áp mã ưu đãi.'); return false; }
   }, [boot.ajaxNonce, boot.ajaxUrl, showToast]);
 
   const toggleCompare = useCallback(async (productId: number) => {
@@ -173,11 +179,11 @@ export function GearForgeProvider({ children }: { children: React.ReactNode }) {
   const clearCompare = useCallback(async () => {
     setCompareIds([]);
     setCompareItems([]);
-    if (boot.ajaxUrl) await apiPostCompare(boot.ajaxUrl, boot.ajaxNonce, 'clear', 0);
+    try { if (boot.ajaxUrl) await apiPostCompare(boot.ajaxUrl, boot.ajaxNonce, 'clear', 0); } catch { /* ignore */ }
   }, [boot.ajaxNonce, boot.ajaxUrl]);
 
   const calcInstallment = useCallback((price: number, downPct: number, months: number) => apiCalcInstallment(boot.restUrl, price, downPct, months), [boot.restUrl]);
-  const lookupOmsOrder = useCallback(async (orderId: number) => (!boot.ajaxUrl ? (boot.sampleOrders?.find((o) => o.orderId === orderId) || boot.sampleOrders?.[0] || null) : apiLookupOms(boot.ajaxUrl, orderId)), [boot.ajaxUrl, boot.sampleOrders]);
+  const lookupOmsOrder = useCallback(async (orderId: number) => (!boot.ajaxUrl ? (boot.sampleOrders?.find((o) => o.orderId === orderId) || null) : apiLookupOms(boot.ajaxUrl, orderId)), [boot.ajaxUrl, boot.sampleOrders]);
 
   const navigateToPage = useCallback((mode: FlagshipPageMode, filterPatch?: Partial<FilterParams>, hash?: string) => {
     setPageMode(mode);
@@ -191,7 +197,9 @@ export function GearForgeProvider({ children }: { children: React.ReactNode }) {
     if (typeof window !== 'undefined' && window.location.pathname + window.location.search + window.location.hash !== url) {
       window.history.pushState({ pageMode: mode }, '', url);
     }
-    if (mode === 'shop' && filterPatch) void fetchCatalog({ ...DEFAULT_FILTERS, ...filterPatch, page: 1 });
+    if (mode === 'shop') {
+      void fetchCatalog(filterPatch ? { ...DEFAULT_FILTERS, ...filterPatch, page: 1 } : DEFAULT_FILTERS);
+    }
     window.setTimeout(() => {
       if (hash) {
         const el = document.querySelector(hash.startsWith('#') ? hash : `#${hash}`);

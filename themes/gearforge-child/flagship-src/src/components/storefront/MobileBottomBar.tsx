@@ -1,4 +1,5 @@
 import { useGearForgeStore } from '../../hooks/useGearForgeStore';
+import './xgear-shelves.css';
 
 export function MobileBottomBar() {
   const { pageMode, cart, navigateToPage, openDrawer, setSearchOpen } = useGearForgeStore();

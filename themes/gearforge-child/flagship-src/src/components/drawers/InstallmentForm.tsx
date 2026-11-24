@@ -93,7 +93,7 @@ export function InstallmentForm({ product, downPct, months }: Props) {
       {!boot.user.loggedIn && (
         <div className="gf-alert-box is-warn">
           Vui lòng{' '}
-          <a href={boot.routes.myAccount} style={{ color: '#2563eb', fontWeight: 800, textDecoration: 'underline' }}>
+          <a href={boot.routes.myAccount} style={{ color: '#D13639', fontWeight: 800, textDecoration: 'underline' }}>
             đăng nhập tài khoản sinh viên
           </a>{' '}
           để hoàn tất gửi hồ sơ CCCD &amp; Thẻ sinh viên.

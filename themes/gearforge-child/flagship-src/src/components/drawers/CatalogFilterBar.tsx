@@ -54,11 +54,12 @@ const BUDGET_PRESETS = [
 interface Props {
   filters: FilterParams;
   searchInput: string;
+  hideCategoryTabs?: boolean;
   onSearchChange: (val: string) => void;
   onUpdate: (patch: Partial<FilterParams>) => void;
 }
 
-export function CatalogFilterBar({ filters, searchInput, onSearchChange, onUpdate }: Props) {
+export function CatalogFilterBar({ filters, searchInput, hideCategoryTabs = false, onSearchChange, onUpdate }: Props) {
   const [budgetDraft, setBudgetDraft] = useState(filters.maxPrice);
   const budgetTimerRef = useRef<number | null>(null);
 
@@ -82,25 +83,27 @@ export function CatalogFilterBar({ filters, searchInput, onSearchChange, onUpdat
 
   return (
     <div className="gf-cat-bar" role="search" aria-label="Bộ lọc sản phẩm GearForge">
-      <div className="gf-cat-pills" role="tablist" aria-label="Phân loại chính">
-        {CATEGORY_TABS.map((tab) => {
-          const active = tab.aliases.includes(filters.category);
-          return (
-            <button
-              key={tab.key || 'all'}
-              type="button"
-              role="tab"
-              aria-selected={active}
-              className={`gf-cat-pill ${active ? 'is-active' : ''}`}
-              onClick={() => onUpdate({ category: tab.key, search: '', cpu: '', ram: '', gpu: '', storage: '', page: 1 })}
-            >
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
+      {!hideCategoryTabs && (
+        <div className="gf-cat-pills" role="tablist" aria-label="Phân loại chính">
+          {CATEGORY_TABS.map((tab) => {
+            const active = tab.aliases.includes(filters.category);
+            return (
+              <button
+                key={tab.key || 'all'}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                className={`gf-cat-pill ${active ? 'is-active' : ''}`}
+                onClick={() => onUpdate({ category: tab.key, search: '', cpu: '', ram: '', gpu: '', storage: '', page: 1 })}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 10, alignItems: 'center' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: hideCategoryTabs ? 0 : 10, alignItems: 'center' }}>
         <span style={{ fontSize: 12, fontWeight: 700, color: '#475569', marginRight: 4 }}>
           {activeGroup ? 'Chọn nhanh theo nhóm:' : 'Gợi ý theo nhu cầu SV:'}
         </span>
@@ -121,7 +124,7 @@ export function CatalogFilterBar({ filters, searchInput, onSearchChange, onUpdat
           <button
             type="button"
             className="gf-mini-pill"
-            style={{ borderColor: '#2563eb', color: '#2563eb', background: '#eff6ff' }}
+            style={{ borderColor: '#FECACA', color: '#B91C1C', background: '#FEF2F2' }}
             onClick={() => {
               onSearchChange('');
               onUpdate({ search: '', category: '', cpu: '', ram: '', gpu: '', storage: '', maxPrice: 80000000, page: 1 });

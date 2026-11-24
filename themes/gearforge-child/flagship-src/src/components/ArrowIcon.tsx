@@ -1,6 +1,6 @@
-export function ArrowIcon({ className = 'tc-arr' }: { className?: string }) {
+export function ArrowIcon({ className = 'tc-arr', size }: { className?: string; size?: number }) {
   return (
-    <svg className={className} viewBox="0 0 20 20" aria-hidden="true">
+    <svg className={className} width={size} height={size} viewBox="0 0 20 20" aria-hidden="true">
       <path
         d="M4 10h11m-4-5 5 5-5 5"
         fill="none"
@@ -13,9 +13,9 @@ export function ArrowIcon({ className = 'tc-arr' }: { className?: string }) {
   );
 }
 
-export function PlayIcon() {
+export function PlayIcon({ size }: { size?: number }) {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
       <path d="M8 5.5v13l10.5-6.5z" fill="currentColor" />
     </svg>
   );

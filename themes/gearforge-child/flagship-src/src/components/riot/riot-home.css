@@ -1,0 +1,619 @@
+.gf-riot-sec {
+  padding: 78px 0;
+  background: #0A0A0A;
+  color: #F4F4F5;
+  position: relative;
+}
+
+.gf-riot-deals {
+  background:
+    radial-gradient(46% 62% at 96% 48%, rgba(185, 24, 30, 0.16) 0%, transparent 72%),
+    #0A0A0A;
+}
+
+.gf-riot-topo {
+  background-color: #1F1F1F;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='480' viewBox='0 0 640 480' fill='none'%3E%3Cpath d='M-80 120C60 40 210 210 360 110C490 25 600 130 720 70' stroke='%23292929' stroke-width='26'/%3E%3Cpath d='M-60 280C100 180 260 360 420 250C540 165 620 290 730 220' stroke='%23272727' stroke-width='32'/%3E%3Cpath d='M-40 420C140 340 290 460 460 370C570 310 640 410 740 360' stroke='%23252525' stroke-width='22'/%3E%3C/svg%3E");
+  background-size: 760px 540px;
+}
+
+.gf-riot-showcase {
+  padding-bottom: 52px;
+  overflow-x: clip;
+}
+
+.gf-riot-eco {
+  padding-top: 38px;
+  padding-bottom: 84px;
+}
+
+.gf-riot-wrap {
+  width: min(1280px, 100% - 64px);
+  margin-inline: auto;
+}
+
+.gf-riot-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 34px;
+}
+
+.gf-riot-h2 {
+  margin: 0;
+  font-family: 'Be Vietnam Pro', 'Inter', sans-serif;
+  font-size: clamp(2rem, 3.1vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+  color: #F9F9F9;
+}
+
+.gf-riot-all-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 6px;
+  border: 0;
+  background: rgba(255, 255, 255, 0.11);
+  color: #F4F4F5;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.gf-riot-all-btn:hover {
+  background: #D13639;
+  color: #FFFFFF;
+}
+
+/* SECTION 2: RIOT NEWS BENTO (1 OPEN FEATURE + 4 EDGE-FLUSH CARDS) */
+.gf-riot-bento {
+  display: grid;
+  grid-template-columns: 1.48fr 1fr;
+  gap: 22px;
+  align-items: start;
+}
+
+.gf-riot-bento-lead {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.gf-riot-bento-lead-media {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #141416;
+}
+
+.gf-riot-bento-lead-media img,
+.tc .gf-riot-bento-lead-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.45s ease;
+}
+
+.gf-riot-bento-lead:hover .gf-riot-bento-lead-media img {
+  transform: scale(1.03);
+}
+
+.gf-riot-lead-title {
+  margin: 18px 0 10px;
+  font-family: 'Be Vietnam Pro', 'Inter', sans-serif;
+  font-size: clamp(1.35rem, 1.85vw, 1.78rem);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: #F9F9F9;
+}
+
+.gf-riot-bento-lead:hover .gf-riot-lead-title {
+  color: #FFFFFF;
+}
+
+.gf-riot-meta-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #A1A1AA;
+  text-transform: uppercase;
+}
+
+.gf-riot-bento-stack {
+  display: grid;
+  grid-template-rows: repeat(4, 128px);
+  gap: 16px;
+}
+
+.gf-riot-stack-card {
+  display: grid;
+  grid-template-columns: 1fr 206px;
+  align-items: stretch;
+  padding: 0;
+  border-radius: 10px;
+  border: 0;
+  background: #1F1F1F;
+  overflow: hidden;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.gf-riot-stack-card:hover {
+  background: #2A2A2D;
+  transform: translateX(3px);
+}
+
+.gf-riot-stack-text {
+  padding: 16px 16px 14px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.gf-riot-stack-title {
+  margin: 0;
+  font-family: 'Be Vietnam Pro', 'Inter', sans-serif;
+  font-size: 15.5px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #F4F4F5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.gf-riot-stack-thumb {
+  width: 206px;
+  height: 100%;
+  background: #141416;
+  overflow: hidden;
+}
+
+.gf-riot-stack-thumb img,
+.tc .gf-riot-stack-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.gf-riot-stack-card:hover .gf-riot-stack-thumb img {
+  transform: scale(1.05);
+}
+
+/* SECTION 3: SMOOTH CAROUSEL WITH CLEAN 14PX BLACK GAPS & SUBTLE 3.5DEG SLANT */
+.gf-riot-games-viewport {
+  width: 100%;
+  overflow: hidden;
+  padding-block: 18px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gf-riot-games-viewport {
+    overflow-x: auto;
+  }
+}
+
+.gf-riot-games-track {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: max-content;
+  padding-inline: 18px;
+  animation: gfRiotGamesMarquee 48s linear infinite;
+}
+
+.gf-riot-games-track.is-paused {
+  animation-play-state: paused;
+}
+
+@keyframes gfRiotGamesMarquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.gf-riot-game-card {
+  position: relative;
+  flex: 0 0 282px;
+  height: 540px;
+  padding: 0;
+  border: 0;
+  background: #141418;
+  overflow: hidden;
+  cursor: pointer;
+  clip-path: polygon(4% 0%, 100% 0%, 96% 100%, 0% 100%);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.gf-riot-game-card.is-elevated,
+.gf-riot-game-card:hover {
+  transform: translateY(-6px) scale(1.025);
+  z-index: 4;
+}
+
+.gf-riot-game-img,
+.tc .gf-riot-game-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.55s ease;
+}
+
+.gf-riot-game-card:hover .gf-riot-game-img {
+  transform: scale(1.06);
+}
+
+.gf-riot-game-grad {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 10, 12, 0.62) 0%,
+    rgba(10, 10, 12, 0.06) 36%,
+    rgba(10, 10, 12, 0.14) 76%,
+    rgba(10, 10, 12, 0.65) 100%
+  );
+}
+
+.gf-riot-game-wordmark {
+  position: absolute;
+  top: 32px;
+  left: 10%;
+  right: 10%;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.78));
+}
+
+.gf-wm-svg {
+  width: 100%;
+  max-width: 210px;
+  height: auto;
+  display: block;
+}
+
+.gf-riot-game-platforms {
+  position: absolute;
+  right: 12%;
+  bottom: 20px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.92);
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.7));
+}
+
+/* SECTION 4A: ESPORTS & ECOSYSTEM STRIP (CLEAN <- | -> + SLANTED CENTERED WORDMARK) */
+.gf-riot-nav-pair {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.gf-riot-nav-txt {
+  border: 0;
+  background: transparent;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 6px;
+  color: #E4E4E7;
+  font-size: 20px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 0.18s ease, transform 0.18s ease;
+}
+
+.gf-riot-nav-txt:hover {
+  color: #FFFFFF;
+  transform: scale(1.12);
+}
+
+.gf-riot-nav-sep {
+  width: 1px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.gf-riot-eco-rail {
+  display: flex;
+  gap: 10px;
+  padding: 0 24px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.gf-riot-eco-rail::-webkit-scrollbar {
+  display: none;
+}
+
+.gf-riot-slant-card {
+  position: relative;
+  flex: 0 0 342px;
+  height: 202px;
+  padding: 0;
+  border: 0;
+  background: #141418;
+  overflow: hidden;
+  cursor: pointer;
+  clip-path: polygon(6% 0%, 100% 0%, 94% 100%, 0% 100%);
+  transition: transform 0.24s ease;
+}
+
+.gf-riot-slant-card:hover {
+  transform: translateY(-4px);
+}
+
+.gf-riot-slant-bg,
+.tc .gf-riot-slant-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.68) contrast(1.06);
+  transition: transform 0.45s ease, filter 0.3s ease;
+}
+
+.gf-riot-slant-card:hover .gf-riot-slant-bg {
+  transform: scale(1.06);
+  filter: brightness(0.84);
+}
+
+.gf-riot-slant-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 14, 0.34);
+}
+
+.gf-riot-slant-center {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  padding: 20px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.gf-riot-slant-title {
+  font-family: 'Barlow Condensed', 'Be Vietnam Pro', sans-serif;
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  line-height: 0.98;
+  color: #FFFFFF;
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.72);
+}
+
+.gf-riot-slant-sub {
+  margin-top: 3px;
+  font-family: 'Barlow Condensed', 'Inter', sans-serif;
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+/* SECTION 4B: MATTE LIGHT #EBEAE8 CENTERED CAREERS-STYLE SPLIT */
+.gf-riot-split {
+  background: #EBEAE8;
+  color: #0A0A0A;
+  overflow: hidden;
+}
+
+.gf-riot-split-inner {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1.06fr;
+  min-height: 610px;
+  align-items: stretch;
+}
+
+.gf-riot-split-copy {
+  padding: 64px 48px 64px 64px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 18px;
+}
+
+.gf-riot-split-h2 {
+  margin: 0;
+  max-width: 500px;
+  font-family: 'Be Vietnam Pro', 'Inter', sans-serif;
+  font-size: clamp(2.35rem, 3.3vw, 3.2rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: #0A0A0A;
+}
+
+.gf-riot-split-lead {
+  margin: 0;
+  max-width: 470px;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #656462;
+}
+
+.gf-riot-stat-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(210px, 262px));
+  gap: 20px;
+  margin-top: 6px;
+}
+
+.gf-riot-stat-box {
+  background: #DFDEDC;
+  border-radius: 14px;
+  padding: 24px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.gf-riot-stat-box strong {
+  font-family: 'Be Vietnam Pro', 'Inter', sans-serif;
+  font-size: 52px;
+  font-weight: 800;
+  line-height: 1;
+  color: #0A0A0A;
+  letter-spacing: -0.03em;
+}
+
+.gf-riot-stat-box span {
+  font-size: 15px;
+  font-weight: 600;
+  color: #656462;
+}
+
+.gf-riot-red-pill {
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 58px;
+  padding: 0 38px;
+  border: 0;
+  border-radius: 999px;
+  background: #D13639;
+  color: #FFFFFF;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.gf-riot-red-pill:hover {
+  background: #EB0029;
+  transform: translateY(-2px);
+}
+
+.gf-riot-split-media {
+  position: relative;
+  min-height: 610px;
+  background: #0A0A0A;
+  clip-path: polygon(9% 0%, 100% 0%, 100% 100%, 0% 100%);
+}
+
+.gf-riot-split-media img,
+.tc .gf-riot-split-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 22%;
+  display: block;
+}
+
+.gf-riot-sec button:focus-visible,
+.gf-riot-split button:focus-visible {
+  outline: 2px solid #EB0029;
+  outline-offset: 2px;
+}
+
+@media (max-width: 1120px) {
+  .gf-riot-games-viewport {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .gf-riot-games-viewport::-webkit-scrollbar {
+    display: none;
+  }
+  .gf-riot-games-track {
+    animation: none;
+    padding-inline: 16px;
+  }
+  .gf-riot-game-card {
+    flex: 0 0 248px;
+    height: 440px;
+  }
+  .gf-riot-game-card.is-elevated,
+  .gf-riot-game-card:hover {
+    height: 440px;
+    transform: none;
+  }
+}
+
+@media (max-width: 1040px) {
+  .gf-riot-bento,
+  .gf-riot-split-inner {
+    grid-template-columns: 1fr;
+  }
+  .gf-riot-split-copy {
+    padding: 48px 24px;
+  }
+  .gf-riot-split-media {
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+    clip-path: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .gf-riot-sec {
+    padding: 50px 0;
+  }
+  .gf-riot-wrap {
+    width: calc(100% - 32px);
+  }
+  .gf-riot-bento-stack {
+    grid-template-rows: none;
+    gap: 12px;
+  }
+  .gf-riot-stack-card {
+    grid-template-columns: 1fr 124px;
+    min-height: 98px;
+  }
+  .gf-riot-stack-thumb {
+    width: 124px;
+  }
+  .gf-riot-stat-pair {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+  .gf-riot-game-card {
+    flex: 0 0 232px;
+    height: 400px;
+  }
+  .gf-riot-slant-card {
+    flex: 0 0 280px;
+    height: 172px;
+  }
+}
