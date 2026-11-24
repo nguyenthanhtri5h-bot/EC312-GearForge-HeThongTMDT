@@ -2,7 +2,7 @@
 /**
  * GearForge Core Activator.
  *
- * Creates the 4 extended MySQL tables (wp_gf_*) and seeds default
+ * Creates the 5 extended MySQL tables (wp_gf_*) and seeds default
  * student installment plans on plugin activation.
  */
 
@@ -22,7 +22,7 @@ class GF_Activator {
     }
 
     /**
-     * Create the 4 custom GearForge tables using the exact EC312 MySQL 8.0 schema.
+     * Create the 5 custom GearForge tables using the exact EC312 MySQL 8.0 schema.
      */
     private static function create_tables(): void {
         global $wpdb;

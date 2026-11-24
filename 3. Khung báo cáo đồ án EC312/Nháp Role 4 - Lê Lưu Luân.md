@@ -6,7 +6,7 @@
 > **Phạm vi đóng góp vào Báo cáo Master (`Khung báo cáo đồ án EC312 GearForge.docx`):**
 > - **Mục 3.7:** Đặc tả `UC-10 ★`, BPMN/Activity & Sequence Diagram liên thông `UC-10..12`
 > - **Mục 4.2:** Mô hình ERD, Script SQL & Từ điển dữ liệu chi tiết 5 bảng mở rộng `wp_gf_*`
-> - **Mục 5.2.3–5.2.4:** Minh chứng Demo Trả góp, Duyệt 2 lớp, Sandbox 3DS, S/N & Hóa đơn PDF T-VAN *(cập nhật ảnh ở Bước 2–5)*
+> - **Mục 5.2.3–5.2.5:** Minh chứng Demo Trả góp, Duyệt 2 lớp, Sandbox 3DS, S/N, Hóa đơn PDF T-VAN & Đổi trả RMA *(cập nhật ảnh thực tế từ Docker)*
 > - **Mục 6.3:** Giải pháp kỹ thuật & Hướng phát triển tương lai (Out-of-scope Roadmap)
 
 ---
@@ -18,7 +18,7 @@
 | Mục | Nội dung đặc tả chi tiết |
 | :--- | :--- |
 | **1. Thông tin định danh (Metadata)** | - **Use Case ID:** `UC-10 ★`<br>- **Use Case Name:** Tính toán gói trả góp & Nộp hồ sơ trả góp sinh viên (3–6–12 tháng)<br>- **Phân loại:** **100% Custom GAP (`gearforge-core`)** — Gồm `InstallmentCalculatorService`, `InstallmentReviewService`, `GF_Vault_Crypto`, kết nối tiếp với `UC-11` (`PaymentGatewayAdapter`) và `UC-12` (`SerialNumberService`, `PdfInvoiceGenerator`).<br>- **Tác nhân chính (Primary Actor):** `StudentCustomer`<br>- **Tác nhân phụ (Secondary Actors):** `InstallmentReviewer`, `PaymentGateway` (VNPay / MoMo / Fundiin Sandbox), `StoreAdmin`, `TVANService`<br>- **Liên kết Yêu cầu:** `FR-08`, `FR-09`, `FR-10`, `NFR-02`, `NFR-03` |
-| **2. Tiền điều kiện & Hậu điều kiện (Pre/Post-conditions)** | - **Tiền điều kiện (Pre-conditions):**<br>  1. Bảng `wp_gf_installment_plans` đã được seed đủ 3 gói kỳ hạn: `3 tháng (0%)`, `6 tháng (1.2%/tháng)`, `12 tháng (1.5%/tháng)`, tỷ lệ trả trước tối thiểu `20%`.<br>  2. Sinh viên đã đăng ký/đăng nhập tài khoản, có MSSV, Email trường `.edu.vn` và chuẩn bị ảnh CCCD + Thẻ sinh viên hợp lệ (`JPG/PNG/PDF`, dung lượng ≤ 5MB).<br>- **Hậu điều kiện (Post-conditions):**<br>  - Tạo đơn hàng WooCommerce ở trạng thái `PENDING_INSTALLMENT_APPROVAL`.<br>  - Tạo bản ghi trong `wp_gf_installment_applications` trạng thái `SUBMITTED` kèm `cccd_hash` (SHA-256), `cccd_encrypted_path`, `student_card_encrypted_path` (mã hóa AES-256-CBC ngoài webroot) và `consent_nd13_accepted = 1`.<br>  - Mở khóa quy trình `UC-11` (Duyệt Lớp 1 $\rightarrow$ Duyệt Lớp 2 $\rightarrow$ Thanh toán trả trước 3D-Secure) và `UC-12` (Gắn `S/N` trước khi `SHIPPING` $\rightarrow$ Xuất Hóa đơn PDF chuẩn T-VAN). |
+| **2. Tiền điều kiện & Hậu điều kiện (Pre/Post-conditions)** | - **Tiền điều kiện (Pre-conditions):**<br>  1. Bảng `wp_gf_installment_plans` đã được seed đủ 3 gói kỳ hạn: `3 tháng (0%)`, `6 tháng (1.2%/tháng)`, `12 tháng (1.5%/tháng)`, tỷ lệ trả trước tối thiểu `20%`.<br>  2. Sinh viên đã đăng ký/đăng nhập tài khoản, có MSSV, Email trường `.edu.vn` và chuẩn bị ảnh CCCD + Thẻ sinh viên hợp lệ (`JPG/PNG/PDF`, dung lượng ≤ 5MB).<br>- **Hậu điều kiện (Post-conditions):**<br>  - Tạo đơn hàng WooCommerce ở trạng thái `PENDING_INSTALLMENT_APPROVAL`.<br>  - Tạo bản ghi trong `wp_gf_installment_applications` trạng thái `SUBMITTED` kèm `cccd_hash` (HMAC-SHA256 với server pepper), `cccd_encrypted_path`, `student_card_encrypted_path` (mã hóa AES-256-CBC ngoài webroot) và `consent_nd13_accepted = 1`.<br>  - Mở khóa quy trình `UC-11` (Duyệt Lớp 1 $\rightarrow$ Duyệt Lớp 2 $\rightarrow$ Thanh toán trả trước 3D-Secure) và `UC-12` (Gắn `S/N` trước khi `SHIPPING` $\rightarrow$ Xuất Hóa đơn PDF chuẩn T-VAN). |
 | **3. Luồng sự kiện chính (Main Flow / Happy Path)** | 1. Trên trang chi tiết Laptop/PC (`installment-widget.php`), sinh viên chọn tỷ lệ trả trước (`20% / 30% / 50%`) và kỳ hạn (`3 / 6 / 12 tháng`).<br>2. Hệ thống gọi `GET /wp-json/gearforge/v1/installment-calc?price=P&down_pct=r&months=N` áp dụng công thức chuẩn:<br>   - Tiền trả trước: $D = P \times r_{\text{down}}$<br>   - Gốc còn lại vay: $L = P - D$<br>   - Tổng lãi cả kỳ hạn: $I = L \times r_{\text{int}} \times N$<br>   - Tiền góp mỗi tháng: $M = \text{round}((L + I) / N, -3)$ *(làm tròn hàng nghìn VNĐ)*.<br>3. Sinh viên điền MSSV, Email `.edu.vn`, Số CCCD (12 số), SĐT, đính kèm ảnh CCCD + Thẻ SV và tick **Consent Banner Nghị định 13/2023/NĐ-CP**.<br>4. Hệ thống gọi `FraudGuardMiddleware` (kiểm tra Rate Limit & `wp_gf_fraud_blacklist`) $\rightarrow$ `GF_Vault_Crypto` (kiểm tra MIME `finfo_file`, mã hóa AES-256-CBC lưu vào `/var/www/gf-vault/`) $\rightarrow$ tạo đơn hàng & lưu hồ sơ `SUBMITTED`.<br>5. *(Liên thông `UC-11`)* `InstallmentReviewer` mở WP Admin: bấm **Duyệt Lớp 1** (`L1_DOCS_VERIFIED`) sau khi giải mã đối chiếu ảnh CCCD/Thẻ SV, rồi bấm **Duyệt Lớp 2** (`APPROVED_WAITING_DOWNPAYMENT`) sau khi xác nhận SĐT & Email `.edu.vn`.<br>6. Sinh viên thực hiện thanh toán khoản tiền trả trước trên cổng **Sandbox 3D-Secure** (`VNPay/MoMo/Fundiin`, OTP test `123456`); Callback IPN xác thực chữ ký HMAC hợp lệ chuyển hồ sơ sang `ACTIVE_INSTALLMENT` và đơn hàng sang `PROCESSING`.<br>7. *(Liên thông `UC-12`)* `StoreAdmin` gắn mã `Serial Number` duy nhất vào `wp_gf_order_serials` (`SERIAL_ASSIGNED`), mở khóa chuyển `SHIPPING` $\rightarrow$ `DELIVERED` $\rightarrow$ xuất Hóa đơn PDF chuẩn T-VAN (hiển thị S/N + VAT 8%–10%). |
 | **4. Luồng thay thế & Ngoại lệ (Alternative / Exception Flows)** | - **EF-01 (Thiếu Consent NĐ 13/2023, sai Email `.edu.vn`, CCCD không đủ 12 số hoặc tệp > 5MB / sai MIME):** Hệ thống trả lỗi `400 Bad Request`, hiển thị thông báo chi tiết và không ghi nhận hồ sơ.<br>- **EF-02 (Vi phạm Rate Limit hoặc nằm trong Blacklist):** `FraudGuardMiddleware` chặn ngay và trả `HTTP 429` (cooldown) hoặc `HTTP 403` (Blacklisted).<br>- **EF-03 (Reviewer cố bấm Duyệt Lớp 2 trước khi Duyệt Lớp 1 – `TC-13`):** `InstallmentReviewService` kiểm tra trạng thái phải là `L1_DOCS_VERIFIED`, nếu không trả lỗi `gf_invalid_state` và giữ nguyên trạng thái.<br>- **EF-04 (Từ chối hoặc phát hiện giả mạo):** Reviewer nhập lý do từ chối hoặc chọn *"Từ chối + Blacklist"* $\rightarrow$ hồ sơ chuyển `REJECTED` / `BLACKLISTED`, đơn hàng chuyển `CANCELLED` và `cccd_hash` được ghi vào `wp_gf_fraud_blacklist`.<br>- **EF-05 (Kho cố chuyển đơn Laptop/PC sang `SHIPPING` khi thiếu `S/N` – `TC-15`):** Hook `woocommerce_order_status_changed` chặn chuyển trạng thái, hoàn nguyên trạng thái cũ và báo lỗi đỏ nhắc nhập S/N. |
 | **5. Yêu cầu Dữ liệu & Giao diện (Data, API & Schema Specs)** | - **REST API nội bộ (`rest_api_init`):**<br>  - `GET /wp-json/gearforge/v1/installment-calc?price=20000000&down_pct=30&months=6`<br>    Trả về JSON: `{"price":20000000,"down_pct":30,"months":6,"downpayment_amount":6000000,"loan_principal":14000000,"total_interest":1008000,"monthly_amount":2501000}`.<br>  - `POST /wp-json/gearforge/v1/installment-apply`: Nộp hồ sơ trả góp kèm upload 2 ảnh CCCD/Thẻ SV mã hóa AES-256-CBC.<br>  - `GET /wp-json/gearforge/v1/oms-status/{order_id}`: Trả về JSON trạng thái tổng hợp `OrderStatus` + `InstallmentApplicationStatus` + mảng `serial_numbers`.<br>  - `POST /wp-json/gearforge/v1/rma-request` & `GET /wp-json/gearforge/v1/rma-status/{order_id}`: Gửi và tra cứu yêu cầu Đổi trả / Bảo hành (RMA).<br>- **5 Bảng MySQL mở rộng:** `wp_gf_installment_plans`, `wp_gf_installment_applications`, `wp_gf_order_serials`, `wp_gf_fraud_blacklist`, `wp_gf_rma_requests`. |
@@ -335,14 +335,14 @@ Lưu thông tin định danh đã mã hóa, kết quả tính toán khoản góp
 | `reviewer_id` | `BIGINT UNSIGNED` | `NULL` | `NULL` | ID của `InstallmentReviewer` xử lý duyệt hồ sơ. |
 | `student_code` | `VARCHAR(50)` | `NOT NULL` | — | Mã số sinh viên (MSSV) khai báo trên form. |
 | `student_edu_email` | `VARCHAR(150)` | `NOT NULL` | — | Email sinh viên tên miền giáo dục (`.edu.vn` / `.edu`). |
-| `cccd_hash` | `CHAR(64)` | `NOT NULL`, `INDEX (idx_gf_app_cccd_hash)` | — | Mã băm **SHA-256** của số CCCD (dùng đối chiếu Blacklist không lưu plain-text). |
+| `cccd_hash` | `CHAR(64)` | `NOT NULL`, `INDEX (idx_gf_app_cccd_hash)` | — | Mã băm **HMAC-SHA256** (kèm server pepper) của số CCCD (dùng đối chiếu Blacklist không lưu plain-text). |
 | `cccd_encrypted_path` | `VARCHAR(255)` | `NOT NULL` | — | Đường dẫn tệp ảnh CCCD đã mã hóa **AES-256-CBC** tại `/var/www/gf-vault/`. |
 | `student_card_encrypted_path` | `VARCHAR(255)` | `NOT NULL` | — | Đường dẫn tệp ảnh Thẻ sinh viên đã mã hóa **AES-256-CBC**. |
 | `downpayment_amount` | `DECIMAL(14,2)` | `NOT NULL` | — | Số tiền trả trước (VNĐ). |
 | `monthly_amount` | `DECIMAL(14,2)` | `NOT NULL` | — | Số tiền phải góp hàng tháng (VNĐ). |
 | `consent_nd13_accepted` | `TINYINT(1)` | `NOT NULL` | `0` | Cờ xác nhận đã tick đồng ý **Nghị định 13/2023/NĐ-CP** (`1`: đồng ý). |
 | `consent_accepted_at` | `DATETIME` | `NULL` | `NULL` | Thời điểm sinh viên xác nhận đồng ý điều khoản bảo mật. |
-| `status` | `VARCHAR(40)` | `NOT NULL`, `INDEX (idx_gf_app_status)` | `'SUBMITTED'` | Trạng thái hồ sơ theo State Machine (`SUBMITTED`, `L1_DOCS_VERIFIED`, `L2_EDU_CONFIRMED`, `APPROVED_WAITING_DOWNPAYMENT`, `ACTIVE_INSTALLMENT`, `CLOSED`, `REJECTED`, `BLACKLISTED`). |
+| `status` | `VARCHAR(40)` | `NOT NULL`, `INDEX (idx_gf_app_status_id)` | `'SUBMITTED'` | Trạng thái hồ sơ theo State Machine (`SUBMITTED`, `L1_DOCS_VERIFIED`, `L2_EDU_CONFIRMED`, `APPROVED_WAITING_DOWNPAYMENT`, `ACTIVE_INSTALLMENT`, `CLOSED`, `REJECTED`, `BLACKLISTED`). |
 | `l1_verified_at` | `DATETIME` | `NULL` | `NULL` | Dấu thời gian hoàn tất **Duyệt Lớp 1** (đối chiếu ảnh CCCD/Thẻ SV). |
 | `l2_verified_at` | `DATETIME` | `NULL` | `NULL` | Dấu thời gian hoàn tất **Duyệt Lớp 2** (xác nhận SĐT & `.edu.vn`). |
 | `reject_reason` | `TEXT` | `NULL` | `NULL` | Lý do từ chối hồ sơ hoặc đưa vào danh sách đen. |
@@ -357,8 +357,8 @@ Lưu thông tin định danh đã mã hóa, kết quả tính toán khoản góp
 | Tên trường (Column) | Kiểu dữ liệu (MySQL 8.0) | Khóa / Ràng buộc | Giá trị mặc định | Mô tả ý nghĩa |
 | :--- | :--- | :--- | :--- | :--- |
 | `serial_id` | `BIGINT UNSIGNED` | `PK`, `AUTO_INCREMENT` | — | Mã bản ghi Serial Number. |
-| `order_id` | `BIGINT UNSIGNED` | `NOT NULL`, `INDEX (idx_gf_serial_order)` | — | Mã đơn hàng (`wp_wc_orders.id`). |
-| `order_item_id` | `BIGINT UNSIGNED` | `NOT NULL` | — | Mã dòng sản phẩm trong đơn (`wp_wc_order_items.order_item_id`). |
+| `order_id` | `BIGINT UNSIGNED` | `NOT NULL`, `INDEX (idx_gf_serial_order_item)` | — | Mã đơn hàng (`wp_wc_orders.id`). |
+| `order_item_id` | `BIGINT UNSIGNED` | `NOT NULL`, `INDEX (idx_gf_serial_order_item)` | — | Mã dòng sản phẩm trong đơn (`wp_wc_order_items.order_item_id`). |
 | `product_id` | `BIGINT UNSIGNED` | `NOT NULL` | — | Mã sản phẩm (`wp_posts.ID`). |
 | `serial_number` | `VARCHAR(100)` | `NOT NULL`, `UNIQUE KEY (uk_gf_serial_number)` | — | Mã Serial Number / Service Tag duy nhất toàn hệ thống. |
 | `warranty_months` | `SMALLINT UNSIGNED` | `NOT NULL` | `12` | Thời hạn bảo hành tính theo tháng (mặc định `12` hoặc `24`). |
@@ -375,7 +375,7 @@ Lưu các đối tượng bị chặn tự động hoặc thủ công để bả
 | :--- | :--- | :--- | :--- | :--- |
 | `blacklist_id` | `BIGINT UNSIGNED` | `PK`, `AUTO_INCREMENT` | — | Mã bản ghi danh sách đen. |
 | `target_type` | `ENUM('IP','USER','PHONE','CCCD_HASH')` | `NOT NULL`, `UNIQUE (uk_gf_blacklist_target)` | — | Phân loại đối tượng bị chặn. |
-| `target_value` | `VARCHAR(150)` | `NOT NULL`, `UNIQUE (uk_gf_blacklist_target)` | — | Giá trị định danh bị chặn (IP, User ID, SĐT, hoặc SHA-256 CCCD). |
+| `target_value` | `VARCHAR(150)` | `NOT NULL`, `UNIQUE (uk_gf_blacklist_target)` | — | Giá trị định danh bị chặn (IP, User ID, SĐT, hoặc HMAC-SHA256 CCCD). |
 | `reason` | `TEXT` | `NOT NULL` | — | Lý do đưa vào danh sách đen (spam đơn ảo, hồ sơ giả mạo...). |
 | `created_by` | `BIGINT UNSIGNED` | `NOT NULL` | — | ID quản trị viên tạo lệnh chặn (`0` nếu hệ thống chặn tự động). |
 | `blocked_until` | `DATETIME` | `NULL` | `NULL` | Thời hạn mở khóa (`NULL` nếu khóa vĩnh viễn). |
@@ -398,6 +398,8 @@ Lưu các yêu cầu trả hàng (`RETURN`), đổi máy (`EXCHANGE`) hoặc b�
 | `admin_note` | `TEXT` | `NULL` | `NULL` | Ghi chú/lý do phản hồi của quản trị viên. |
 | `reviewed_by` | `BIGINT UNSIGNED` | `NULL` | `NULL` | ID quản trị viên xử lý yêu cầu. |
 | `reviewed_at` | `DATETIME` | `NULL` | `NULL` | Thời điểm duyệt/hoàn tất RMA. |
+| `created_at` | `DATETIME` | `NOT NULL` | `CURRENT_TIMESTAMP` | Thời điểm gửi yêu cầu RMA. |
+| `updated_at` | `DATETIME` | `NOT NULL` | `CURRENT_TIMESTAMP ON UPDATE` | Thời điểm cập nhật trạng thái RMA gần nhất. |
 
 ---
 
@@ -438,7 +440,7 @@ CREATE TABLE IF NOT EXISTS wp_gf_installment_applications (
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_gf_app_order (order_id),
     INDEX idx_gf_app_user (user_id),
-    INDEX idx_gf_app_status (status),
+    INDEX idx_gf_app_status_id (status, app_id),
     INDEX idx_gf_app_cccd_hash (cccd_hash),
     CONSTRAINT fk_gf_app_plan FOREIGN KEY (plan_id) REFERENCES wp_gf_installment_plans(plan_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -454,7 +456,7 @@ CREATE TABLE IF NOT EXISTS wp_gf_order_serials (
     assigned_by BIGINT UNSIGNED NOT NULL,
     assigned_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY uk_gf_serial_number (serial_number),
-    INDEX idx_gf_serial_order (order_id)
+    INDEX idx_gf_serial_order_item (order_id, order_item_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS wp_gf_fraud_blacklist (
@@ -593,13 +595,20 @@ classDiagram
 2. **Hóa đơn PDF chuẩn dữ liệu T-VAN (`TC-16`):**
    - Tham khảo chuẩn thông tin hóa đơn điện tử **Nghị định 123/2020/NĐ-CP** từ **MISA meInvoice** & **VNPT Invoice**. Bộ sinh `%PDF-1.4` thuần PHP xuất hóa đơn chứa đầy đủ Tên đơn vị bán (`CONG TY TNHH CONG NGHE GEARFORGE`), MST (`0312345678`), **Serial Number**, **VAT 10%**, và hình thức trả góp SV (tệp mẫu: `Ảnh minh chứng Role 4/GearForge-Invoice-20.pdf`).
 
-### 5.2.5. Tóm tắt các điểm Nâng cấp Bảo mật & Tối ưu CSDL
+### 5.2.5. Quản lý Yêu cầu Đổi trả / Bảo hành (`RMA`)
+1. **API & Ràng buộc Nghiệp vụ Hậu mãi (`GF_RMA_Manager`):**
+   - Khách hàng gửi yêu cầu qua `POST /wp-json/gearforge/v1/rma-request` (hoặc tra cứu qua `GET /wp-json/gearforge/v1/rma-status/{order_id}`) kèm kiểm tra chủ đơn (anti-IDOR), đối chiếu `serial_number` thuộc đơn hàng, kiểm tra đơn đã giao/hoàn tất và hạn 15 ngày đối với yêu cầu `RETURN`/`EXCHANGE`.
+   - Quản trị viên duyệt tuần tự (`REQUESTED` $\rightarrow$ `APPROVED` $\rightarrow$ `COMPLETED` / `REJECTED`) trên trang WP Admin **Đổi trả / RMA** có Keyset Pagination. Khi hoàn tất yêu cầu `RETURN` trong MySQL Transaction, hệ thống tự động thu hồi S/N, đóng hồ sơ trả góp (`CLOSED`) và chuyển đơn sang `refunded` khi toàn bộ S/N của đơn đã được trả.
+   - *(Ảnh minh chứng: `Ảnh minh chứng Role 4/5_WP_Admin_RMA.png`)*
+
+### 5.2.6. Tóm tắt các điểm Nâng cấp Bảo mật & Tối ưu CSDL
 - **Atomic Conditional Update (`FIX-01`):** Chặn Race Condition khi duyệt 2 lớp.
 - **Keyed HMAC-SHA256 Pepper (`FIX-02`):** Bảo vệ `cccd_hash` chống brute-force Rainbow Table.
 - **MySQL Transaction & Advisory Lock (`FIX-03`, `FIX-10`):** Đảm bảo tính ACID khi từ chối/blacklist và Idempotency chống Replay Attack khi nhận IPN.
 - **Composite Index MySQL 8.0 (`FIX-05`):** Nâng cấp `(status, app_id)` và `(order_id, order_item_id)` tối ưu hiệu năng truy vấn.
 - **Domain-Separated HMAC (`FIX-08`):** Tách biệt chữ ký `3ds` và `ipn` ngăn chặn 3DS OTP Bypass.
 - **Chống Double Charge khi mất mạng & Active Reconciliation `QueryDR` (`FIX-12`):** Tách biệt Server-to-Server IPN với Browser Return, khóa form thanh toán ngay từ bước tạo phiên & màn hình 3DS nếu IPN đã chốt đơn (`is_order_already_paid()`), gắn `idempotency_key` (`GF_{order_id}_{mode}`) và cung cấp API đối soát chủ động `GET /wp-json/gearforge/v1/payment-sandbox/query/{order_id}`.
+- **Hardening Nộp trả góp & Đổi trả RMA (`FIX-13`):** Khóa `GET_LOCK` chống nộp hồ sơ trả góp trùng song song, chỉ cho nộp khi đơn ở `pending`/`on-hold`, kiểm tra hạn 15 ngày RMA (`RETURN`/`EXCHANGE`) và bọc Transaction thu hồi S/N + tự đóng hồ sơ trả góp (`CLOSED`) + chuyển `refunded` khi trả toàn bộ S/N.
 
 ---
 
