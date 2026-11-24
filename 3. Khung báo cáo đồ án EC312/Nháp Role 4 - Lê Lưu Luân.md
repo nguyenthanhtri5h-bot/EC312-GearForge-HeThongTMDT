@@ -5,7 +5,7 @@
 > **Nhánh Git độc quyền:** `role4-backend-payment` *(Issue `#4`)*  
 > **Phạm vi đóng góp vào Báo cáo Master (`Khung báo cáo đồ án EC312 GearForge.docx`):**
 > - **Mục 3.7:** Đặc tả `UC-10 ★`, BPMN/Activity & Sequence Diagram liên thông `UC-10..12`
-> - **Mục 4.2:** Mô hình ERD, Script SQL & Từ điển dữ liệu chi tiết 4 bảng mở rộng `wp_gf_*`
+> - **Mục 4.2:** Mô hình ERD, Script SQL & Từ điển dữ liệu chi tiết 5 bảng mở rộng `wp_gf_*`
 > - **Mục 5.2.3–5.2.4:** Minh chứng Demo Trả góp, Duyệt 2 lớp, Sandbox 3DS, S/N & Hóa đơn PDF T-VAN *(cập nhật ảnh ở Bước 2–5)*
 > - **Mục 6.3:** Giải pháp kỹ thuật & Hướng phát triển tương lai (Out-of-scope Roadmap)
 
@@ -21,7 +21,7 @@
 | **2. Tiền điều kiện & Hậu điều kiện (Pre/Post-conditions)** | - **Tiền điều kiện (Pre-conditions):**<br>  1. Bảng `wp_gf_installment_plans` đã được seed đủ 3 gói kỳ hạn: `3 tháng (0%)`, `6 tháng (1.2%/tháng)`, `12 tháng (1.5%/tháng)`, tỷ lệ trả trước tối thiểu `20%`.<br>  2. Sinh viên đã đăng ký/đăng nhập tài khoản, có MSSV, Email trường `.edu.vn` và chuẩn bị ảnh CCCD + Thẻ sinh viên hợp lệ (`JPG/PNG/PDF`, dung lượng ≤ 5MB).<br>- **Hậu điều kiện (Post-conditions):**<br>  - Tạo đơn hàng WooCommerce ở trạng thái `PENDING_INSTALLMENT_APPROVAL`.<br>  - Tạo bản ghi trong `wp_gf_installment_applications` trạng thái `SUBMITTED` kèm `cccd_hash` (SHA-256), `cccd_encrypted_path`, `student_card_encrypted_path` (mã hóa AES-256-CBC ngoài webroot) và `consent_nd13_accepted = 1`.<br>  - Mở khóa quy trình `UC-11` (Duyệt Lớp 1 $\rightarrow$ Duyệt Lớp 2 $\rightarrow$ Thanh toán trả trước 3D-Secure) và `UC-12` (Gắn `S/N` trước khi `SHIPPING` $\rightarrow$ Xuất Hóa đơn PDF chuẩn T-VAN). |
 | **3. Luồng sự kiện chính (Main Flow / Happy Path)** | 1. Trên trang chi tiết Laptop/PC (`installment-widget.php`), sinh viên chọn tỷ lệ trả trước (`20% / 30% / 50%`) và kỳ hạn (`3 / 6 / 12 tháng`).<br>2. Hệ thống gọi `GET /wp-json/gearforge/v1/installment-calc?price=P&down_pct=r&months=N` áp dụng công thức chuẩn:<br>   - Tiền trả trước: $D = P \times r_{\text{down}}$<br>   - Gốc còn lại vay: $L = P - D$<br>   - Tổng lãi cả kỳ hạn: $I = L \times r_{\text{int}} \times N$<br>   - Tiền góp mỗi tháng: $M = \text{round}((L + I) / N, -3)$ *(làm tròn hàng nghìn VNĐ)*.<br>3. Sinh viên điền MSSV, Email `.edu.vn`, Số CCCD (12 số), SĐT, đính kèm ảnh CCCD + Thẻ SV và tick **Consent Banner Nghị định 13/2023/NĐ-CP**.<br>4. Hệ thống gọi `FraudGuardMiddleware` (kiểm tra Rate Limit & `wp_gf_fraud_blacklist`) $\rightarrow$ `GF_Vault_Crypto` (kiểm tra MIME `finfo_file`, mã hóa AES-256-CBC lưu vào `/var/www/gf-vault/`) $\rightarrow$ tạo đơn hàng & lưu hồ sơ `SUBMITTED`.<br>5. *(Liên thông `UC-11`)* `InstallmentReviewer` mở WP Admin: bấm **Duyệt Lớp 1** (`L1_DOCS_VERIFIED`) sau khi giải mã đối chiếu ảnh CCCD/Thẻ SV, rồi bấm **Duyệt Lớp 2** (`APPROVED_WAITING_DOWNPAYMENT`) sau khi xác nhận SĐT & Email `.edu.vn`.<br>6. Sinh viên thực hiện thanh toán khoản tiền trả trước trên cổng **Sandbox 3D-Secure** (`VNPay/MoMo/Fundiin`, OTP test `123456`); Callback IPN xác thực chữ ký HMAC hợp lệ chuyển hồ sơ sang `ACTIVE_INSTALLMENT` và đơn hàng sang `PROCESSING`.<br>7. *(Liên thông `UC-12`)* `StoreAdmin` gắn mã `Serial Number` duy nhất vào `wp_gf_order_serials` (`SERIAL_ASSIGNED`), mở khóa chuyển `SHIPPING` $\rightarrow$ `DELIVERED` $\rightarrow$ xuất Hóa đơn PDF chuẩn T-VAN (hiển thị S/N + VAT 8%–10%). |
 | **4. Luồng thay thế & Ngoại lệ (Alternative / Exception Flows)** | - **EF-01 (Thiếu Consent NĐ 13/2023, sai Email `.edu.vn`, CCCD không đủ 12 số hoặc tệp > 5MB / sai MIME):** Hệ thống trả lỗi `400 Bad Request`, hiển thị thông báo chi tiết và không ghi nhận hồ sơ.<br>- **EF-02 (Vi phạm Rate Limit hoặc nằm trong Blacklist):** `FraudGuardMiddleware` chặn ngay và trả `HTTP 429` (cooldown) hoặc `HTTP 403` (Blacklisted).<br>- **EF-03 (Reviewer cố bấm Duyệt Lớp 2 trước khi Duyệt Lớp 1 – `TC-13`):** `InstallmentReviewService` kiểm tra trạng thái phải là `L1_DOCS_VERIFIED`, nếu không trả lỗi `gf_invalid_state` và giữ nguyên trạng thái.<br>- **EF-04 (Từ chối hoặc phát hiện giả mạo):** Reviewer nhập lý do từ chối hoặc chọn *"Từ chối + Blacklist"* $\rightarrow$ hồ sơ chuyển `REJECTED` / `BLACKLISTED`, đơn hàng chuyển `CANCELLED` và `cccd_hash` được ghi vào `wp_gf_fraud_blacklist`.<br>- **EF-05 (Kho cố chuyển đơn Laptop/PC sang `SHIPPING` khi thiếu `S/N` – `TC-15`):** Hook `woocommerce_order_status_changed` chặn chuyển trạng thái, hoàn nguyên trạng thái cũ và báo lỗi đỏ nhắc nhập S/N. |
-| **5. Yêu cầu Dữ liệu & Giao diện (Data, API & Schema Specs)** | - **REST API nội bộ (`rest_api_init`):**<br>  - `GET /wp-json/gearforge/v1/installment-calc?price=20000000&down_pct=30&months=6`<br>    Trả về JSON: `{"price":20000000,"down_pct":30,"months":6,"downpayment_amount":6000000,"loan_principal":14000000,"total_interest":1008000,"monthly_amount":2501000}`.<br>  - `GET /wp-json/gearforge/v1/oms-status/{order_id}`: Trả về JSON trạng thái tổng hợp `OrderStatus` + `InstallmentApplicationStatus` + mảng `serial_numbers`.<br>- **4 Bảng MySQL mở rộng:** `wp_gf_installment_plans`, `wp_gf_installment_applications`, `wp_gf_order_serials`, `wp_gf_fraud_blacklist`. |
+| **5. Yêu cầu Dữ liệu & Giao diện (Data, API & Schema Specs)** | - **REST API nội bộ (`rest_api_init`):**<br>  - `GET /wp-json/gearforge/v1/installment-calc?price=20000000&down_pct=30&months=6`<br>    Trả về JSON: `{"price":20000000,"down_pct":30,"months":6,"downpayment_amount":6000000,"loan_principal":14000000,"total_interest":1008000,"monthly_amount":2501000}`.<br>  - `POST /wp-json/gearforge/v1/installment-apply`: Nộp hồ sơ trả góp kèm upload 2 ảnh CCCD/Thẻ SV mã hóa AES-256-CBC.<br>  - `GET /wp-json/gearforge/v1/oms-status/{order_id}`: Trả về JSON trạng thái tổng hợp `OrderStatus` + `InstallmentApplicationStatus` + mảng `serial_numbers`.<br>  - `POST /wp-json/gearforge/v1/rma-request` & `GET /wp-json/gearforge/v1/rma-status/{order_id}`: Gửi và tra cứu yêu cầu Đổi trả / Bảo hành (RMA).<br>- **5 Bảng MySQL mở rộng:** `wp_gf_installment_plans`, `wp_gf_installment_applications`, `wp_gf_order_serials`, `wp_gf_fraud_blacklist`, `wp_gf_rma_requests`. |
 | **6. Tiêu chí nghiệm thu (Acceptance Criteria – Chuẩn BDD)** | - **Scenario 1 (`TC-12` – Công thức tính trả góp 6 tháng):**<br>  `Given` máy giá `20.000.000đ`, trả trước `30%` (`6.000.000đ`), kỳ hạn `6 tháng` (`1.2%/tháng`)<br>  `When` gọi `GET /wp-json/gearforge/v1/installment-calc`<br>  `Then` trả về `downpayment_amount = 6000000`, `loan_principal = 14000000`, `total_interest = 1008000`, `monthly_amount = 2501000`.<br>- **Scenario 2 (`TC-05` & `TC-06` – Bảo mật NĐ 13/2023):**<br>  `Given` sinh viên nộp hồ sơ không tick Consent hoặc cố truy cập URL trực tiếp file ảnh CCCD<br>  `When` gửi form hoặc mở URL ẩn danh<br>  `Then` form bị chặn khi thiếu Consent; ảnh đã mã hóa AES-256-CBC ngoài webroot không thể truy cập trực tiếp.<br>- **Scenario 3 (`TC-13` – Tuần tự Duyệt Lớp 1 $\rightarrow$ Lớp 2):**<br>  `Given` hồ sơ ở trạng thái `SUBMITTED`<br>  `When` Reviewer thử Duyệt Lớp 2 nhảy cóc, sau đó thực hiện đúng Lớp 1 rồi Lớp 2<br>  `Then` gọi nhảy cóc bị chặn (`gf_invalid_state`); thực hiện đúng tuần tự chuyển thành `L1_DOCS_VERIFIED` $\rightarrow$ `APPROVED_WAITING_DOWNPAYMENT`.<br>- **Scenario 4 (`TC-14`, `TC-15`, `TC-16` – 3DS, Chặn thiếu S/N & PDF T-VAN):**<br>  `Given` hồ sơ đã duyệt trả trước qua Sandbox 3DS (`PROCESSING`) nhưng chưa nhập S/N<br>  `When` Admin chuyển đơn sang `SHIPPING` trước rồi mới gán S/N và xuất Hóa đơn PDF<br>  `Then` lần chuyển thiếu S/N bị chặn; sau khi gán S/N duy nhất vào `wp_gf_order_serials` thì xuất kho thành công và tải được file `.pdf` có đủ S/N + VAT 8%–10%. |
 
 ---
@@ -128,13 +128,14 @@ sequenceDiagram
 
 ### 4.2.1. Mô hình Thực thể Kết hợp (ERD)
 
-Hệ thống áp dụng kiến trúc **mở rộng không xâm lấn (Non-intrusive Extension)** trên nền tảng WordPress / WooCommerce (tương thích chuẩn **HPOS – High-Performance Order Storage**). Thay vì sửa đổi cấu trúc bảng lõi của WooCommerce (`wp_users`, `wp_posts`, `wp_wc_orders`, `wp_wc_order_items`), plugin `gearforge-core` bổ sung **4 bảng quan hệ `wp_gf_*`** liên kết chặt chẽ qua các khóa ngoại (`order_id`, `user_id`, `product_id`, `order_item_id`, `plan_id`):
+Hệ thống áp dụng kiến trúc **mở rộng không xâm lấn (Non-intrusive Extension)** trên nền tảng WordPress / WooCommerce (tương thích chuẩn **HPOS – High-Performance Order Storage**). Thay vì sửa đổi cấu trúc bảng lõi của WooCommerce (`wp_users`, `wp_posts`, `wp_wc_orders`, `wp_wc_order_items`), plugin `gearforge-core` bổ sung **5 bảng quan hệ `wp_gf_*`** liên kết chặt chẽ qua các khóa ngoại (`order_id`, `user_id`, `product_id`, `order_item_id`, `plan_id`):
 
 - `wp_users` (`1`) — (`0..N`) `wp_gf_installment_applications`: Một sinh viên có thể nộp nhiều hồ sơ trả góp (qua các đơn hàng khác nhau).
 - `wp_gf_installment_plans` (`1`) — (`0..N`) `wp_gf_installment_applications`: Một gói kỳ hạn áp dụng cho nhiều hồ sơ trả góp.
 - `wp_wc_orders` (`1`) — (`0..1`) `wp_gf_installment_applications`: Mỗi đơn hàng trả góp gắn với tối đa một hồ sơ trả góp sinh viên.
 - `wp_wc_orders` (`1`) — (`0..N`) `wp_gf_order_serials` và `wp_wc_order_items` (`1`) — (`0..N`) `wp_gf_order_serials`: Một đơn hàng gồm nhiều dòng sản phẩm, mỗi máy xuất kho bắt buộc có bản ghi `serial_number` riêng biệt.
 - `wp_users` (`1`) — (`0..N`) `wp_gf_fraud_blacklist`: Ghi nhận quản trị viên (`StoreAdmin` / `InstallmentReviewer`) đã tạo quy tắc chặn gian lận.
+- `wp_wc_orders` (`1`) — (`0..N`) `wp_gf_rma_requests` và `wp_users` (`1`) — (`0..N`) `wp_gf_rma_requests`: Lưu yêu cầu đổi trả / bảo hành (RMA) gắn với đơn hàng và `serial_number` thiết bị.
 
 *(File nguồn: `2. Quy ước và Sơ đồ UML/role4_diagrams/ERD_GearForge_Role4.mmd`)*
 
@@ -148,6 +149,8 @@ erDiagram
     wp_wc_orders ||--|{ wp_wc_order_items : contains
     wp_wc_orders ||--o| wp_gf_installment_applications : finances
     wp_wc_orders ||--o{ wp_gf_order_serials : tracks
+    wp_wc_orders ||--o{ wp_gf_rma_requests : requests_rma
+    wp_users ||--o{ wp_gf_rma_requests : submits_rma
     wp_wc_order_items ||--o{ wp_gf_order_serials : assigns
     wp_gf_installment_plans ||--o{ wp_gf_installment_applications : defines_terms
 
@@ -236,6 +239,20 @@ erDiagram
         text reason
         bigint created_by FK
         datetime blocked_until
+        datetime created_at
+    }
+
+    wp_gf_rma_requests {
+        bigint rma_id PK
+        bigint order_id FK
+        bigint user_id FK
+        varchar serial_number
+        enum request_type
+        text reason
+        varchar status
+        text admin_note
+        bigint reviewed_by FK
+        datetime reviewed_at
         datetime created_at
     }
 ```
@@ -562,4 +579,4 @@ Trên nền tảng kiến trúc Microkernel (`gearforge-core`) đã chuẩn hóa
 | :--- | :--- | :--- | :--- | :--- |
 | **WordPress Admin** (`StoreAdmin` / `InstallmentReviewer`) | `http://localhost:8080/wp-admin` | `admin` | `admin123` | Quản lý sản phẩm, Duyệt hồ sơ trả góp 2 lớp, Gán S/N, Xuất PDF T-VAN |
 | **Tài khoản Sinh viên** (`StudentCustomer`) | `http://localhost:8080/wp-login.php` | `user` (`24521027@gm.uit.edu.vn`) | `admin123` | Đăng nhập khách hàng sinh viên test đặt hàng, trả góp, theo dõi OMS |
-| **phpMyAdmin** (MySQL 8.0) | `http://localhost:8081` | `gf_user` | `admin123` | Kiểm tra trực tiếp 4 bảng mở rộng `wp_gf_*` và dữ liệu seed |
+| **phpMyAdmin** (MySQL 8.0) | `http://localhost:8081` | `gf_user` | `admin123` | Kiểm tra trực tiếp 5 bảng mở rộng `wp_gf_*` và dữ liệu seed |

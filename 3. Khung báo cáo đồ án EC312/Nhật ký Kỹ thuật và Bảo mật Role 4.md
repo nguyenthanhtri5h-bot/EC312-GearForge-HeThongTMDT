@@ -9,7 +9,7 @@
 
 | STT | Module / File | Chức năng chính | Nguồn tham chiếu thực tế |
 | :-: | :--- | :--- | :--- |
-| 1 | `includes/class-gf-activator.php` | Tạo 4 bảng MySQL mở rộng `wp_gf_*`, seed 3 gói trả góp (3/6/12 tháng) và tạo vùng vault `/var/www/gf-vault/.htaccess`. | Chuẩn kiến trúc Microkernel + WooCommerce HPOS |
+| 1 | `includes/class-gf-activator.php` | Tạo 5 bảng MySQL mở rộng `wp_gf_*` (gồm cả `wp_gf_rma_requests`), seed 3 gói trả góp (3/6/12 tháng) và tạo vùng vault `/var/www/gf-vault/.htaccess`. | Chuẩn kiến trúc Microkernel + WooCommerce HPOS |
 | 2 | `includes/class-gf-installment-calc.php` | Công thức tính tiền trả trước, gốc vay, tổng lãi, góp/tháng (làm tròn hàng nghìn) + REST API `GET /gearforge/v1/installment-calc`. | TGDĐ, CellphoneS, GearVN, Xgear, MemoryZone |
 | 3 | `includes/class-gf-vault-crypto.php` | Kiểm tra MIME thực tế (`finfo`), giới hạn ≤ 5MB, mã hóa `AES-256-CBC` + `HMAC-SHA256` ngoài webroot, giải mã stream cho Reviewer. | Nghị định 13/2023/NĐ-CP về Bảo vệ dữ liệu cá nhân |
 | 4 | `includes/class-gf-installment-review.php` | Nộp hồ sơ trả góp SV (`.edu.vn`, Consent NĐ 13), **Duyệt 2 lớp tuần tự** (L1 giấy tờ $\rightarrow$ L2 SĐT/Email), Từ chối + Blacklist. | CellphoneS (S-Student), zShop, UNiDAYS/SheerID |

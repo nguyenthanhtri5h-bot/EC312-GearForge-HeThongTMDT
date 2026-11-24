@@ -11,7 +11,7 @@
 | Hạng mục | Đường dẫn xem nhanh | Mô tả nội dung |
 | :--- | :--- | :--- |
 | **Mã nguồn Plugin (`gearforge-core`)** | [plugins/gearforge-core/](plugins/gearforge-core/) | 8 class PHP xử lý trả góp SV 3–6–12 tháng, mã hóa AES-256-CBC, duyệt 2 lớp, Sandbox 3DS, S/N xuất kho và Hóa đơn PDF T-VAN. |
-| **Bộ 5 Sơ đồ UML & ERD** | [2. Quy ước và Sơ đồ UML/role4_diagrams/](<2. Quy ước và Sơ đồ UML/role4_diagrams/>) | Gồm mã nguồn `.mmd` và ảnh `.png`: ERD (4 bảng `wp_gf_*`), Activity `UC-10..12`, Sequence `UC-10/11`, Sequence `UC-12` và Class Diagram Backend. |
+| **Bộ 5 Sơ đồ UML & ERD** | [2. Quy ước và Sơ đồ UML/role4_diagrams/](<2. Quy ước và Sơ đồ UML/role4_diagrams/>) | Gồm mã nguồn `.mmd` và ảnh `.png`: ERD (5 bảng `wp_gf_*`), Activity `UC-10..12`, Sequence `UC-10/11`, Sequence `UC-12` và Class Diagram Backend. |
 | **Báo cáo Nháp Role 4 (Word & MD)** | [Nháp Role 4 - Lê Lưu Luân.docx](<3. Khung báo cáo đồ án EC312/Nháp Role 4 - Lê Lưu Luân.docx>) | Trình bày đầy đủ Mục 3.7 (`UC-10 ★`), Mục 4.2 (ERD & Data Dictionary), Mục 5.1/5.2.3–5.2.4 (ảnh Demo thực tế) và Mục 6.3. |
 | **Nhật ký Kỹ thuật & Bảo mật** | [Nhật ký Kỹ thuật và Bảo mật Role 4.docx](<3. Khung báo cáo đồ án EC312/Nhật ký Kỹ thuật và Bảo mật Role 4.docx>) | Ghi nhận chi tiết 12 điểm tối ưu bảo mật & hiệu năng (`FIX-01..FIX-12`) kèm nguyên nhân và cách xử lý. |
 | **Ảnh minh chứng & PDF mẫu** | [Ảnh minh chứng Role 4/](<3. Khung báo cáo đồ án EC312/Ảnh minh chứng Role 4/>) | Ảnh chụp REST API, WP Admin duyệt 2 lớp, Sandbox 3DS, Meta Box S/N và file Hóa đơn PDF mẫu `GearForge-Invoice-20.pdf`. |
@@ -22,7 +22,7 @@
 ## 2. PHẠM VI NGHIỆP VỤ & CÁC API CUNG CẤP CHO NHÓM
 
 * **Cụm Use Case phụ trách:** `UC-10 ★` (Tính & nộp hồ sơ trả góp SV 3–6–12 tháng), `UC-11` (Duyệt 2 lớp & Sandbox VNPay/MoMo/Fundiin 3D-Secure), `UC-12` (Gắn Serial Number xuất kho & Xuất Hóa đơn PDF chuẩn T-VAN).
-* **4 bảng MySQL mở rộng (`wp_gf_*`):** `wp_gf_installment_plans`, `wp_gf_installment_applications`, `wp_gf_order_serials`, `wp_gf_fraud_blacklist`.
+* **5 bảng MySQL mở rộng (`wp_gf_*`):** `wp_gf_installment_plans`, `wp_gf_installment_applications`, `wp_gf_order_serials`, `wp_gf_fraud_blacklist`, `wp_gf_rma_requests`.
 * **REST API Endpoints phục vụ Frontend (Role 3) & Kiểm thử (Role 2):**
   * `GET /wp-json/gearforge/v1/installment-calc?price=...&down_pct=...&months=...` — Tính trả trước, gốc vay, lãi và tiền góp hàng tháng.
   * `GET /wp-json/gearforge/v1/oms-status/{order_id}` — Tra cứu trạng thái đơn hàng + hồ sơ trả góp + Serial Number *(yêu cầu đăng nhập đúng chủ đơn hoặc Admin/Reviewer)*.
