@@ -611,6 +611,7 @@ classDiagram
 - **Domain-Separated HMAC (`FIX-08`):** Tách biệt chữ ký `3ds` và `ipn` ngăn chặn 3DS OTP Bypass.
 - **Chống Double Charge khi mất mạng & Active Reconciliation `QueryDR` (`FIX-12`):** Tách biệt Server-to-Server IPN với Browser Return, khóa form thanh toán ngay từ bước tạo phiên & màn hình 3DS nếu IPN đã chốt đơn (`is_order_already_paid()`), gắn `idempotency_key` (`GF_{order_id}_{mode}`) và cung cấp API đối soát chủ động `GET /wp-json/gearforge/v1/payment-sandbox/query/{order_id}`.
 - **Hardening Nộp trả góp & Đổi trả RMA (`FIX-13`):** Khóa `GET_LOCK` chống nộp hồ sơ trả góp trùng song song, chỉ cho nộp khi đơn ở `pending`/`on-hold`, kiểm tra hạn 15 ngày RMA (`RETURN`/`EXCHANGE`) và bọc Transaction thu hồi S/N + tự đóng hồ sơ trả góp (`CLOSED`) + chuyển `refunded` khi trả toàn bộ S/N.
+- **Phòng thủ chiều sâu, khóa RMA `REPEATABLE READ`, API Session 3DS & PDF Đa trang (`FIX-14`):** Tách subkey mã hóa/MAC ở Vault v2 và Sandbox HMAC; hỗ trợ `.htaccess` Apache 2.4; dọn file `.gfenc` mồ côi và dùng `INSERT ... ON DUPLICATE KEY UPDATE`; bổ sung `POST /wp-json/gearforge/v1/payment-sandbox/session`, đối chiếu khớp số tiền thanh toán, gắn nút tải Hóa đơn PDF ở My Account & phân trang tự động (`> 42` dòng); khóa `GET_LOCK("gf_rma_order_{order_id}")` chống snapshot race `REPEATABLE READ` và kiểm chứng 24/24 assertions qua `tests/verify-role4.php`.
 
 ---
 
