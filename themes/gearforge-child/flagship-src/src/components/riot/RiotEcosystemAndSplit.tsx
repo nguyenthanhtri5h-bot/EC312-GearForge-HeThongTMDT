@@ -20,31 +20,31 @@ export function RiotEcosystemStrip() {
     {
       id: 'ai',
       title: 'AI BUILDER',
-      img: hw.laptopRogRgb,
+      img: hw.riotEcoAiBuilder,
       action: () => navigateToPage('ecosystem'),
     },
     {
       id: 'setup',
       title: 'ĐHQG SETUP',
-      img: hw.riotNewsBooth,
+      img: hw.pcMiniItx,
       action: () => navigateToPage('gallery'),
     },
     {
       id: 'lab',
       title: 'LAB STRESS',
-      img: hw.campusBkCad,
+      img: hw.riotEcoStressLab,
       action: () => setVideoModalSrc(VIBE_VIDEOS.labPc),
     },
     {
       id: 'oms',
       title: 'OMS SERIAL',
-      img: hw.galleryEsportsDesk,
+      img: hw.riotNewsOmsSerial,
       action: () => openDrawer('oms'),
     },
     {
       id: 'sv-club',
       title: 'CAMPUS ARENA',
-      img: hw.campusUitAi,
+      img: hw.riotNewsBooth,
       action: () => navigateToPage('gallery'),
     },
   ];

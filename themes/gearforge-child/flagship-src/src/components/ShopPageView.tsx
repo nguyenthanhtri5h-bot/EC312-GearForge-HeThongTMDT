@@ -8,6 +8,7 @@ const SHOP_TABS = [
   { label: 'LAPTOP GAMING', slug: 'laptop-gaming' },
   { label: 'ULTRABOOK & ĐỒ HỌA', slug: 'laptop-ultrabook' },
   { label: 'PC WORKSTATION', slug: 'pc-workstation' },
+  { label: 'LINH KIỆN PC', slug: 'linh-kien' },
   { label: 'GEAR & PHỤ KIỆN', slug: 'gear' },
 ];
 
@@ -20,6 +21,7 @@ function resolveInitialCategoryFromUrl(): string {
   if (path.includes('laptop-gaming')) return 'laptop-gaming';
   if (path.includes('laptop-do-hoa') || path.includes('laptop-van-phong')) return 'laptop-ultrabook';
   if (path.includes('pc-nguyen-bo') || path.includes('pc-gaming')) return 'pc-workstation';
+  if (path.includes('linh-kien')) return 'linh-kien';
   if (path.includes('phu-kien')) return 'gear';
   return '';
 }
@@ -65,11 +67,11 @@ export function ShopPageView() {
               <h1
                 style={{
                   margin: 0,
-                  fontFamily: "'Be Vietnam Pro', 'Inter', sans-serif",
-                  fontSize: 'clamp(2.1rem, 3.6vw, 3.25rem)',
-                  fontWeight: 900,
-                  lineHeight: 1.08,
-                  letterSpacing: '-0.03em',
+                  fontFamily: "var(--gf-font-display, 'Be Vietnam Pro', sans-serif)",
+                  fontSize: 'clamp(28px, 3.2vw, 42px)',
+                  fontWeight: 700,
+                  lineHeight: 1.24,
+                  letterSpacing: '-0.015em',
                   color: '#FFFFFF',
                 }}
               >
@@ -79,15 +81,14 @@ export function ShopPageView() {
 
             <button
               type="button"
-              className="gf-riot-red-pill"
-              style={{ height: 46, padding: '0 24px', fontSize: 14 }}
+              className="gf-shop-hero-cta"
               onClick={() => openDrawer('installment')}
             >
               Trả góp 0% · Duyệt .edu.vn
             </button>
           </div>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 22, marginTop: 28 }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 22, marginTop: 26 }}>
             {SHOP_TABS.map((t) => {
               const isOn = (filters.category || '') === t.slug;
               return (
@@ -99,11 +100,11 @@ export function ShopPageView() {
                     background: 'none',
                     border: 0,
                     padding: '6px 0',
-                    borderBottom: isOn ? '2px solid #EB0029' : '2px solid transparent',
+                    borderBottom: isOn ? '2px solid #D13639' : '2px solid transparent',
                     color: isOn ? '#FFFFFF' : '#A1A1AA',
                     fontSize: 12,
                     fontWeight: 800,
-                    letterSpacing: '0.1em',
+                    letterSpacing: '0.08em',
                     cursor: 'pointer',
                   }}
                 >
@@ -115,7 +116,7 @@ export function ShopPageView() {
         </div>
       </section>
 
-      <div style={{ background: '#F1F0EC', paddingBlock: 16 }}>
+      <div style={{ background: '#F1F0EC', paddingBlock: 12 }}>
         <CatalogSection hideCategoryTabs />
       </div>
     </main>

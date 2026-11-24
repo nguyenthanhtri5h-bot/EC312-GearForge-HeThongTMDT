@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useGearForgeStore } from '../hooks/useGearForgeStore';
 import { CatalogFilterBar } from './drawers/CatalogFilterBar';
+import { ShopFilterSidebar } from './drawers/ShopFilterSidebar';
+import { ShopSortBar } from './drawers/ShopSortBar';
 import { StorefrontProductCard } from './storefront/StorefrontProductCard';
 import './drawers/drawers-extra.css';
 
@@ -37,6 +39,21 @@ export function CatalogSection({ hideCategoryTabs = false }: { hideCategoryTabs?
     return () => window.clearTimeout(timer);
   }, [searchInput, filters.search, fetchCatalog]);
 
+  const handleResetAll = () => {
+    setSearchInput('');
+    void fetchCatalog({
+      search: '',
+      category: '',
+      cpu: '',
+      ram: '',
+      gpu: '',
+      storage: '',
+      maxPrice: 80000000,
+      sort: 'featured',
+      page: 1,
+    });
+  };
+
   return (
     <section id="gf-catalog" className="tc-sec gf-cat-sec" aria-labelledby="gf-catalog-heading">
       <div className="tc-wrap">
@@ -50,7 +67,6 @@ export function CatalogSection({ hideCategoryTabs = false }: { hideCategoryTabs?
             </p>
           </div>
           <div className="gf-cat-toolbar">
-            <span className="gf-cat-count">Tìm thấy {totalProducts} sản phẩm</span>
             <div className="gf-drawer-triggers">
               <button type="button" className="gf-pill-trigger" onClick={() => openDrawer('compare')}>
                 <span>So sánh</span>
@@ -64,66 +80,78 @@ export function CatalogSection({ hideCategoryTabs = false }: { hideCategoryTabs?
           </div>
         </div>
 
-        <CatalogFilterBar
-          filters={filters}
-          searchInput={searchInput}
-          hideCategoryTabs={hideCategoryTabs}
-          onSearchChange={setSearchInput}
-          onUpdate={(patch) => void fetchCatalog(patch)}
-        />
+        <div className="gf-shop-layout">
+          <ShopFilterSidebar
+            filters={filters}
+            onUpdate={(patch) => void fetchCatalog(patch)}
+            onResetAll={handleResetAll}
+          />
 
-        {catalogLoading ? (
-          <div className="gf-cat-grid" aria-busy="true" aria-label="Đang tải sản phẩm">
-            {Array.from({ length: 6 }).map((_, idx) => (
-              <div key={idx} className="gf-skel-card" />
-            ))}
-          </div>
-        ) : products.length === 0 ? (
-          <div className="gf-alert-box is-warn">
-            Không tìm thấy sản phẩm khớp bộ lọc.{' '}
-            <button
-              type="button"
-              className="gf-mini-pill is-active"
-              style={{ marginLeft: 8 }}
-              onClick={() => {
-                setSearchInput('');
-                void fetchCatalog({ search: '', category: '', cpu: '', ram: '', gpu: '', storage: '', maxPrice: 80000000, page: 1 });
-              }}
-            >
-              Đặt lại bộ lọc
-            </button>
-          </div>
-        ) : (
-          <div className="gf-cat-grid">
-            {products.map((p, idx) => (
-              <StorefrontProductCard key={p.id} product={p} eagerImage={idx < 6} />
-            ))}
-          </div>
-        )}
+          <div className="gf-shop-main">
+            <CatalogFilterBar
+              filters={filters}
+              searchInput={searchInput}
+              totalProducts={totalProducts}
+              hideCategoryTabs={hideCategoryTabs}
+              onSearchChange={setSearchInput}
+              onUpdate={(patch) => void fetchCatalog(patch)}
+            />
 
-        {totalPages > 1 && (
-          <div className="gf-pagination" role="navigation" aria-label="Phân trang sản phẩm">
-            <button
-              type="button"
-              className="gf-page-btn"
-              disabled={filters.page <= 1 || catalogLoading}
-              onClick={() => void fetchCatalog({ page: Math.max(1, filters.page - 1) })}
-            >
-              ← Trước
-            </button>
-            <span className="gf-page-status">
-              Trang <strong>{filters.page}</strong> / {totalPages}
-            </span>
-            <button
-              type="button"
-              className="gf-page-btn"
-              disabled={filters.page >= totalPages || catalogLoading}
-              onClick={() => void fetchCatalog({ page: Math.min(totalPages, filters.page + 1) })}
-            >
-              Sau →
-            </button>
+            <ShopSortBar
+              sort={filters.sort}
+              onChange={(patch) => void fetchCatalog(patch)}
+            />
+
+            {catalogLoading ? (
+              <div className="gf-cat-grid" aria-busy="true" aria-label="Đang tải sản phẩm">
+                {Array.from({ length: 8 }).map((_, idx) => (
+                  <div key={idx} className="gf-skel-card" />
+                ))}
+              </div>
+            ) : products.length === 0 ? (
+              <div className="gf-empty-state">
+                <p>Không tìm thấy sản phẩm khớp bộ lọc hiện tại.</p>
+                <button
+                  type="button"
+                  className="gf-mini-pill is-active"
+                  onClick={handleResetAll}
+                >
+                  Đặt lại bộ lọc
+                </button>
+              </div>
+            ) : (
+              <div className="gf-cat-grid">
+                {products.map((p, idx) => (
+                  <StorefrontProductCard key={p.id} product={p} eagerImage={idx < 8} />
+                ))}
+              </div>
+            )}
+
+            {totalPages > 1 && (
+              <div className="gf-pagination" role="navigation" aria-label="Phân trang sản phẩm">
+                <button
+                  type="button"
+                  className="gf-page-btn"
+                  disabled={filters.page <= 1 || catalogLoading}
+                  onClick={() => void fetchCatalog({ page: Math.max(1, filters.page - 1) })}
+                >
+                  ← Trước
+                </button>
+                <span className="gf-page-status">
+                  Trang <strong>{filters.page}</strong> / {totalPages}
+                </span>
+                <button
+                  type="button"
+                  className="gf-page-btn"
+                  disabled={filters.page >= totalPages || catalogLoading}
+                  onClick={() => void fetchCatalog({ page: Math.min(totalPages, filters.page + 1) })}
+                >
+                  Sau →
+                </button>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </section>
   );

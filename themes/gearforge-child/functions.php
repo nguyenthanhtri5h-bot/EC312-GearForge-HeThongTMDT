@@ -12,6 +12,11 @@ if (!defined('ABSPATH')) {
 
 define('GF_CHILD_VERSION', '4.1.0');
 
+$gf_bridge_file = get_stylesheet_directory() . '/inc/class-gf-role4-bridge.php';
+if (file_exists($gf_bridge_file)) {
+    require_once $gf_bridge_file;
+}
+
 /**
  * Resolve category- and keyword-aware studio hardware image URL across 8 visuals.
  */
@@ -52,13 +57,22 @@ function gf_resolve_studio_image_url(?WC_Product $product = null): string {
                 $img     = $pc_pool[$pid % 4];
             }
         } elseif (
+            str_contains($joined, 'linh-kien')
+            || str_contains($joined, 'cpu')
+            || str_contains($joined, 'vga')
+            || preg_match('/\b(rtx\s*40|rx\s*7|core\s*i[579]\s*1\d{4}|ryzen\s*[579]\s*\d{4}x3d|vga\s)/iu', $title)
+        ) {
+            $img = str_contains($joined, 'ram') ? 'gear-audio-hub.jpg' : 'pc-watercool.jpg';
+        } elseif (
             str_contains($joined, 'phu-kien')
+            || str_contains($joined, 'gear')
             || str_contains($joined, 'balo')
-            || str_contains($joined, 'ban-phim-co')
-            || str_contains($joined, 'chuot-gaming')
+            || str_contains($joined, 'ban-phim')
+            || str_contains($joined, 'chuot')
+            || str_contains($joined, 'lot-chuot')
             || str_contains($joined, 'ram-ssd')
             || str_contains($joined, 'tai-nghe')
-            || (!str_contains($joined, 'laptop') && preg_match('/(balo|chuột|bàn phím|tai nghe|hub|lót chuột|tản nhiệt|sạc|cáp|giá đỡ|ram |ssd |túi)/u', $title))
+            || (!str_contains($joined, 'laptop') && preg_match('/(balo|chuột|bàn phím|lót chuột|tai nghe|hub|tản nhiệt|sạc|cáp|giá đỡ|ram |ssd |túi)/u', $title))
         ) {
             if (preg_match('/(balo|túi|sạc|cáp|gan|giá đỡ|đế tản nhiệt)/u', $title) || str_contains($joined, 'balo')) {
                 $img = 'gear-backpack.jpg';
@@ -245,7 +259,7 @@ add_action('wp_enqueue_scripts', static function (): void {
     if (gf_is_flagship_front_request()) {
         wp_enqueue_style(
             'gearforge-flagship-fonts',
-            'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap',
+            'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap',
             [],
             null
         );
@@ -267,7 +281,7 @@ add_action('wp_enqueue_scripts', static function (): void {
 
     wp_enqueue_style(
         'gearforge-fonts',
-        'https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap',
+        'https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap',
         [],
         null
     );
@@ -435,7 +449,7 @@ add_action('wp_body_open', static function (): void {
         <div class="gf-sec-hd-inner">
             <a class="gf-sec-brand" href="<?php echo esc_url(home_url('/')); ?>" aria-label="GearForge Trang chủ" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;">
                 <?php echo gf_render_canonical_logo_svg(28); ?>
-                <span style="font-family:'Barlow Condensed','Be Vietnam Pro',sans-serif;font-size:18px;font-weight:900;letter-spacing:0.06em;color:#FFFFFF;line-height:1;">GEARFORGE</span>
+                <span style="font-family:'Be Vietnam Pro',sans-serif;font-size:16px;font-weight:800;letter-spacing:0.08em;color:#FFFFFF;line-height:1;">GEARFORGE</span>
             </a>
 
             <nav class="gf-sec-nav" aria-label="Điều hướng chính">
@@ -495,7 +509,7 @@ add_action('wp_footer', static function (): void {
             <div class="gf-sec-ft-brand">
                 <a class="gf-sec-brand" href="<?php echo esc_url(home_url('/')); ?>" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;">
                     <?php echo gf_render_canonical_logo_svg(28); ?>
-                    <span style="font-family:'Barlow Condensed','Be Vietnam Pro',sans-serif;font-size:18px;font-weight:900;letter-spacing:0.06em;color:#FFFFFF;line-height:1;">GEARFORGE</span>
+                    <span style="font-family:'Be Vietnam Pro',sans-serif;font-size:16px;font-weight:800;letter-spacing:0.08em;color:#FFFFFF;line-height:1;">GEARFORGE</span>
                 </a>
                 <p>Hệ thống Laptop, PC Workstation &amp; Gaming Gear dành cho Sinh viên ĐHQG TP.HCM — Trả góp 0% kỳ hạn 3 tháng qua email .edu.vn, giao KTX trong 2 giờ &amp; bảo hành điện tử theo Serial.</p>
             </div>
@@ -1005,6 +1019,10 @@ function gf_flagship_product_image(WC_Product $product): string {
             return $url;
         }
     }
+    $ext_url = (string) get_post_meta($product->get_id(), '_gf_external_image_url', true);
+    if ($ext_url !== '' && filter_var($ext_url, FILTER_VALIDATE_URL)) {
+        return esc_url_raw($ext_url);
+    }
     return gf_resolve_studio_image_url($product);
 }
 
@@ -1396,24 +1414,14 @@ function gf_flagship_query_catalog(array $params): array {
         }
     }
 
-    $cat_aliases = [
-        'laptop'           => ['laptop', 'laptop-gaming', 'laptop-van-phong', 'laptop-do-hoa'],
-        'gaming'           => ['laptop-gaming'],
+    $cat_map_path = get_stylesheet_directory() . '/config/category-map.php';
+    $cat_map_cfg  = file_exists($cat_map_path) ? (array) require $cat_map_path : [];
+    $cat_aliases  = is_array($cat_map_cfg['aliases'] ?? null) ? $cat_map_cfg['aliases'] : [
         'laptop-gaming'    => ['laptop-gaming'],
-        'ultrabook'        => ['laptop-van-phong', 'laptop-do-hoa'],
-        'laptop-ultrabook' => ['laptop-van-phong', 'laptop-do-hoa'],
-        'laptop-van-phong' => ['laptop-van-phong'],
-        'dev'              => ['laptop-van-phong', 'laptop-do-hoa'],
-        'creator'          => ['laptop-do-hoa'],
-        'laptop-do-hoa'    => ['laptop-do-hoa'],
-        'workstation'      => ['pc-nguyen-bo', 'pc-gaming', 'pc-van-phong-do-hoa'],
-        'pc-workstation'   => ['pc-nguyen-bo', 'pc-gaming', 'pc-van-phong-do-hoa'],
-        'pc-nguyen-bo'     => ['pc-nguyen-bo', 'pc-gaming', 'pc-van-phong-do-hoa'],
-        'pc'               => ['pc-nguyen-bo', 'pc-gaming', 'pc-van-phong-do-hoa'],
-        'pc-gaming'        => ['pc-gaming'],
-        'gear'             => ['phu-kien', 'balo-de-tan-nhiet', 'ban-phim-co', 'chuot-gaming', 'ram-ssd', 'tai-nghe'],
-        'phu-kien'         => ['phu-kien', 'balo-de-tan-nhiet', 'ban-phim-co', 'chuot-gaming', 'ram-ssd', 'tai-nghe'],
-        'accessories'      => ['phu-kien', 'balo-de-tan-nhiet', 'ban-phim-co', 'chuot-gaming', 'ram-ssd', 'tai-nghe'],
+        'laptop-ultrabook' => ['laptop-van-phong', 'laptop-do-hoa', 'laptop-sinh-vien'],
+        'pc-workstation'   => ['pc', 'pc-nguyen-bo', 'pc-gaming', 'pc-do-hoa', 'pc-van-phong'],
+        'linh-kien'        => ['linh-kien', 'cpu', 'ram', 'vga', 'ram-ssd'],
+        'gear'             => ['gear', 'phu-kien', 'ban-phim', 'chuot', 'lot-chuot'],
     ];
 
     $filtered = [];

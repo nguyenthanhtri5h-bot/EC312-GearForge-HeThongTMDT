@@ -42,11 +42,11 @@
 
 .gf-riot-h2 {
   margin: 0;
-  font-family: 'Be Vietnam Pro', 'Inter', sans-serif;
-  font-size: clamp(2rem, 3.1vw, 3rem);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.12;
+  font-family: var(--gf-font-display, 'Be Vietnam Pro', sans-serif);
+  font-size: clamp(28px, 2.8vw, 40px);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.24;
   color: #F9F9F9;
 }
 
@@ -114,11 +114,11 @@
 
 .gf-riot-lead-title {
   margin: 18px 0 10px;
-  font-family: 'Be Vietnam Pro', 'Inter', sans-serif;
-  font-size: clamp(1.35rem, 1.85vw, 1.78rem);
-  font-weight: 800;
-  line-height: 1.25;
-  letter-spacing: -0.02em;
+  font-family: var(--gf-font-display, 'Be Vietnam Pro', sans-serif);
+  font-size: clamp(21px, 1.8vw, 26px);
+  font-weight: 700;
+  line-height: 1.32;
+  letter-spacing: -0.012em;
   color: #F9F9F9;
 }
 
@@ -408,21 +408,21 @@
 }
 
 .gf-riot-slant-title {
-  font-family: 'Barlow Condensed', 'Be Vietnam Pro', sans-serif;
-  font-size: 30px;
-  font-weight: 900;
-  letter-spacing: 0.04em;
-  line-height: 0.98;
+  font-family: var(--gf-font-display, 'Be Vietnam Pro', sans-serif);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.12;
   color: #FFFFFF;
   text-shadow: 0 4px 18px rgba(0, 0, 0, 0.72);
 }
 
 .gf-riot-slant-sub {
-  margin-top: 3px;
-  font-family: 'Barlow Condensed', 'Inter', sans-serif;
-  font-size: 12.5px;
-  font-weight: 800;
-  letter-spacing: 0.16em;
+  margin-top: 4px;
+  font-family: var(--gf-font-sans, 'Be Vietnam Pro', sans-serif);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   color: rgba(255, 255, 255, 0.88);
 }
 
@@ -454,21 +454,21 @@
 .gf-riot-split-h2 {
   margin: 0;
   max-width: 500px;
-  font-family: 'Be Vietnam Pro', 'Inter', sans-serif;
-  font-size: clamp(2.35rem, 3.3vw, 3.2rem);
-  font-weight: 800;
-  line-height: 1.08;
-  letter-spacing: -0.03em;
+  font-family: var(--gf-font-display, 'Be Vietnam Pro', sans-serif);
+  font-size: clamp(32px, 3vw, 44px);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
   color: #0A0A0A;
 }
 
 .gf-riot-split-lead {
   margin: 0;
   max-width: 470px;
-  font-size: 17px;
+  font-size: 16.5px;
   font-weight: 500;
-  line-height: 1.5;
-  color: #656462;
+  line-height: 1.55;
+  color: #4A4947;
 }
 
 .gf-riot-stat-pair {
@@ -480,7 +480,7 @@
 
 .gf-riot-stat-box {
   background: #DFDEDC;
-  border-radius: 14px;
+  border-radius: 12px;
   padding: 24px 18px;
   display: flex;
   flex-direction: column;
@@ -490,18 +490,18 @@
 }
 
 .gf-riot-stat-box strong {
-  font-family: 'Be Vietnam Pro', 'Inter', sans-serif;
-  font-size: 52px;
-  font-weight: 800;
-  line-height: 1;
+  font-family: var(--gf-font-display, 'Be Vietnam Pro', sans-serif);
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.05;
   color: #0A0A0A;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
 }
 
 .gf-riot-stat-box span {
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 600;
-  color: #656462;
+  color: #4A4947;
 }
 
 .gf-riot-red-pill {
@@ -509,14 +509,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 58px;
-  padding: 0 38px;
+  height: 54px;
+  padding: 0 36px;
   border: 0;
   border-radius: 999px;
   background: #D13639;
   color: #FFFFFF;
-  font-size: 18px;
-  font-weight: 800;
+  font-size: 16.5px;
+  font-weight: 700;
   cursor: pointer;
   transition: background 0.18s ease, transform 0.18s ease;
 }

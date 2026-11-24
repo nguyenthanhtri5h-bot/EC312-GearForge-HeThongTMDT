@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { formatVnd, useGearForgeStore } from '../hooks/useGearForgeStore';
 import type { OmsOrder, OmsStep } from '../types/gearforge';
+import { OmsSandboxBox } from './drawers/OmsSandboxBox';
 import { OmsWarrantyCard } from './drawers/OmsWarrantyCard';
 import './drawers/drawers-extra.css';
 
@@ -167,6 +168,7 @@ export function OmsLookupPanel({ initialOrderId = 542 }: { initialOrderId?: numb
             </div>
           )}
 
+          <OmsSandboxBox order={order} onOrderRefresh={runLookup} />
           <OmsWarrantyCard order={order} />
         </div>
       )}

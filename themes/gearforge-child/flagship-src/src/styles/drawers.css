@@ -79,12 +79,12 @@
 .gf-prod-cat { position: absolute; top: 10px; left: 10px; padding: 3px 8px; border-radius: 6px; background: rgba(15, 23, 42, 0.85); color: #ffffff; font-size: 11px; font-weight: 700; }
 
 .gf-prod-body { display: flex; flex-direction: column; flex: 1; padding: 16px; gap: 10px; }
-.gf-prod-title { font-family: 'Be Vietnam Pro', 'Inter', sans-serif; font-size: 15.5px; font-weight: 700; line-height: 1.44; color: #0f172a; }
+.gf-prod-title { font-family: var(--gf-font-display, 'Be Vietnam Pro', sans-serif); font-size: 14.5px; font-weight: 600; line-height: 1.44; color: #0A0A0A; }
 .gf-prod-specs { display: flex; flex-wrap: wrap; gap: 6px; }
-.gf-spec-chip { padding: 4px 8px; border-radius: 6px; background: #f1f5f9; border: 1px solid #e2e8f0; color: #334155; font-size: 12px; font-weight: 600; }
+.gf-spec-chip { padding: 4px 8px; border-radius: 6px; background: #F5F4F0; border: 1px solid #DFDEDC; color: #27272A; font-size: 12px; font-weight: 600; }
 
 .gf-prod-price-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-top: auto; }
-.gf-prod-price { font-family: 'Be Vietnam Pro', 'Inter', sans-serif; font-size: 19px; font-weight: 800; color: #0f172a; font-variant-numeric: tabular-nums; letter-spacing: -0.015em; }
+.gf-prod-price { font-family: var(--gf-font-display, 'Be Vietnam Pro', sans-serif); font-size: 18px; font-weight: 700; color: #D13639; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
 .gf-prod-inst { font-size: 12px; font-weight: 600; color: #475569; }
 
 .gf-prod-actions { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; }
@@ -135,12 +135,12 @@
   border-left: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
-  box-shadow: -20px 0 50px rgba(15, 23, 42, 0.18);
-  font-family: 'Inter', 'Be Vietnam Pro', system-ui, sans-serif;
+  box-shadow: -20px 0 50px rgba(10, 10, 12, 0.22);
+  font-family: var(--gf-font-sans, 'Be Vietnam Pro', system-ui, sans-serif);
 }
 
-.gf-drawer-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 24px; border-bottom: 1px solid #e2e8f0; background: #ffffff; }
-.gf-drawer-head h3 { margin: 0; font-family: 'Be Vietnam Pro', 'Inter', sans-serif; font-size: 20px; font-weight: 800; color: #0f172a; }
+.gf-drawer-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 24px; border-bottom: 1px solid #DFDEDC; background: #ffffff; }
+.gf-drawer-head h3 { margin: 0; font-family: var(--gf-font-display, 'Be Vietnam Pro', sans-serif); font-size: 19px; font-weight: 700; letter-spacing: -0.01em; color: #0A0A0A; }
 .gf-drawer-close { width: 42px; height: 42px; border-radius: 10px; border: 1px solid #cbd5e1; background: #f8fafc; color: #0f172a; font-size: 22px; cursor: pointer; }
 .gf-drawer-body { flex: 1; overflow-y: auto; padding: 22px 24px; display: flex; flex-direction: column; gap: 18px; }
 .gf-drawer-foot { padding: 16px 24px; border-top: 1px solid #e2e8f0; background: #f8fafc; }
@@ -155,7 +155,7 @@
 .gf-inst-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .gf-inst-stat { padding: 12px; border-radius: 12px; background: #f8fafc; border: 1px solid #e2e8f0; }
 .gf-inst-stat span { display: block; font-size: 12px; color: #475569; }
-.gf-inst-stat strong { display: block; margin-top: 4px; font-size: 17px; font-family: 'Be Vietnam Pro', 'Inter', sans-serif; font-weight: 800; font-variant-numeric: tabular-nums; color: #0f172a; }
+.gf-inst-stat strong { display: block; margin-top: 4px; font-size: 17px; font-family: var(--gf-font-display, 'Be Vietnam Pro', sans-serif); font-weight: 700; font-variant-numeric: tabular-nums; color: #0A0A0A; }
 
 .gf-nd13-box {
   display: flex;
@@ -216,13 +216,17 @@
   transform: translateX(-50%);
   z-index: 1400;
   padding: 11px 18px;
-  border-radius: 10px;
-  background: #0f172a;
+  border-radius: 8px;
+  background: #0A0A0A;
   color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.3);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
   font-size: 13.5px;
   font-weight: 600;
+}
+
+@media (max-width: 767px) {
+  .gf-toast { bottom: 78px; max-width: calc(100vw - 32px); text-align: center; }
 }
 
 @media (max-width: 1024px) {

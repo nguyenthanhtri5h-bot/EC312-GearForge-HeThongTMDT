@@ -73,10 +73,11 @@ export function FloatingWidgets() {
       },
     ]);
     setInput('');
-    if (clean.length >= 2) {
+    const kwMatch = clean.match(/\b(RTX\s*\d{4}|ASUS|ROG|Lenovo|Legion|MSI|Katana|Acer|HP|MacBook|ThinkPad|RAM|SSD|VGA|CPU|PC)\b/i);
+    if (kwMatch) {
       window.setTimeout(() => {
         setChatOpen(false);
-        navigateToPage('shop', { search: clean, page: 1 });
+        navigateToPage('shop', { search: kwMatch[0], page: 1 });
       }, 650);
     }
   };

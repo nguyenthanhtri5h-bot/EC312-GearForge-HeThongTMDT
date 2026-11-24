@@ -37,7 +37,7 @@
 .tc-dd-nhan.noi { opacity: 1; translate: 0 0; }
 
 /* ── Bottom-left Live Feed ── */
-.notis { position: fixed; bottom: 24px; left: 16px; z-index: 150; font-family: 'Inter', 'Be Vietnam Pro', system-ui, sans-serif; }
+.notis { position: fixed; bottom: 24px; left: 16px; z-index: 150; font-family: var(--gf-font-sans, 'Be Vietnam Pro', system-ui, sans-serif); }
 .notis-list { position: absolute; bottom: calc(100% + 10px); left: 0; width: 260px; display: flex; flex-direction: column; gap: 8px; transition: opacity 0.25s ease, transform 0.25s ease; }
 .notis.hide .notis-list { opacity: 0; pointer-events: none; transform: translateX(-110%); }
 .notis-item { padding: 10px; border-radius: 10px; background: rgba(15, 23, 42, 0.94); backdrop-filter: blur(8px); display: flex; align-items: center; gap: 10px; color: #f8fafc; text-decoration: none; border: 1px solid rgba(255, 255, 255, 0.14); box-shadow: 0 8px 24px rgba(15, 23, 42, 0.28); }
@@ -53,7 +53,7 @@
 .mc-bubble:hover { transform: scale(1.06); border-color: #EB0029; }
 .mc-bubble img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-.mc-panel { position: fixed; right: 20px; bottom: 86px; width: min(370px, calc(100vw - 32px)); height: 480px; max-height: calc(100vh - 120px); background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; box-shadow: 0 20px 60px rgba(15, 23, 42, 0.25); z-index: 995; display: flex; flex-direction: column; overflow: hidden; font-family: 'Inter', 'Be Vietnam Pro', system-ui, sans-serif; }
+.mc-panel { position: fixed; right: 20px; bottom: 86px; width: min(370px, calc(100vw - 32px)); height: 480px; max-height: calc(100vh - 120px); background: #fff; border: 1px solid #DFDEDC; border-radius: 10px; box-shadow: 0 20px 60px rgba(10, 10, 12, 0.25); z-index: 995; display: flex; flex-direction: column; overflow: hidden; font-family: var(--gf-font-sans, 'Be Vietnam Pro', system-ui, sans-serif); }
 .mc-panel-head { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: #111111; border-bottom: 1px solid rgba(255, 255, 255, 0.14); color: #fff; }
 .mc-panel-head img { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; background: #fff; }
 .mc-panel-head .title { font-weight: 700; font-size: 15px; }

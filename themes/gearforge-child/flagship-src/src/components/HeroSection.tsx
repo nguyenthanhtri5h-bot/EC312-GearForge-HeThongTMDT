@@ -4,7 +4,7 @@ import { useGearForgeStore } from '../hooks/useGearForgeStore';
 import { useHeroAnimation } from '../hooks/useHeroAnimation';
 
 export function HeroSection() {
-  const { setVideoModalSrc } = useGearForgeStore();
+  const { setVideoModalSrc, navigateToPage, openDrawer } = useGearForgeStore();
   const heroRef = useRef<HTMLElement>(null);
   const reducedMotion =
     typeof window !== 'undefined' &&
@@ -45,15 +45,31 @@ export function HeroSection() {
         <div className="gf-hero-top-scrim" />
       </div>
 
-      <button
-        type="button"
-        className="gf-hero-mini-play"
-        aria-label="Phát Trailer 60fps toàn màn hình"
-        title="Xem Trailer toàn màn hình"
-        onClick={() => setVideoModalSrc(VIBE_VIDEOS.heroRiotCinematic)}
-      >
-        &#9654;
-      </button>
+      <div className="gf-hero-bottom-bar">
+        <button
+          type="button"
+          className="gf-hero-mini-play"
+          aria-label="Phát Trailer toàn màn hình"
+          title="Xem Trailer toàn màn hình"
+          onClick={() => setVideoModalSrc(VIBE_VIDEOS.heroRiotCinematic)}
+        >
+          &#9654;
+        </button>
+        <button
+          type="button"
+          className="gf-hero-cta-primary"
+          onClick={() => navigateToPage('shop')}
+        >
+          Khám phá Kho Máy ĐHQG →
+        </button>
+        <button
+          type="button"
+          className="gf-hero-cta-secondary"
+          onClick={() => openDrawer('installment')}
+        >
+          Trả góp 0% · .edu.vn
+        </button>
+      </div>
     </section>
   );
 }

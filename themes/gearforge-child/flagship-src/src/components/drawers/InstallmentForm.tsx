@@ -1,4 +1,5 @@
-import { useState, type FormEvent } from 'react';
+import { useRef, useState, type FormEvent } from 'react';
+import { submitTwoStepInstallment, type InstallmentSubmitOutcome } from '../../hooks/installmentSubmitApi';
 import { useGearForgeStore } from '../../hooks/useGearForgeStore';
 import type { GearForgeProduct } from '../../types/gearforge';
 
@@ -8,15 +9,8 @@ interface Props {
   months: number;
 }
 
-interface SubmitReceipt {
-  ok: boolean;
-  message: string;
-  orderId?: number;
-  trackingUrl?: string;
-}
-
 export function InstallmentForm({ product, downPct, months }: Props) {
-  const { boot, showToast } = useGearForgeStore();
+  const { boot, showToast, openDrawer } = useGearForgeStore();
   const [studentCode, setStudentCode] = useState('');
   const [eduEmail, setEduEmail] = useState('');
   const [cccdNumber, setCccdNumber] = useState('');
@@ -25,61 +19,48 @@ export function InstallmentForm({ product, downPct, months }: Props) {
   const [svCardFile, setSvCardFile] = useState<File | null>(null);
   const [consent, setConsent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [receipt, setReceipt] = useState<SubmitReceipt | null>(null);
+  const [receipt, setReceipt] = useState<InstallmentSubmitOutcome | null>(null);
+  const draftOrderRef = useRef<Record<number, number>>({});
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!consent || submitting) return;
 
-    if (!boot.ajaxUrl) {
+    if (!boot.user.loggedIn) {
       setReceipt({
-        ok: true,
-        orderId: 543,
-        trackingUrl: boot.routes.tracking,
-        message: `Đã tiếp nhận hồ sơ trả góp cho ${studentCode || 'sinh viên ĐHQG-HCM'} (${product.name}, ${months} tháng).`,
+        ok: false,
+        message: 'Vui lòng đăng nhập tài khoản sinh viên trước khi nộp hồ sơ trả góp.',
       });
-      showToast('Đã nộp hồ sơ trả góp 0% thành công!');
+      return;
+    }
+    if (!cccdFile || !svCardFile) {
+      setReceipt({
+        ok: false,
+        message: 'Vui lòng đính kèm đủ cả ảnh CCCD và ảnh Thẻ Sinh viên.',
+      });
       return;
     }
 
     setSubmitting(true);
     setReceipt(null);
     try {
-      const fd = new FormData();
-      fd.set('action', 'gf_submit_installment_app');
-      fd.set('nonce', boot.ajaxNonce);
-      fd.set('product_id', String(product.id));
-      fd.set('down_pct', String(downPct));
-      fd.set('downpayment_pct', String(downPct));
-      fd.set('months', String(months));
-      fd.set('student_code', studentCode.trim());
-      fd.set('student_edu_email', eduEmail.trim());
-      fd.set('cccd_number', cccdNumber.trim());
-      fd.set('phone', phone.trim());
-      fd.set('consent_nd13_accepted', '1');
-      if (cccdFile) fd.set('cccd_file', cccdFile);
-      if (svCardFile) fd.set('student_card_file', svCardFile);
-
-      const res = await fetch(boot.ajaxUrl, {
-        method: 'POST',
-        credentials: 'same-origin',
-        body: fd,
+      const outcome = await submitTwoStepInstallment({
+        boot,
+        productId: product.id,
+        downPct,
+        months,
+        studentCode,
+        eduEmail,
+        cccdNumber,
+        phone,
+        cccdFile,
+        svCardFile,
+        draftOrderMap: draftOrderRef.current,
       });
-      const json = await res.json();
-      if (res.ok && json?.success && json.data) {
-        setReceipt({
-          ok: true,
-          message: json.data.message || 'Hồ sơ của bạn đã được tiếp nhận và bảo mật an toàn.',
-          orderId: Number(json.data.order_id || 0) || undefined,
-          trackingUrl: json.data.tracking_url || boot.routes.tracking,
-        });
-        showToast('Nộp hồ sơ trả góp thành công!');
+      setReceipt(outcome);
+      if (outcome.ok && outcome.orderId) {
+        showToast(`Đã tiếp nhận hồ sơ #${outcome.appId} (Đơn #${outcome.orderId})!`);
         setConsent(false);
-      } else {
-        setReceipt({
-          ok: false,
-          message: json?.data?.message || 'Không thể nộp hồ sơ. Vui lòng kiểm tra đăng nhập và định dạng ảnh.',
-        });
       }
     } catch {
       setReceipt({ ok: false, message: 'Lỗi kết nối máy chủ khi gửi hồ sơ trả góp.' });
@@ -201,9 +182,16 @@ export function InstallmentForm({ product, downPct, months }: Props) {
         <div className={`gf-alert-box ${receipt.ok ? 'is-ok' : 'is-err'}`} role="status" aria-live="polite">
           <span>{receipt.message}</span>
           {receipt.ok && receipt.orderId && (
-            <div style={{ marginTop: 6 }}>
-              <a href={receipt.trackingUrl} style={{ color: '#047857', fontWeight: 800, textDecoration: 'underline' }}>
-                Theo dõi đơn hàng #{receipt.orderId} →
+            <div style={{ marginTop: 6, display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+              <button
+                type="button"
+                onClick={() => openDrawer('oms')}
+                style={{ background: 'none', border: 0, padding: 0, color: '#047857', fontWeight: 800, textDecoration: 'underline', cursor: 'pointer' }}
+              >
+                Mở tra cứu OMS #{receipt.orderId} →
+              </button>
+              <a href={receipt.trackingUrl} style={{ color: '#047857', fontWeight: 700, textDecoration: 'underline' }}>
+                Trang theo dõi chi tiết
               </a>
             </div>
           )}

@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { formatVnd, useGearForgeStore } from '../../hooks/useGearForgeStore';
 import type { OmsOrder } from '../../types/gearforge';
+import { OmsRmaList, type RmaEntry } from './OmsRmaList';
 
 export function OmsWarrantyCard({ order }: { order: OmsOrder }) {
   const { boot } = useGearForgeStore();
@@ -12,12 +13,32 @@ export function OmsWarrantyCard({ order }: { order: OmsOrder }) {
   const [reason, setReason] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [rmaFeedback, setRmaFeedback] = useState<{ ok: boolean; text: string } | null>(null);
+  const [rmaHistory, setRmaHistory] = useState<RmaEntry[]>([]);
   const [showInvoice, setShowInvoice] = useState(false);
+
+  const loadRmaStatus = async (orderId: number) => {
+    if (!boot.user.loggedIn) {
+      setRmaHistory([]);
+      return;
+    }
+    try {
+      const res = await fetch(`${boot.restUrl}/rma-status/${orderId}`, {
+        credentials: 'same-origin',
+        headers: boot.restNonce ? { 'X-WP-Nonce': boot.restNonce } : undefined,
+      });
+      if (res.ok) {
+        const json = await res.json();
+        setRmaHistory(Array.isArray(json?.requests) ? (json.requests as RmaEntry[]) : []);
+      }
+    } catch { /* silent */ }
+  };
 
   useEffect(() => {
     setSerialNumber(firstSn);
     setRmaFeedback(null);
     setShowInvoice(false);
+    void loadRmaStatus(order.orderId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [order.orderId, firstSn]);
 
   const handleWarrantySubmit = async (e: FormEvent) => {
@@ -70,6 +91,7 @@ export function OmsWarrantyCard({ order }: { order: OmsOrder }) {
       if (res.ok) {
         setRmaFeedback({ ok: true, text: json?.message || 'Đã tiếp nhận yêu cầu bảo hành / đổi trả.' });
         setReason('');
+        void loadRmaStatus(order.orderId);
       } else {
         setRmaFeedback({
           ok: false,
@@ -188,6 +210,8 @@ export function OmsWarrantyCard({ order }: { order: OmsOrder }) {
           {rmaFeedback.text}
         </div>
       )}
+
+      <OmsRmaList entries={rmaHistory} />
     </>
   );
 }

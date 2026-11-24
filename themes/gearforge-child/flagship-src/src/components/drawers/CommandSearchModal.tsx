@@ -93,7 +93,21 @@ export function CommandSearchModal() {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 8 }}>
-            {matches.map((m) => (
+            {matches.length === 0 ? (
+              <div style={{ padding: 20, borderRadius: 8, background: '#F5F4F0', border: '1px solid #DFDEDC', textAlign: 'center', fontSize: 13.5, color: '#52525B' }}>
+                Không tìm thấy máy khớp &ldquo;{q}&rdquo;.{' '}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchOpen(false);
+                    navigateToPage('shop', { search: q.trim(), page: 1 });
+                  }}
+                  style={{ background: 'none', border: 0, color: '#D13639', fontWeight: 700, textDecoration: 'underline', cursor: 'pointer' }}
+                >
+                  Tìm toàn bộ trong Kho sản phẩm →
+                </button>
+              </div>
+            ) : matches.map((m) => (
               <button
                 key={m.id}
                 type="button"

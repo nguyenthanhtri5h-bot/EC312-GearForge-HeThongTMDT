@@ -19,8 +19,8 @@ const SHOWCASE_LINES: ShowcaseLine[] = [
   { id: 'apex-rtx-pc', categorySlug: 'pc-workstation', label: 'Apex RTX Custom Series', img: hw.riotP1ApexPc, platforms: ['win', 'gpu', 'ktx'] },
   { id: 'cipher-ultrabook', categorySlug: 'laptop-ultrabook', label: 'Cipher Evo Ultrabook', img: hw.riotP3Cipher, platforms: ['win', 'mac', 'ktx'] },
   { id: 'strike-gear', categorySlug: 'gear', label: 'Strike Pro Esports Gear', img: hw.riotP5Strike, platforms: ['win', 'mac'] },
-  { id: 'valkyrie-2', categorySlug: 'laptop-gaming', label: 'ROG Strix & Legion RTX', img: hw.laptopRogRgb, platforms: ['win', 'gpu'] },
-  { id: 'titan-2', categorySlug: 'pc-workstation', label: 'ĐHQG Dorm Mini-ITX', img: hw.campusBkCad, platforms: ['win', 'ktx'] },
+  { id: 'valkyrie-2', categorySlug: 'laptop-gaming', label: 'ROG Strix & Legion RTX', img: hw.riotP6RogLegion, platforms: ['win', 'gpu'] },
+  { id: 'titan-2', categorySlug: 'pc-workstation', label: 'ĐHQG Dorm Mini-ITX', img: hw.riotP7DormMini, platforms: ['win', 'ktx'] },
 ];
 
 function PlatformIcon({ kind }: { kind: 'win' | 'mac' | 'gpu' | 'ktx' }) {
@@ -57,7 +57,7 @@ function PlatformIcon({ kind }: { kind: 'win' | 'mac' | 'gpu' | 'ktx' }) {
 export function RiotProductsShowcase() {
   const { navigateToPage } = useGearForgeStore();
   const [paused, setPaused] = useState(false);
-  const [activeIdx, setActiveIdx] = useState(2);
+  const [activeIdx, setActiveIdx] = useState<number | null>(null);
 
   return (
     <section
@@ -65,7 +65,10 @@ export function RiotProductsShowcase() {
       className="gf-riot-sec gf-riot-topo gf-riot-showcase"
       aria-labelledby="riot-showcase-h"
       onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
+      onMouseLeave={() => {
+        setPaused(false);
+        setActiveIdx(null);
+      }}
     >
       <div className="gf-riot-wrap">
         <div className="gf-riot-head">
@@ -79,11 +82,14 @@ export function RiotProductsShowcase() {
         <div className={`gf-riot-games-track${paused ? ' is-paused' : ''}`}>
           {[...SHOWCASE_LINES, ...SHOWCASE_LINES].map((item, idx) => {
             const logicalIdx = idx % SHOWCASE_LINES.length;
+            const isClone = idx >= SHOWCASE_LINES.length;
             const isElevated = logicalIdx === activeIdx;
             return (
               <button
                 key={`${item.id}-${idx}`}
                 type="button"
+                tabIndex={isClone ? -1 : 0}
+                aria-hidden={isClone ? true : undefined}
                 className={`gf-riot-game-card${isElevated ? ' is-elevated' : ''}`}
                 onMouseEnter={() => setActiveIdx(logicalIdx)}
                 onClick={() => navigateToPage('shop', { category: item.categorySlug })}

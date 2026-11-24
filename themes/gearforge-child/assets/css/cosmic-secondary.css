@@ -25,25 +25,25 @@ body.gf-cosmic-secondary {
   --gf-warning-soft: #fffbeb;
   --gf-danger: #991b1b;
   --gf-danger-soft: #fef2f2;
-  --gf-font-display: 'Be Vietnam Pro', 'Inter', system-ui, -apple-system, sans-serif;
-  --gf-font-body: 'Inter', 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
+  --gf-font-display: 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
+  --gf-font-body: 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
   --gf-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
 
-  --theme-palette-color-1: #2563eb;
-  --theme-palette-color-2: #1d4ed8;
-  --theme-palette-color-3: #0f172a;
-  --theme-palette-color-4: #475569;
-  --theme-palette-color-5: #e2e8f0;
-  --theme-palette-color-6: #f1f5f9;
-  --theme-palette-color-7: #f8fafc;
+  --theme-palette-color-1: #D13639;
+  --theme-palette-color-2: #B91C1C;
+  --theme-palette-color-3: #0A0A0A;
+  --theme-palette-color-4: #52525B;
+  --theme-palette-color-5: #DFDEDC;
+  --theme-palette-color-6: #F5F4F0;
+  --theme-palette-color-7: #F1F0EC;
   --theme-palette-color-8: #ffffff;
   --theme-font-family: var(--gf-font-body);
   --theme-headings-font-family: var(--gf-font-display);
 
-  background: #f8fafc !important;
-  color: #0f172a !important;
+  background: #F1F0EC !important;
+  color: #0A0A0A !important;
   font-family: var(--gf-font-body) !important;
-  padding-top: 68px;
+  padding-top: 78px;
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -113,7 +113,7 @@ body.gf-cosmic-secondary a:hover {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
   z-index: 950;
-  font-family: 'Inter', 'Be Vietnam Pro', system-ui, sans-serif;
+  font-family: var(--gf-font-body);
 }
 
 body.admin-bar .gf-sec-hd {

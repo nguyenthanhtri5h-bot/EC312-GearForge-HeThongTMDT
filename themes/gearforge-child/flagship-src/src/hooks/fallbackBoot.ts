@@ -1,6 +1,6 @@
 import type { CartState, CompareItem, FilterParams, GearForgeBoot, GearForgeProduct, InstallmentCalcResult } from '../types/gearforge';
 
-const ASSET_ROOT = '/wp-content/themes/gearforge-child/assets/img';
+const ASSET_ROOT = '/wp-content/themes/gearforge-child/assets/flagship/vibe/hardware';
 
 export const FALLBACK_PRODUCTS: GearForgeProduct[] = [
   {
@@ -93,6 +93,22 @@ export const FALLBACK_PRODUCTS: GearForgeProduct[] = [
     stockQty: 18,
     monthly3m: Math.round((21800000 * 0.8) / 3),
   },
+  {
+    id: 107,
+    name: 'VGA ASUS Dual GeForce RTX 4070 SUPER OC 12GB GDDR6X',
+    slug: 'vga-asus-dual-rtx-4070-super',
+    permalink: '/product/vga-asus-dual-rtx-4070-super/',
+    price: 18990000,
+    regularPrice: 20490000,
+    salePrice: 18990000,
+    image: `${ASSET_ROOT}/pc-watercool.jpg`,
+    category: 'VGA',
+    categorySlug: 'vga',
+    specs: { cpu: 'PCIe 4.0 x16', ram: '12GB GDDR6X', gpu: 'RTX 4070 SUPER', storage: '2-Fan Axial', screen: '267mm Compact', weight: '1.1 kg' },
+    stockStatus: 'instock',
+    stockQty: 11,
+    monthly3m: Math.round((18990000 * 0.8) / 3),
+  },
 ];
 
 export function getInitialBoot(): GearForgeBoot {
@@ -145,13 +161,14 @@ export function filterLocalProducts(list: GearForgeProduct[], next: FilterParams
   const catAliases: Record<string, string[]> = {
     'laptop-gaming': ['laptop-gaming'],
     gaming: ['laptop-gaming'],
-    'laptop-ultrabook': ['laptop-van-phong', 'laptop-do-hoa'],
-    ultrabook: ['laptop-van-phong', 'laptop-do-hoa'],
-    'pc-workstation': ['pc-nguyen-bo', 'pc-gaming', 'pc-van-phong-do-hoa'],
-    workstation: ['pc-nguyen-bo', 'pc-gaming', 'pc-van-phong-do-hoa'],
-    gear: ['phu-kien', 'ban-phim-co', 'chuot-gaming', 'tai-nghe', 'ram-ssd', 'balo-de-tan-nhiet'],
+    'laptop-ultrabook': ['laptop-van-phong', 'laptop-do-hoa', 'laptop-sinh-vien'],
+    ultrabook: ['laptop-van-phong', 'laptop-do-hoa', 'laptop-sinh-vien'],
+    'pc-workstation': ['pc', 'pc-nguyen-bo', 'pc-gaming', 'pc-do-hoa', 'pc-van-phong', 'pc-van-phong-do-hoa'],
+    workstation: ['pc', 'pc-nguyen-bo', 'pc-gaming', 'pc-do-hoa', 'pc-van-phong', 'pc-van-phong-do-hoa'],
+    'linh-kien': ['linh-kien', 'cpu', 'ram', 'vga', 'ram-ssd'],
+    gear: ['gear', 'phu-kien', 'ban-phim', 'chuot', 'lot-chuot', 'ban-phim-co', 'chuot-gaming', 'tai-nghe', 'ram-ssd', 'balo-de-tan-nhiet'],
   };
-  return list.filter((p) => {
+  const filtered = list.filter((p) => {
     if (q && !`${p.name} ${p.specs.cpu || ''} ${p.specs.gpu || ''} ${p.specs.storage || ''}`.toLowerCase().includes(q)) return false;
     if (next.category) {
       const targets = catAliases[next.category] || [next.category];
@@ -162,6 +179,12 @@ export function filterLocalProducts(list: GearForgeProduct[], next: FilterParams
     if (next.gpu && !(p.specs.gpu || '').toLowerCase().includes(next.gpu.toLowerCase())) return false;
     if (next.storage && !(p.specs.storage || '').toLowerCase().includes(next.storage.toLowerCase())) return false;
     return p.price <= next.maxPrice;
+  });
+  return [...filtered].sort((a, b) => {
+    if (next.sort === 'price_asc') return a.price - b.price;
+    if (next.sort === 'price_desc') return b.price - a.price;
+    if (next.sort === 'newest') return b.id - a.id;
+    return 0;
   });
 }
 

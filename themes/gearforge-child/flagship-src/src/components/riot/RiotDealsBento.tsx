@@ -25,14 +25,17 @@ export function RiotDealsBento() {
 
   const shortName = heroDeal?.name ? heroDeal.name.split('(')[0].trim() : 'MSI Katana 15 RTX 4070';
 
+  const deal2Cat = (flashDeals[1]?.category || 'PC RTX').toUpperCase();
+  const deal3Cat = (flashDeals[2]?.category || 'ĐHQG').toUpperCase();
+
   const sideItems: NewsRowItem[] = [
     {
       id: 'deal-2',
-      tag: 'TIN TỨC · PC RTX',
+      tag: `TIN TỨC · ${deal2Cat}`,
       title: flashDeals[1]
         ? `${flashDeals[1].name.split('(')[0].trim()} · ${formatVnd(flashDeals[1].price)}`
         : 'Custom PC Nova RTX 4070 Super AI Build',
-      thumb: hw.riotNewsBooth,
+      thumb: hw.riotEcoAiBuilder,
       action: () =>
         flashDeals[1]
           ? setQuickViewProduct(flashDeals[1])
@@ -40,7 +43,7 @@ export function RiotDealsBento() {
     },
     {
       id: 'deal-3',
-      tag: 'TIN TỨC · ĐHQG',
+      tag: `TIN TỨC · ${deal3Cat}`,
       title: flashDeals[2]
         ? `${flashDeals[2].name.split('(')[0].trim()} · ${formatVnd(flashDeals[2].price)}`
         : 'Ultrabook Dev Linux Pin 14h Cho Sinh Viên IT',
@@ -54,14 +57,14 @@ export function RiotDealsBento() {
       id: 'sv-0',
       tag: 'TIN TỨC · TÀI CHÍNH',
       title: 'Duyệt Trả Góp 0% Qua Email .edu.vn Trong 2 Giờ',
-      thumb: hw.campusBkCad,
+      thumb: hw.riotNewsInstallment,
       action: () => openDrawer('installment'),
     },
     {
       id: 'oms-check',
       tag: 'TIN TỨC · BẢO HÀNH',
       title: 'Tra Cứu Serial Chính Hãng & Hóa Đơn VAT ĐHQG',
-      thumb: hw.galleryEsportsDesk,
+      thumb: hw.riotNewsOmsSerial,
       action: () => openDrawer('oms'),
     },
   ];

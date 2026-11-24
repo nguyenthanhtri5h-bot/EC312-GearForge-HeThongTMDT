@@ -6,12 +6,14 @@ import { OmsPipelineSimulator } from './ecosystem/OmsPipelineSimulator';
 import { StudentBuildEstimator } from './ecosystem/StudentBuildEstimator';
 import './ecosystem/ecosystem.css';
 
+const hw = VIBE_PORTFOLIO_CARDS.hardware;
+
 const INFRA_MODULES = [
-  { id: 'catalog', title: 'Lọc Máy Theo Ngành Học', tag: 'CPU · RAM · GPU · SSD', desc: 'Chọn nhanh cấu hình phù hợp từng chuyên ngành CNTT, AI, Đồ họa hay Văn phòng trong vài giây.' },
-  { id: 'installment', title: 'Trả Góp 0% .edu.vn', tag: 'Kỳ hạn 3–6–12 tháng', desc: 'Chỉ cần email sinh viên ĐHQG-HCM & thẻ SV, không phí hồ sơ kỳ hạn 3 tháng, không giữ giấy tờ gốc.' },
-  { id: 'security', title: 'Bảo Mật Thông Tin Cá Nhân', tag: 'An toàn tuyệt đối', desc: 'Hình ảnh CCCD & Thẻ sinh viên được mã hóa bảo mật riêng tư, chỉ dùng để duyệt hồ sơ trả góp.' },
-  { id: 'serial', title: 'Bảo Hành Theo Số Serial', tag: 'Tra cứu trực tuyến', desc: 'Mỗi thiết bị đều có mã định danh Serial chính hãng, hỗ trợ gửi bảo hành hoặc đổi trả nhanh chóng.' },
-  { id: 'delivery', title: 'Hóa Đơn VAT & Giao KTX 2h', tag: 'Khu A / Khu B', desc: 'Xuất hóa đơn điện tử hợp lệ & kỹ thuật viên cài đặt sẵn phần mềm môn học tận phòng ký túc xá.' },
+  { id: 'catalog', title: 'Lọc Máy Theo Ngành Học', tag: 'CPU · RAM · GPU · SSD', img: hw.riotEcoAiBuilder, desc: 'Chọn nhanh cấu hình phù hợp từng chuyên ngành CNTT, AI, Đồ họa hay Văn phòng trong vài giây.' },
+  { id: 'installment', title: 'Trả Góp 0% .edu.vn', tag: 'Kỳ hạn 3–6–12 tháng', img: hw.riotNewsInstallment, desc: 'Chỉ cần email sinh viên ĐHQG-HCM & thẻ SV, không phí hồ sơ kỳ hạn 3 tháng, không giữ giấy tờ gốc.' },
+  { id: 'security', title: 'Bảo Mật Thông Tin Cá Nhân', tag: 'An toàn tuyệt đối', img: hw.riotNewsOmsSerial, desc: 'Hình ảnh CCCD & Thẻ sinh viên được mã hóa bảo mật riêng tư, chỉ dùng để duyệt hồ sơ trả góp.' },
+  { id: 'serial', title: 'Bảo Hành Theo Số Serial', tag: 'Tra cứu trực tuyến', img: hw.riotEcoStressLab, desc: 'Mỗi thiết bị đều có mã định danh Serial chính hãng, hỗ trợ gửi bảo hành hoặc đổi trả nhanh chóng.' },
+  { id: 'delivery', title: 'Hóa Đơn VAT & Giao KTX 2h', tag: 'Khu A / Khu B', img: hw.riotNewsLead, desc: 'Xuất hóa đơn điện tử hợp lệ & kỹ thuật viên cài đặt sẵn phần mềm môn học tận phòng ký túc xá.' },
 ];
 
 export function EcosystemPageView() {
@@ -85,14 +87,14 @@ export function EcosystemPageView() {
           <div className="gf-live-card">
             <div>
               <span className="gf-live-badge"><i /> {current.tag}</span>
-              <h2 style={{ margin: '12px 0 8px', fontFamily: "'Be Vietnam Pro', sans-serif", fontSize: 22, fontWeight: 800, color: '#fff' }}>
+              <h2 style={{ margin: '12px 0 8px', fontFamily: "var(--gf-font-display, 'Be Vietnam Pro', sans-serif)", fontSize: 22, fontWeight: 700, color: '#fff' }}>
                 {current.title}
               </h2>
               <p style={{ margin: 0, fontSize: 14, color: '#D4D4D8', lineHeight: 1.55 }}>{current.desc}</p>
             </div>
             <img
-              src={VIBE_PORTFOLIO_CARDS.hardware.riotNewsBooth}
-              alt="Hệ sinh thái Chọn Máy & Bảo Hành GearForge"
+              src={current.img}
+              alt={current.title}
               style={{ width: 170, height: 128, objectFit: 'cover', borderRadius: 10 }}
             />
           </div>

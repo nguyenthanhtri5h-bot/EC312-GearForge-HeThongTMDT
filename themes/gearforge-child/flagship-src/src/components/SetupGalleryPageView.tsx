@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { VIBE_PORTFOLIO_CARDS, VIBE_VIDEOS } from '../data/vibeAssets';
-import { useHoloTilt } from '../hooks/useHoloTilt';
 import { useGearForgeStore } from '../hooks/useGearForgeStore';
 import './ecosystem/ecosystem.css';
 
@@ -36,7 +35,6 @@ const KPIS = [
 
 export function SetupGalleryPageView() {
   const { navigateToPage } = useGearForgeStore();
-  const { handleMouseMove, handleMouseLeave, tiltStyle } = useHoloTilt(4.5);
   const [filterTag, setFilterTag] = useState('Tất cả');
   const [query, setQuery] = useState('');
 
@@ -77,10 +75,10 @@ export function SetupGalleryPageView() {
           <h1 className="tc-h1" style={{ color: '#fff', fontSize: 'clamp(28px, 3.5vw, 44px)' }}>
             Góc Máy Thực Tế Đã Bàn Giao Cho <span className="tc-dan">Sinh Viên ĐHQG</span>
           </h1>
-          <div className="gf-kpi-strip">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 16, marginTop: 22, padding: '14px 0', borderTop: '1px solid rgba(255,255,255,0.12)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>
             {KPIS.map((k) => (
-              <div key={k.l} className="gf-kpi-tile" style={{ background: '#1F1F1F', borderColor: 'rgba(255,255,255,0.12)', color: '#D4D4D8' }}>
-                <strong style={{ color: '#ffffff' }}>{k.v}</strong>
+              <div key={k.l} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <strong style={{ color: '#FFFFFF', fontSize: 20, fontWeight: 700 }}>{k.v}</strong>
                 <span style={{ fontSize: 12.5, color: '#A1A1AA' }}>{k.l}</span>
               </div>
             ))}
@@ -123,14 +121,12 @@ export function SetupGalleryPageView() {
               </button>
             </div>
           ) : (
-            <div className="gf-cat-grid">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))', gap: 18 }}>
               {visible.map((s) => (
                 <article
                   key={s.id}
-                  className="gf-chrome-card gf-holo-card"
-                  style={{ ...tiltStyle, background: '#1F1F1F', borderColor: 'rgba(255,255,255,0.1)', color: '#F4F4F5' }}
-                  onMouseMove={handleMouseMove}
-                  onMouseLeave={handleMouseLeave}
+                  className="gf-chrome-card"
+                  style={{ background: '#1F1F1F', borderColor: 'rgba(255,255,255,0.1)', color: '#F4F4F5', borderRadius: 10 }}
                 >
                   <div style={{ position: 'relative' }}>
                     <img src={s.img} alt={s.title} style={{ width: '100%', aspectRatio: '16/10', objectFit: 'cover', display: 'block' }} />
