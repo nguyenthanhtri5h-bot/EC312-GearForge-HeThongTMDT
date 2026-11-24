@@ -20,6 +20,31 @@ class GF_Invoice_PDF {
     public static function init(): void {
         add_action('admin_post_gf_download_invoice_pdf', [self::class, 'handle_download_request']);
         add_action('wpo_wcpdf_after_item_meta', [self::class, 'inject_serial_into_wpo_pdf'], 10, 3);
+        add_filter('woocommerce_my_account_my_orders_actions', [self::class, 'add_my_account_invoice_action'], 10, 2);
+    }
+
+    /**
+     * Build a nonce-protected invoice download URL for an authorized order owner or operator.
+     */
+    public static function get_download_url(int $order_id): string {
+        return wp_nonce_url(
+            admin_url("admin-post.php?action=gf_download_invoice_pdf&order_id={$order_id}"),
+            "gf_pdf_{$order_id}"
+        );
+    }
+
+    /**
+     * Expose a "Hóa đơn PDF" button in WooCommerce My Account -> Orders without editing theme files.
+     */
+    public static function add_my_account_invoice_action(array $actions, $order): array {
+        if (!$order || in_array($order->get_status(), ['cancelled', 'failed'], true)) {
+            return $actions;
+        }
+        $actions['gf_invoice_pdf'] = [
+            'url'  => self::get_download_url((int) $order->get_id()),
+            'name' => 'Hóa đơn PDF',
+        ];
+        return $actions;
     }
 
     /**
@@ -121,21 +146,35 @@ class GF_Invoice_PDF {
     }
 
     private static function render_minimal_pdf(array $lines): string {
-        $stream_ops = ["BT", "/F1 11 Tf", "50 760 Td", "16 TL"];
-        foreach ($lines as $idx => $line) {
-            $escaped = str_replace(['\\', '(', ')'], ['\\\\', '\\(', '\\)'], $line);
-            $stream_ops[] = ($idx === 0 ? "({$escaped}) Tj" : "T* ({$escaped}) Tj");
-        }
-        $stream_ops[] = "ET";
-        $stream       = implode("\n", $stream_ops);
+        $chunks   = array_chunk($lines, 42) ?: [[]];
+        $page_ids = [];
+        $objects  = [];
 
-        $objects = [
-            1 => "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n",
-            2 => "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n",
-            3 => "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>\nendobj\n",
-            4 => "4 0 obj\n<< /Length " . strlen($stream) . " >>\nstream\n{$stream}\nendstream\nendobj\n",
-            5 => "5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>\nendobj\n",
-        ];
+        $objects[1] = ''; // Placeholder for Catalog
+        $objects[2] = ''; // Placeholder for Pages
+        $objects[3] = "3 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>\nendobj\n";
+
+        $next_id = 4;
+        foreach ($chunks as $page_lines) {
+            $page_id    = $next_id++;
+            $content_id = $next_id++;
+            $page_ids[] = $page_id . ' 0 R';
+
+            $stream_ops = ["BT", "/F1 11 Tf", "50 780 Td", "16 TL"];
+            foreach ($page_lines as $idx => $line) {
+                $escaped      = str_replace(['\\', '(', ')'], ['\\\\', '\\(', '\\)'], $line);
+                $stream_ops[] = ($idx === 0 ? "({$escaped}) Tj" : "T* ({$escaped}) Tj");
+            }
+            $stream_ops[] = "ET";
+            $stream       = implode("\n", $stream_ops);
+
+            $objects[$page_id]    = "{$page_id} 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents {$content_id} 0 R /Resources << /Font << /F1 3 0 R >> >> >>\nendobj\n";
+            $objects[$content_id] = "{$content_id} 0 obj\n<< /Length " . strlen($stream) . " >>\nstream\n{$stream}\nendstream\nendobj\n";
+        }
+
+        $objects[1] = "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n";
+        $objects[2] = "2 0 obj\n<< /Type /Pages /Kids [" . implode(' ', $page_ids) . "] /Count " . count($page_ids) . " >>\nendobj\n";
+        ksort($objects);
 
         $pdf     = "%PDF-1.4\n";
         $offsets = [0];

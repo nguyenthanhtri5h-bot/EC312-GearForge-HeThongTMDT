@@ -26,11 +26,13 @@
 * **REST API Endpoints phục vụ Frontend (Role 3) & Kiểm thử (Role 2):**
   * `GET /wp-json/gearforge/v1/installment-calc?price=...&down_pct=...&months=...` — Tính trả trước, gốc vay, lãi và tiền góp hàng tháng.
   * `POST /wp-json/gearforge/v1/installment-apply` — Nộp hồ sơ trả góp sinh viên kèm upload 2 ảnh CCCD/Thẻ SV mã hóa AES-256-CBC *(yêu cầu đăng nhập đúng chủ đơn)*.
-  * `GET /wp-json/gearforge/v1/oms-status/{order_id}` — Tra cứu trạng thái đơn hàng + hồ sơ trả góp + Serial Number *(yêu cầu đăng nhập đúng chủ đơn hoặc Admin/Reviewer)*.
+  * `POST /wp-json/gearforge/v1/payment-sandbox/session` — Khởi tạo URL thanh toán Sandbox 3D-Secure ký HMAC-SHA256 (TTL 15 phút) cho khoản trả trước (`APPROVED_WAITING_DOWNPAYMENT`) hoặc trả thẳng.
+  * `GET /wp-json/gearforge/v1/oms-status/{order_id}` — Tra cứu trạng thái đơn hàng + hồ sơ trả góp + Serial Number + `invoice_download_url` *(yêu cầu đăng nhập đúng chủ đơn hoặc Admin/Reviewer)*.
   * `POST /wp-json/gearforge/v1/payment-sandbox/ipn` — Nhận Webhook IPN xác thực chữ ký HMAC-SHA256.
   * `GET /wp-json/gearforge/v1/payment-sandbox/query/{order_id}` — Đối soát chủ động `QueryDR` chống thanh toán trùng khi rớt mạng.
   * `POST /wp-json/gearforge/v1/rma-request` — Gửi yêu cầu Đổi trả / Bảo hành (RMA) gắn `serial_number` và kiểm tra hạn 15 ngày.
   * `GET /wp-json/gearforge/v1/rma-status/{order_id}` — Tra cứu danh sách và trạng thái yêu cầu RMA của đơn hàng *(có chống IDOR)*.
+* **Kiểm thử hồi quy CLI (`plugins/gearforge-core/tests/verify-role4.php`):** Chạy qua Docker `docker exec gearforge_wp php /var/www/html/wp-content/plugins/gearforge-core/tests/verify-role4.php` (24 assertions E2E).
 
 ---
 

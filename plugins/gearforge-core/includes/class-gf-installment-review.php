@@ -151,8 +151,8 @@ class GF_Installment_Review {
         }
 
         $edu_email = sanitize_email($data['student_edu_email'] ?? '');
-        if (!preg_match('/\.edu(\.vn)?$/i', $edu_email)) {
-            return new WP_Error('gf_invalid_edu_email', 'Email sinh viên phải có đuôi .edu.vn hoặc .edu.');
+        if ($edu_email === '' || !is_email($edu_email) || !preg_match('/\.edu(\.vn)?$/i', $edu_email)) {
+            return new WP_Error('gf_invalid_edu_email', 'Email sinh viên phải hợp lệ và có đuôi .edu.vn hoặc .edu.');
         }
 
         $cccd_number = preg_replace('/\D/', '', (string) ($data['cccd_number'] ?? ''));
@@ -172,6 +172,7 @@ class GF_Installment_Review {
 
         $card_path = GF_Vault_Crypto::encrypt_and_store_upload($student_card_file);
         if (is_wp_error($card_path)) {
+            GF_Vault_Crypto::delete_stored_file($cccd_path);
             return $card_path;
         }
 
@@ -197,6 +198,8 @@ class GF_Installment_Review {
         );
 
         if ($inserted === false) {
+            GF_Vault_Crypto::delete_stored_file($cccd_path);
+            GF_Vault_Crypto::delete_stored_file($card_path);
             return new WP_Error('gf_db_insert_failed', 'Không thể lưu hồ sơ trả góp vào cơ sở dữ liệu.');
         }
 
@@ -261,15 +264,15 @@ class GF_Installment_Review {
             }
 
             if ($blacklist && !empty($app['cccd_hash'])) {
-                $bl_res = $wpdb->replace(
-                    "{$wpdb->prefix}gf_fraud_blacklist",
-                    [
-                        'target_type'  => 'CCCD_HASH',
-                        'target_value' => $app['cccd_hash'],
-                        'reason'       => $clean_reason,
-                        'created_by'   => $reviewer_id,
-                    ],
-                    ['%s', '%s', '%s', '%d']
+                $bl_res = $wpdb->query(
+                    $wpdb->prepare(
+                        "INSERT INTO {$wpdb->prefix}gf_fraud_blacklist (target_type, target_value, reason, created_by)
+                         VALUES ('CCCD_HASH', %s, %s, %d)
+                         ON DUPLICATE KEY UPDATE reason = VALUES(reason), created_by = VALUES(created_by), blocked_until = NULL",
+                        $app['cccd_hash'],
+                        $clean_reason,
+                        $reviewer_id
+                    )
                 );
                 if ($bl_res === false) {
                     throw new RuntimeException('Ghi danh sách đen thất bại.');
@@ -328,6 +331,10 @@ class GF_Installment_Review {
      */
     private static function atomic_transition(int $app_id, string $expected_status, string $next_status, int $reviewer_id, string $timestamp_col) {
         global $wpdb;
+
+        if (!in_array($timestamp_col, ['l1_verified_at', 'l2_verified_at'], true)) {
+            return new WP_Error('gf_invalid_column', 'Cột thời gian duyệt không hợp lệ.');
+        }
 
         $table = "{$wpdb->prefix}gf_installment_applications";
         $now   = current_time('mysql');

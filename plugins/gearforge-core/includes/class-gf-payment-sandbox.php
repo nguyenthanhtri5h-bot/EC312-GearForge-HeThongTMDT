@@ -24,6 +24,17 @@ class GF_Payment_Sandbox {
     }
 
     public static function register_routes(): void {
+        register_rest_route('gearforge/v1', '/payment-sandbox/session', [
+            'methods'             => WP_REST_Server::CREATABLE,
+            'callback'            => [self::class, 'handle_create_session_rest'],
+            'permission_callback' => [self::class, 'check_order_access_permission'],
+            'args'                => [
+                'order_id' => ['required' => true, 'type' => 'integer'],
+                'provider' => ['required' => false, 'type' => 'string', 'default' => 'vnpay'],
+                'mode'     => ['required' => false, 'type' => 'string', 'default' => 'downpayment'],
+            ],
+        ]);
+
         register_rest_route('gearforge/v1', '/payment-sandbox/ipn', [
             'methods'             => WP_REST_Server::CREATABLE,
             'callback'            => [self::class, 'handle_ipn_callback'],
@@ -41,6 +52,40 @@ class GF_Payment_Sandbox {
             'callback'            => [self::class, 'handle_oms_status_request'],
             'permission_callback' => [self::class, 'check_order_access_permission'],
         ]);
+    }
+
+    /**
+     * REST callback for POST /wp-json/gearforge/v1/payment-sandbox/session.
+     * Issues a time-limited, HMAC-signed Sandbox 3D-Secure URL for Frontend Checkout/OMS.
+     */
+    public static function handle_create_session_rest(WP_REST_Request $request) {
+        $order_id = (int) $request->get_param('order_id');
+        $provider = sanitize_key((string) ($request->get_param('provider') ?: 'vnpay'));
+        $mode     = sanitize_key((string) ($request->get_param('mode') ?: 'downpayment'));
+
+        $checkout_url = self::create_sandbox_payment_session($order_id, $provider, $mode);
+        if (is_wp_error($checkout_url)) {
+            $status = $checkout_url->get_error_code() === 'gf_already_paid' ? 409 : 400;
+            return new WP_REST_Response(
+                ['code' => $checkout_url->get_error_code(), 'message' => $checkout_url->get_error_message()],
+                $status
+            );
+        }
+
+        $amount = self::resolve_payable_amount($order_id, $mode);
+
+        return new WP_REST_Response(
+            [
+                'order_id'        => $order_id,
+                'provider'        => $provider,
+                'mode'            => $mode,
+                'amount'          => is_wp_error($amount) ? 0 : (int) $amount,
+                'idempotency_key' => "GF_{$order_id}_{$mode}",
+                'expires_in'      => self::SESSION_TTL_SEC,
+                'checkout_url'    => $checkout_url,
+            ],
+            201
+        );
     }
 
     public static function check_order_access_permission(WP_REST_Request $request): bool {
@@ -73,12 +118,27 @@ class GF_Payment_Sandbox {
      */
     public static function create_sandbox_payment_session(int $order_id, string $provider = 'vnpay', string $mode = 'downpayment') {
         $provider = strtolower($provider);
+        $mode     = strtolower($mode);
         if (!in_array($provider, self::SUPPORTED_GATEWAY, true)) {
             return new WP_Error('gf_unsupported_gateway', 'Cổng thanh toán Sandbox chỉ hỗ trợ vnpay, momo hoặc fundiin.');
         }
 
+        if (!in_array($mode, ['downpayment', 'full'], true)) {
+            return new WP_Error('gf_invalid_payment_mode', 'Chế độ thanh toán chỉ hỗ trợ downpayment hoặc full.');
+        }
+
         if (self::is_order_already_paid($order_id)) {
             return new WP_Error('gf_already_paid', 'Đơn hàng này đã thanh toán thành công, không thể tạo phiên thanh toán lần 2.');
+        }
+
+        if ($mode === 'downpayment') {
+            $app = class_exists('GF_Installment_Review') ? GF_Installment_Review::get_application_by_order($order_id) : null;
+            if (!$app) {
+                return new WP_Error('gf_app_not_found', 'Không tìm thấy hồ sơ trả góp gắn với đơn hàng.');
+            }
+            if ($app['status'] !== 'APPROVED_WAITING_DOWNPAYMENT') {
+                return new WP_Error('gf_app_not_approved', 'Hồ sơ trả góp chưa được duyệt qua 2 lớp để thanh toán tiền cọc.');
+            }
         }
 
         $amount = self::resolve_payable_amount($order_id, $mode);
@@ -203,15 +263,19 @@ class GF_Payment_Sandbox {
             return new WP_REST_Response(['code' => 'gf_order_not_found', 'message' => 'Không tìm thấy đơn hàng.'], 404);
         }
 
-        $app     = class_exists('GF_Installment_Review') ? GF_Installment_Review::get_application_by_order($order_id) : null;
-        $txn_ref = (string) $order->get_meta('_gf_transaction_ref');
-        $is_paid = self::is_order_already_paid($order_id);
+        $app        = class_exists('GF_Installment_Review') ? GF_Installment_Review::get_application_by_order($order_id) : null;
+        $txn_ref    = (string) $order->get_meta('_gf_transaction_ref');
+        $saved_mode = (string) $order->get_meta('_gf_payment_mode');
+        $mode       = $saved_mode !== ''
+            ? $saved_mode
+            : (($app && !in_array($app['status'], ['REJECTED', 'BLACKLISTED'], true)) ? 'downpayment' : 'full');
+        $is_paid    = self::is_order_already_paid($order_id);
 
         return rest_ensure_response([
             'order_id'           => $order_id,
             'payment_state'      => $is_paid ? 'PAID' : 'PENDING',
             'can_retry_payment'  => !$is_paid,
-            'idempotency_key'    => 'GF_' . $order_id . '_' . ($app ? 'downpayment' : 'full'),
+            'idempotency_key'    => 'GF_' . $order_id . '_' . $mode,
             'transaction_ref'    => $txn_ref ?: null,
             'provider'           => $order->get_meta('_gf_payment_provider') ?: null,
             'paid_amount'        => $is_paid ? (int) $order->get_meta('_gf_paid_amount') : 0,
@@ -234,13 +298,15 @@ class GF_Payment_Sandbox {
         $serials = $wpdb->get_col(
             $wpdb->prepare("SELECT serial_number FROM {$wpdb->prefix}gf_order_serials WHERE order_id = %d", $order_id)
         );
+        $can_invoice = !in_array($order->get_status(), ['cancelled', 'failed'], true) && class_exists('GF_Invoice_PDF');
 
         return rest_ensure_response([
-            'order_id'           => $order_id,
-            'order_status'       => $order->get_status(),
-            'installment_status' => $app ? $app['status'] : null,
-            'transaction_ref'    => $order->get_meta('_gf_transaction_ref') ?: null,
-            'serial_numbers'     => $serials ?: [],
+            'order_id'             => $order_id,
+            'order_status'         => $order->get_status(),
+            'installment_status'   => $app ? $app['status'] : null,
+            'transaction_ref'      => $order->get_meta('_gf_transaction_ref') ?: null,
+            'serial_numbers'       => $serials ?: [],
+            'invoice_download_url' => $can_invoice ? GF_Invoice_PDF::get_download_url($order_id) : null,
         ]);
     }
 
@@ -251,6 +317,12 @@ class GF_Payment_Sandbox {
      */
     public static function finalize_verified_payment(int $order_id, int $amount, string $provider, string $mode, string $txn_ref) {
         global $wpdb;
+
+        $provider = strtolower($provider);
+        $mode     = strtolower($mode);
+        if (!in_array($provider, self::SUPPORTED_GATEWAY, true) || !in_array($mode, ['downpayment', 'full'], true)) {
+            return new WP_Error('gf_invalid_payment_params', 'Thông tin cổng thanh toán hoặc chế độ không hợp lệ.');
+        }
 
         $lock_name = "gf_pay_{$order_id}";
         $locked    = (int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 5)', $lock_name));
@@ -267,6 +339,14 @@ class GF_Payment_Sandbox {
             $existing_txn = (string) $order->get_meta('_gf_transaction_ref');
             if ($existing_txn !== '' || $order->is_paid()) {
                 return new WP_Error('gf_already_paid', 'Đơn hàng đã được ghi nhận thanh toán trước đó (Idempotency guard).');
+            }
+
+            $expected_amount = self::resolve_payable_amount($order_id, $mode);
+            if (is_wp_error($expected_amount)) {
+                return $expected_amount;
+            }
+            if ($amount !== (int) $expected_amount) {
+                return new WP_Error('gf_amount_mismatch', 'Số tiền thanh toán không khớp với giá trị đơn hàng / khoản trả trước.');
             }
 
             if ($mode === 'downpayment') {
@@ -290,6 +370,7 @@ class GF_Payment_Sandbox {
 
             $order->update_meta_data('_gf_transaction_ref', $txn_ref);
             $order->update_meta_data('_gf_payment_provider', strtoupper($provider));
+            $order->update_meta_data('_gf_payment_mode', $mode);
             $order->update_meta_data('_gf_paid_amount', $amount);
             $order->payment_complete($txn_ref);
             $order->add_order_note(sprintf('GearForge Sandbox (%s): Đã nhận %s VNĐ. Mã GD: %s', strtoupper($provider), number_format($amount), $txn_ref));
@@ -344,9 +425,9 @@ class GF_Payment_Sandbox {
     private static function get_hmac_secret(): string {
         $key = getenv('GF_VAULT_ENCRYPTION_KEY');
         if (!$key || $key === 'replace_with_32_byte_hex_key_in_env') {
-            return wp_salt('auth');
+            $key = wp_salt('auth');
         }
-        return $key;
+        return hash_hmac('sha256', 'gf_sandbox_hmac_v1', $key, true);
     }
 }
 

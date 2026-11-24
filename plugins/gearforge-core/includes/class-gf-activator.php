@@ -192,8 +192,9 @@ class GF_Activator {
         }
 
         $htaccess = rtrim($vault_dir, '/\\') . '/.htaccess';
-        if (is_dir($vault_dir) && !file_exists($htaccess)) {
-            file_put_contents($htaccess, "Order deny,allow\nDeny from all\n");
+        $rules    = "<IfModule mod_authz_core.c>\n    Require all denied\n</IfModule>\n<IfModule !mod_authz_core.c>\n    Order deny,allow\n    Deny from all\n</IfModule>\n";
+        if (is_dir($vault_dir) && (!file_exists($htaccess) || strpos((string) @file_get_contents($htaccess), 'Require all denied') === false)) {
+            file_put_contents($htaccess, $rules);
         }
     }
 }

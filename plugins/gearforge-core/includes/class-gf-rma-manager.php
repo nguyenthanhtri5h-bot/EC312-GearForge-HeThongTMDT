@@ -167,11 +167,11 @@ class GF_RMA_Manager {
         }
 
         if (in_array($clean_type, ['RETURN', 'EXCHANGE'], true)) {
-            $ref_date = $order->get_date_completed() ?: $order->get_date_created();
-            if ($ref_date && (time() - $ref_date->getTimestamp()) > (self::RETURN_WINDOW_DAYS * DAY_IN_SECONDS)) {
+            $completed_date = $order->get_date_completed();
+            if ($completed_date && (time() - $completed_date->getTimestamp()) > (self::RETURN_WINDOW_DAYS * DAY_IN_SECONDS)) {
                 return new WP_Error(
                     'gf_return_window_expired',
-                    sprintf('Đã quá thời hạn %d ngày hỗ trợ đổi/trả hàng cho đơn #%d.', self::RETURN_WINDOW_DAYS, $order_id)
+                    sprintf('Đã quá thời hạn %d ngày kể từ khi giao hoàn tất cho đơn #%d.', self::RETURN_WINDOW_DAYS, $order_id)
                 );
             }
         }
@@ -181,7 +181,18 @@ class GF_RMA_Manager {
             return new WP_Error('gf_reason_too_short', 'Vui lòng mô tả lý do đổi trả tối thiểu 5 ký tự.');
         }
 
-        $clean_serial = strtoupper(sanitize_text_field($serial_number));
+        $clean_serial      = strtoupper(sanitize_text_field($serial_number));
+        $order_has_serials = (int) $wpdb->get_var(
+            $wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}gf_order_serials WHERE order_id = %d", $order_id)
+        ) > 0;
+
+        if ($clean_serial === '' && $order_has_serials) {
+            return new WP_Error(
+                'gf_serial_required',
+                sprintf('Đơn hàng #%d có gắn Serial Number, vui lòng chọn đúng mã S/N cần đổi trả / bảo hành.', $order_id)
+            );
+        }
+
         if ($clean_serial !== '') {
             $owned = $wpdb->get_var(
                 $wpdb->prepare(
@@ -275,87 +286,105 @@ class GF_RMA_Manager {
         global $wpdb;
         self::ensure_table();
 
-        $rma = self::get_request($rma_id);
-        if (!$rma) {
+        $initial_rma = self::get_request($rma_id);
+        if (!$initial_rma) {
             return new WP_Error('gf_rma_not_found', 'Không tìm thấy yêu cầu đổi trả.');
         }
 
-        $order_id         = (int) $rma['order_id'];
+        $order_id         = (int) $initial_rma['order_id'];
         $clean_note       = sanitize_textarea_field($admin_note);
         $released_serials = [];
         $remaining_count  = 0;
+        $rma_type         = '';
 
-        $wpdb->query('START TRANSACTION');
+        // Advisory lock per order prevents REPEATABLE READ snapshot races when 2 RMAs complete concurrently
+        $lock_name = "gf_rma_order_{$order_id}";
+        $locked    = (int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 5)', $lock_name));
+        if ($locked !== 1) {
+            return new WP_Error('gf_rma_lock_busy', 'Hệ thống đang xử lý RMA khác cho đơn hàng này, vui lòng thử lại.');
+        }
+
         try {
-            $now      = current_time('mysql');
-            $affected = $wpdb->query(
-                $wpdb->prepare(
-                    "UPDATE {$wpdb->prefix}gf_rma_requests
-                     SET status = 'COMPLETED', reviewed_by = %d, reviewed_at = %s, admin_note = %s
-                     WHERE rma_id = %d AND status = 'APPROVED'",
-                    $reviewer_id,
-                    $now,
-                    $clean_note,
-                    $rma_id
-                )
-            );
-
-            if ($affected !== 1) {
-                throw new RuntimeException(
-                    sprintf('Không thể hoàn tất: RMA #%d hiện đang ở trạng thái %s (yêu cầu APPROVED).', $rma_id, $rma['status'])
-                );
-            }
-
-            if ($rma['request_type'] === 'RETURN') {
-                $serial_table = "{$wpdb->prefix}gf_order_serials";
-                if (!empty($rma['serial_number'])) {
-                    $deleted = $wpdb->delete($serial_table, ['order_id' => $order_id, 'serial_number' => $rma['serial_number']], ['%d', '%s']);
-                    if ($deleted) {
-                        $released_serials[] = $rma['serial_number'];
-                    }
-                } else {
-                    $existing_serials = $wpdb->get_col(
-                        $wpdb->prepare("SELECT serial_number FROM {$serial_table} WHERE order_id = %d", $order_id)
-                    ) ?: [];
-                    if (!empty($existing_serials)) {
-                        $wpdb->delete($serial_table, ['order_id' => $order_id], ['%d']);
-                        $released_serials = $existing_serials;
-                    }
+            $wpdb->query('START TRANSACTION');
+            try {
+                $rma = self::get_request($rma_id);
+                if (!$rma) {
+                    throw new RuntimeException('Không tìm thấy yêu cầu đổi trả.');
                 }
+                $rma_type = (string) $rma['request_type'];
 
-                $remaining_count = (int) $wpdb->get_var(
-                    $wpdb->prepare("SELECT COUNT(*) FROM {$serial_table} WHERE order_id = %d", $order_id)
+                $now      = current_time('mysql');
+                $affected = $wpdb->query(
+                    $wpdb->prepare(
+                        "UPDATE {$wpdb->prefix}gf_rma_requests
+                         SET status = 'COMPLETED', reviewed_by = %d, reviewed_at = %s, admin_note = %s
+                         WHERE rma_id = %d AND status = 'APPROVED'",
+                        $reviewer_id,
+                        $now,
+                        $clean_note,
+                        $rma_id
+                    )
                 );
 
-                // Close active installment application if full order is returned
-                if ($remaining_count === 0) {
-                    $wpdb->query(
-                        $wpdb->prepare(
-                            "UPDATE {$wpdb->prefix}gf_installment_applications
-                             SET status = 'CLOSED', reject_reason = %s
-                             WHERE order_id = %d AND status IN ('SUBMITTED', 'L1_DOCS_VERIFIED', 'APPROVED_WAITING_DOWNPAYMENT', 'ACTIVE_INSTALLMENT')",
-                            'Đóng hồ sơ do hoàn tất trả hàng RMA #' . $rma_id,
-                            $order_id
-                        )
+                if ($affected !== 1) {
+                    throw new RuntimeException(
+                        sprintf('Không thể hoàn tất: RMA #%d hiện đang ở trạng thái %s (yêu cầu APPROVED).', $rma_id, $rma['status'])
                     );
                 }
-            }
 
-            $wpdb->query('COMMIT');
-        } catch (Throwable $e) {
-            $wpdb->query('ROLLBACK');
-            return new WP_Error('gf_rma_tx_failed', $e->getMessage());
+                if ($rma_type === 'RETURN') {
+                    $serial_table = "{$wpdb->prefix}gf_order_serials";
+                    if (!empty($rma['serial_number'])) {
+                        $deleted = $wpdb->delete($serial_table, ['order_id' => $order_id, 'serial_number' => $rma['serial_number']], ['%d', '%s']);
+                        if ($deleted) {
+                            $released_serials[] = $rma['serial_number'];
+                        }
+                    } else {
+                        $existing_serials = $wpdb->get_col(
+                            $wpdb->prepare("SELECT serial_number FROM {$serial_table} WHERE order_id = %d", $order_id)
+                        ) ?: [];
+                        if (!empty($existing_serials)) {
+                            $wpdb->delete($serial_table, ['order_id' => $order_id], ['%d']);
+                            $released_serials = $existing_serials;
+                        }
+                    }
+
+                    $remaining_count = (int) $wpdb->get_var(
+                        $wpdb->prepare("SELECT COUNT(*) FROM {$serial_table} WHERE order_id = %d", $order_id)
+                    );
+
+                    // Close active installment application if full order is returned
+                    if ($remaining_count === 0) {
+                        $wpdb->query(
+                            $wpdb->prepare(
+                                "UPDATE {$wpdb->prefix}gf_installment_applications
+                                 SET status = 'CLOSED', reject_reason = %s
+                                 WHERE order_id = %d AND status IN ('SUBMITTED', 'L1_DOCS_VERIFIED', 'APPROVED_WAITING_DOWNPAYMENT', 'ACTIVE_INSTALLMENT')",
+                                'Đóng hồ sơ do hoàn tất trả hàng RMA #' . $rma_id,
+                                $order_id
+                            )
+                        );
+                    }
+                }
+
+                $wpdb->query('COMMIT');
+            } catch (Throwable $e) {
+                $wpdb->query('ROLLBACK');
+                return new WP_Error('gf_rma_tx_failed', $e->getMessage());
+            }
+        } finally {
+            $wpdb->query($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock_name));
         }
 
         if (function_exists('wc_get_order')) {
             $order = wc_get_order($order_id);
             if ($order) {
                 $serial_info = !empty($released_serials) ? ' Đã thu hồi S/N: ' . implode(', ', $released_serials) . '.' : '';
-                if ($rma['request_type'] === 'RETURN' && $remaining_count === 0 && $order->get_status() !== 'refunded') {
+                if ($rma_type === 'RETURN' && $remaining_count === 0 && $order->get_status() !== 'refunded') {
                     $order->update_status('refunded', sprintf('Hoàn tất trả hàng toàn phần theo RMA #%d.%s', $rma_id, $serial_info));
                 } else {
                     $order->add_order_note(
-                        sprintf('Đã hoàn tất xử lý RMA #%d (%s).%s%s', $rma_id, $rma['request_type'], $serial_info, $clean_note !== '' ? ' Ghi chú: ' . $clean_note : '')
+                        sprintf('Đã hoàn tất xử lý RMA #%d (%s).%s%s', $rma_id, $rma_type, $serial_info, $clean_note !== '' ? ' Ghi chú: ' . $clean_note : '')
                     );
                 }
             }

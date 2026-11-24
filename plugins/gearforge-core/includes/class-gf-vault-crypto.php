@@ -50,26 +50,29 @@ class GF_Vault_Crypto {
     }
 
     /**
-     * Encrypt raw bytes and persist as an authenticated payload (IV + HMAC + Ciphertext).
+     * Encrypt raw bytes and persist as an authenticated payload (v2: separated enc/mac subkeys).
      *
      * @return string|WP_Error Relative filename inside GF_VAULT_DIR.
      */
     public static function encrypt_bytes(string $plaintext, string $mime) {
-        $key = self::get_encryption_key();
-        if (is_wp_error($key)) {
-            return $key;
+        $master_key = self::get_encryption_key();
+        if (is_wp_error($master_key)) {
+            return $master_key;
         }
 
+        $enc_key    = self::derive_subkey($master_key, 'gf_vault_enc_v2');
+        $mac_key    = self::derive_subkey($master_key, 'gf_vault_mac_v2');
         $iv_len     = openssl_cipher_iv_length(self::CIPHER);
         $iv         = random_bytes($iv_len);
-        $ciphertext = openssl_encrypt($plaintext, self::CIPHER, $key, OPENSSL_RAW_DATA, $iv);
+        $ciphertext = openssl_encrypt($plaintext, self::CIPHER, $enc_key, OPENSSL_RAW_DATA, $iv);
 
         if ($ciphertext === false) {
             return new WP_Error('gf_encrypt_failed', 'Lỗi mã hóa dữ liệu định danh.');
         }
 
-        $mac      = hash_hmac('sha256', $iv . $ciphertext, $key, true);
+        $mac      = hash_hmac('sha256', 'v2|' . $mime . '|' . $iv . $ciphertext, $mac_key, true);
         $envelope = wp_json_encode([
+            'v'    => 2,
             'mime' => $mime,
             'data' => base64_encode($iv . $mac . $ciphertext),
         ]);
@@ -92,13 +95,14 @@ class GF_Vault_Crypto {
 
     /**
      * Decrypt a stored vault file after checking path containment and HMAC integrity.
+     * Supports both v2 (separated subkeys + authenticated MIME) and legacy v1 envelopes.
      *
      * @return array{mime:string, bytes:string}|WP_Error
      */
     public static function decrypt_file(string $stored_filename) {
-        $key = self::get_encryption_key();
-        if (is_wp_error($key)) {
-            return $key;
+        $master_key = self::get_encryption_key();
+        if (is_wp_error($master_key)) {
+            return $master_key;
         }
 
         $vault_real = realpath(GF_VAULT_DIR);
@@ -113,7 +117,7 @@ class GF_Vault_Crypto {
             return new WP_Error('gf_corrupt_vault', 'Định dạng tệp mã hóa không hợp lệ.');
         }
 
-        $raw = base64_decode($envelope['data'], true);
+        $raw    = base64_decode($envelope['data'], true);
         $iv_len = openssl_cipher_iv_length(self::CIPHER);
         if ($raw === false || strlen($raw) <= $iv_len + 32) {
             return new WP_Error('gf_corrupt_payload', 'Dữ liệu mã hóa bị hỏng.');
@@ -122,13 +126,18 @@ class GF_Vault_Crypto {
         $iv         = substr($raw, 0, $iv_len);
         $mac        = substr($raw, $iv_len, 32);
         $ciphertext = substr($raw, $iv_len + 32);
+        $is_v2      = isset($envelope['v']) && (int) $envelope['v'] === 2;
 
-        $expected_mac = hash_hmac('sha256', $iv . $ciphertext, $key, true);
+        $enc_key      = $is_v2 ? self::derive_subkey($master_key, 'gf_vault_enc_v2') : $master_key;
+        $mac_key      = $is_v2 ? self::derive_subkey($master_key, 'gf_vault_mac_v2') : $master_key;
+        $mac_payload  = $is_v2 ? ('v2|' . $envelope['mime'] . '|' . $iv . $ciphertext) : ($iv . $ciphertext);
+        $expected_mac = hash_hmac('sha256', $mac_payload, $mac_key, true);
+
         if (!hash_equals($expected_mac, $mac)) {
             return new WP_Error('gf_tampered_file', 'Cảnh báo: Tệp hồ sơ có dấu hiệu bị thay đổi trái phép.');
         }
 
-        $plaintext = openssl_decrypt($ciphertext, self::CIPHER, $key, OPENSSL_RAW_DATA, $iv);
+        $plaintext = openssl_decrypt($ciphertext, self::CIPHER, $enc_key, OPENSSL_RAW_DATA, $iv);
         if ($plaintext === false) {
             return new WP_Error('gf_decrypt_failed', 'Giải mã tệp hồ sơ thất bại.');
         }
@@ -137,6 +146,24 @@ class GF_Vault_Crypto {
             'mime'  => $envelope['mime'],
             'bytes' => $plaintext,
         ];
+    }
+
+    /**
+     * Safely delete a stored encrypted file inside GF_VAULT_DIR (used for rollback on failed submissions).
+     */
+    public static function delete_stored_file(string $stored_filename): void {
+        if ($stored_filename === '') {
+            return;
+        }
+        $vault_real = realpath(GF_VAULT_DIR);
+        $target     = $vault_real ? realpath($vault_real . DIRECTORY_SEPARATOR . basename($stored_filename)) : false;
+        if ($vault_real && $target && strpos($target, $vault_real) === 0 && is_file($target)) {
+            @unlink($target);
+        }
+    }
+
+    private static function derive_subkey(string $master_key, string $purpose): string {
+        return hash_hmac('sha256', $purpose, $master_key, true);
     }
 
     /**

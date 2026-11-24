@@ -110,6 +110,7 @@ class GF_Admin_Pages {
             'L1_DOCS_VERIFIED'           => 'Đã duyệt L1 (L1_DOCS_VERIFIED)',
             'APPROVED_WAITING_DOWNPAYMENT' => 'Chờ trả trước (APPROVED)',
             'ACTIVE_INSTALLMENT'         => 'Đang góp (ACTIVE)',
+            'CLOSED'                     => 'Đã đóng (CLOSED)',
             'REJECTED'                   => 'Từ chối (REJECTED)',
             'BLACKLISTED'                => 'Danh sách đen (BLACKLISTED)',
         ];
@@ -195,16 +196,24 @@ class GF_Admin_Pages {
                 echo '<a class="button button-small" target="_blank" href="' . esc_url($card_url) . '">Xem Thẻ SV</a></td>';
                 echo '<td><code>' . esc_html($row['status']) . '</code></td>';
                 echo '<td>';
-                echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">';
-                echo '<input type="hidden" name="action" value="gf_review_action" />';
-                echo '<input type="hidden" name="app_id" value="' . $id . '" />';
-                wp_nonce_field('gf_review_' . $id);
-                echo '<button class="button button-primary" name="review_step" value="layer1">Duyệt Lớp 1</button>';
-                echo '<button class="button button-primary" name="review_step" value="layer2">Duyệt Lớp 2</button>';
-                echo '<input type="text" name="reject_reason" placeholder="Lý do từ chối..." style="max-width:150px;" />';
-                echo '<button class="button" name="review_step" value="reject">Từ chối</button>';
-                echo '<button class="button button-link-delete" name="review_step" value="blacklist">Từ chối + Blacklist</button>';
-                echo '</form></td></tr>';
+                if (in_array($row['status'], ['SUBMITTED', 'L1_DOCS_VERIFIED', 'APPROVED_WAITING_DOWNPAYMENT'], true)) {
+                    echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">';
+                    echo '<input type="hidden" name="action" value="gf_review_action" />';
+                    echo '<input type="hidden" name="app_id" value="' . $id . '" />';
+                    wp_nonce_field('gf_review_' . $id);
+                    if ($row['status'] === 'SUBMITTED') {
+                        echo '<button class="button button-primary" name="review_step" value="layer1">Duyệt Lớp 1</button>';
+                    } elseif ($row['status'] === 'L1_DOCS_VERIFIED') {
+                        echo '<button class="button button-primary" name="review_step" value="layer2">Duyệt Lớp 2</button>';
+                    }
+                    echo '<input type="text" name="reject_reason" placeholder="Lý do từ chối..." style="max-width:150px;" />';
+                    echo '<button class="button" name="review_step" value="reject">Từ chối</button>';
+                    echo '<button class="button button-link-delete" name="review_step" value="blacklist">Từ chối + Blacklist</button>';
+                    echo '</form>';
+                } else {
+                    echo '<em>Đã kết thúc duyệt</em>';
+                }
+                echo '</td></tr>';
             }
         }
         echo '</tbody></table>';
