@@ -70,6 +70,13 @@ class GF_Invoice_PDF {
             wp_die('401 Unauthorized', '401 Unauthorized', ['response' => 401]);
         }
 
+        if (function_exists('gf_core_check_rate_limit')) {
+            $rl = gf_core_check_rate_limit('invoice_pdf', 20, 60, 'u' . get_current_user_id());
+            if (is_wp_error($rl)) {
+                wp_die(esc_html($rl->get_error_message()), '429 Too Many Requests', ['response' => 429]);
+            }
+        }
+
         $order_id = (int) ($_GET['order_id'] ?? 0);
         check_admin_referer('gf_pdf_' . $order_id);
 
@@ -91,6 +98,9 @@ class GF_Invoice_PDF {
 
         header('Content-Type: application/pdf');
         header('Content-Disposition: inline; filename="GearForge-Invoice-' . $order_id . '.pdf"');
+        header('X-Content-Type-Options: nosniff');
+        header('Content-Security-Policy: default-src \'none\'; sandbox');
+        header('Cache-Control: private, no-store, max-age=0');
         header('Content-Length: ' . strlen($pdf_bytes));
         echo $pdf_bytes;
         exit;
@@ -162,7 +172,8 @@ class GF_Invoice_PDF {
 
             $stream_ops = ["BT", "/F1 11 Tf", "50 780 Td", "16 TL"];
             foreach ($page_lines as $idx => $line) {
-                $escaped      = str_replace(['\\', '(', ')'], ['\\\\', '\\(', '\\)'], $line);
+                $clean_line   = preg_replace('/[\x00-\x1F\x7F]/', ' ', (string) $line);
+                $escaped      = str_replace(['\\', '(', ')'], ['\\\\', '\\(', '\\)'], $clean_line);
                 $stream_ops[] = ($idx === 0 ? "({$escaped}) Tj" : "T* ({$escaped}) Tj");
             }
             $stream_ops[] = "ET";

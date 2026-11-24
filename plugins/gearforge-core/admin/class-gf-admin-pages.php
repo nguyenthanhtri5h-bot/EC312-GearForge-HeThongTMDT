@@ -94,8 +94,13 @@ class GF_Admin_Pages {
 
         error_log(sprintf('[GearForge Audit] User #%d viewed %s for app #%d', get_current_user_id(), $doc, $app_id));
 
+        $ext_map = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'application/pdf' => 'pdf'];
+        $ext     = $ext_map[$plain['mime']] ?? 'bin';
+
         header('Content-Type: ' . $plain['mime']);
+        header('Content-Disposition: inline; filename="vault-doc-' . $app_id . '-' . $doc . '.' . $ext . '"');
         header('X-Content-Type-Options: nosniff');
+        header('Content-Security-Policy: default-src \'none\'; frame-ancestors \'none\'; sandbox');
         header('Cache-Control: no-store, no-cache, must-revalidate');
         echo $plain['bytes'];
         exit;

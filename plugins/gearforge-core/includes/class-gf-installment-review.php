@@ -34,6 +34,13 @@ class GF_Installment_Review {
      * installment figures server-side, and prevents IDOR / duplicate applications.
      */
     public static function handle_apply_rest(WP_REST_Request $request) {
+        if (function_exists('gf_core_check_rate_limit')) {
+            $rl = gf_core_check_rate_limit('installment_apply', 15, 60, 'u' . get_current_user_id());
+            if (is_wp_error($rl)) {
+                return gf_core_rate_limit_rest_response($rl);
+            }
+        }
+
         $order_id = (int) $request->get_param('order_id');
         if ($order_id <= 0 || !function_exists('wc_get_order')) {
             return new WP_REST_Response(['code' => 'gf_invalid_order', 'message' => 'Mã đơn hàng không hợp lệ.'], 400);
@@ -155,6 +162,11 @@ class GF_Installment_Review {
             return new WP_Error('gf_invalid_edu_email', 'Email sinh viên phải hợp lệ và có đuôi .edu.vn hoặc .edu.');
         }
 
+        $student_code = trim((string) ($data['student_code'] ?? ''));
+        if (!preg_match('/^[A-Za-z0-9_-]{4,32}$/', $student_code)) {
+            return new WP_Error('gf_invalid_student_code', 'Mã số sinh viên phải dài 4–32 ký tự và chỉ gồm chữ, số, dấu gạch ngang hoặc gạch dưới.');
+        }
+
         $cccd_number = preg_replace('/\D/', '', (string) ($data['cccd_number'] ?? ''));
         if (strlen($cccd_number) !== 12) {
             return new WP_Error('gf_invalid_cccd', 'Số CCCD gắn chip phải gồm đúng 12 chữ số.');
@@ -183,7 +195,7 @@ class GF_Installment_Review {
                 'order_id'                    => (int) $data['order_id'],
                 'user_id'                     => (int) $data['user_id'],
                 'plan_id'                     => (int) $data['plan_id'],
-                'student_code'                => sanitize_text_field($data['student_code'] ?? ''),
+                'student_code'                => $student_code,
                 'student_edu_email'           => $edu_email,
                 'cccd_hash'                   => $cccd_hash,
                 'cccd_encrypted_path'         => $cccd_path,
@@ -238,7 +250,7 @@ class GF_Installment_Review {
             return new WP_Error('gf_not_found', 'Không tìm thấy hồ sơ trả góp.');
         }
 
-        $clean_reason = sanitize_textarea_field($reason);
+        $clean_reason = mb_substr(sanitize_textarea_field($reason), 0, 500);
         if ($clean_reason === '') {
             return new WP_Error('gf_reason_required', 'Bắt buộc phải nhập lý do từ chối hồ sơ.');
         }

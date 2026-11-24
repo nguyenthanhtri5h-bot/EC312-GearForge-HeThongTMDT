@@ -55,9 +55,11 @@ class GF_Serial_Manager {
         global $wpdb;
 
         $clean_serial = strtoupper(sanitize_text_field($serial_number));
-        if ($clean_serial === '') {
-            return new WP_Error('gf_empty_serial', 'Mã Serial Number không được để trống.');
+        if (!preg_match('/^[A-Z0-9._-]{4,64}$/', $clean_serial)) {
+            return new WP_Error('gf_invalid_serial_format', 'Mã Serial Number phải dài 4–64 ký tự và chỉ gồm chữ, số, dấu gạch ngang, gạch dưới hoặc dấu chấm.');
         }
+
+        $warranty_months = max(1, min(120, $warranty_months));
 
         $table = "{$wpdb->prefix}gf_order_serials";
         $exists = $wpdb->get_var(

@@ -39,6 +39,13 @@ class GF_Installment_Calc {
      * REST callback for GET /wp-json/gearforge/v1/installment-calc.
      */
     public static function handle_calc_request(WP_REST_Request $request) {
+        if (function_exists('gf_core_check_rate_limit')) {
+            $rl = gf_core_check_rate_limit('installment_calc', 60, 60);
+            if (is_wp_error($rl)) {
+                return gf_core_rate_limit_rest_response($rl);
+            }
+        }
+
         $price    = (float) $request->get_param('price');
         $down_pct = (float) $request->get_param('down_pct');
         $months   = (int) $request->get_param('months');
@@ -61,8 +68,8 @@ class GF_Installment_Calc {
      * @return array|WP_Error
      */
     public static function calculate(float $price, float $down_pct, int $months) {
-        if ($price <= 0) {
-            return new WP_Error('gf_invalid_price', 'Giá sản phẩm phải lớn hơn 0 VNĐ.');
+        if (!is_finite($price) || $price <= 0 || $price > 10000000000) {
+            return new WP_Error('gf_invalid_price', 'Giá sản phẩm phải nằm trong khoảng 1 đến 10.000.000.000 VNĐ.');
         }
 
         $plan = self::get_plan_by_months($months);
@@ -71,7 +78,7 @@ class GF_Installment_Calc {
         }
 
         $min_down = (float) $plan['min_downpayment_pct'];
-        if ($down_pct < $min_down || $down_pct > 80) {
+        if (!is_finite($down_pct) || $down_pct < $min_down || $down_pct > 80) {
             return new WP_Error(
                 'gf_invalid_downpayment',
                 sprintf('Tỷ lệ trả trước phải từ %.0f%% đến 80%%.', $min_down)

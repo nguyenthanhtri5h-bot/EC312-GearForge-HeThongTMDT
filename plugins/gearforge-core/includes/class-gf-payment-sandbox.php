@@ -59,6 +59,13 @@ class GF_Payment_Sandbox {
      * Issues a time-limited, HMAC-signed Sandbox 3D-Secure URL for Frontend Checkout/OMS.
      */
     public static function handle_create_session_rest(WP_REST_Request $request) {
+        if (function_exists('gf_core_check_rate_limit')) {
+            $rl = gf_core_check_rate_limit('sandbox_session', 20, 60, 'u' . get_current_user_id());
+            if (is_wp_error($rl)) {
+                return gf_core_rate_limit_rest_response($rl);
+            }
+        }
+
         $order_id = (int) $request->get_param('order_id');
         $provider = sanitize_key((string) ($request->get_param('provider') ?: 'vnpay'));
         $mode     = sanitize_key((string) ($request->get_param('mode') ?: 'downpayment'));
@@ -180,6 +187,11 @@ class GF_Payment_Sandbox {
             wp_die('Phiên thanh toán Sandbox đã hết hạn hoặc chữ ký HMAC không hợp lệ.', '403 Forbidden', ['response' => 403]);
         }
 
+        header('X-Frame-Options: DENY');
+        header('Content-Security-Policy: frame-ancestors \'none\'');
+        header('X-Content-Type-Options: nosniff');
+        header('Cache-Control: no-store, no-cache, must-revalidate');
+
         // Prevent double charge if IPN already settled the order while customer lost internet
         if (self::is_order_already_paid($order_id)) {
             $order   = function_exists('wc_get_order') ? wc_get_order($order_id) : null;
@@ -195,13 +207,26 @@ class GF_Payment_Sandbox {
             exit;
         }
 
+        $ip_hash      = md5(sanitize_text_field($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0'));
+        $otp_fail_key = "gf_3ds_otp_fail_{$order_id}_{$ip_hash}";
+        $fail_count   = (int) get_transient($otp_fail_key);
+        if ($fail_count >= 5) {
+            wp_die('Bạn đã nhập sai OTP 3D-Secure quá 5 lần. Phiên thanh toán tạm khóa trong 15 phút để chống dò mã.', '429 Too Many Requests', ['response' => 429]);
+        }
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gf_otp_code'])) {
             check_admin_referer('gf_3ds_submit_' . $order_id);
             $otp = sanitize_text_field(wp_unslash($_POST['gf_otp_code']));
 
-            if ($otp !== self::SANDBOX_OTP) {
-                $error_msg = 'Mã OTP 3D-Secure không chính xác (Mã test hợp lệ: 123456).';
+            if (!hash_equals(self::SANDBOX_OTP, $otp)) {
+                $fail_count++;
+                set_transient($otp_fail_key, $fail_count, self::SESSION_TTL_SEC);
+                if ($fail_count >= 5) {
+                    wp_die('Bạn đã nhập sai OTP 3D-Secure quá 5 lần. Phiên thanh toán tạm khóa trong 15 phút.', '429 Too Many Requests', ['response' => 429]);
+                }
+                $error_msg = sprintf('Mã OTP 3D-Secure không chính xác (còn %d lượt thử; mã test: 123456).', 5 - $fail_count);
             } else {
+                delete_transient($otp_fail_key);
                 $txn_ref = strtoupper($provider) . '-' . gmdate('YmdHis') . '-' . $order_id;
                 $result  = self::finalize_verified_payment($order_id, $amount, $provider, $mode, $txn_ref);
                 if (!is_wp_error($result)) {
@@ -231,7 +256,18 @@ class GF_Payment_Sandbox {
     }
 
     public static function handle_ipn_callback(WP_REST_Request $request) {
-        $params   = $request->get_json_params() ?: $request->get_params();
+        if (function_exists('gf_core_check_rate_limit')) {
+            $rl = gf_core_check_rate_limit('sandbox_ipn', 30, 60);
+            if (is_wp_error($rl)) {
+                return gf_core_rate_limit_rest_response($rl);
+            }
+        }
+
+        $params = $request->get_json_params() ?: $request->get_params();
+        if (!is_array($params)) {
+            return new WP_REST_Response(['code' => 'gf_invalid_payload', 'message' => 'Dữ liệu IPN không hợp lệ.'], 400);
+        }
+
         $order_id = (int) ($params['order_id'] ?? 0);
         $amount   = (int) ($params['amount'] ?? 0);
         $provider = sanitize_key($params['provider'] ?? 'vnpay');
@@ -240,7 +276,7 @@ class GF_Payment_Sandbox {
         $txn_ref  = sanitize_text_field($params['transaction_ref'] ?? '');
         $sig      = sanitize_text_field($params['signature'] ?? '');
 
-        if ($txn_ref === '' || !self::verify_hmac_signature('ipn', $order_id, $amount, $provider, $mode, $exp, $sig, $txn_ref)) {
+        if ($order_id <= 0 || $amount <= 0 || $txn_ref === '' || !self::verify_hmac_signature('ipn', $order_id, $amount, $provider, $mode, $exp, $sig, $txn_ref)) {
             return new WP_REST_Response(['code' => 'gf_invalid_hmac', 'message' => 'Chữ ký IPN không hợp lệ hoặc đã hết hạn.'], 403);
         }
 
@@ -256,6 +292,13 @@ class GF_Payment_Sandbox {
      * Active Reconciliation (QueryDR): allows frontend/admin to verify real payment status after network drop.
      */
     public static function handle_query_dr(WP_REST_Request $request) {
+        if (function_exists('gf_core_check_rate_limit')) {
+            $rl = gf_core_check_rate_limit('sandbox_query', 30, 60, 'u' . get_current_user_id());
+            if (is_wp_error($rl)) {
+                return gf_core_rate_limit_rest_response($rl);
+            }
+        }
+
         $order_id = (int) $request->get_param('order_id');
         $order    = function_exists('wc_get_order') ? wc_get_order($order_id) : null;
 
@@ -286,6 +329,13 @@ class GF_Payment_Sandbox {
 
     public static function handle_oms_status_request(WP_REST_Request $request) {
         global $wpdb;
+
+        if (function_exists('gf_core_check_rate_limit')) {
+            $rl = gf_core_check_rate_limit('oms_status', 30, 60, 'u' . get_current_user_id());
+            if (is_wp_error($rl)) {
+                return gf_core_rate_limit_rest_response($rl);
+            }
+        }
 
         $order_id = (int) $request->get_param('order_id');
         $order    = function_exists('wc_get_order') ? wc_get_order($order_id) : null;

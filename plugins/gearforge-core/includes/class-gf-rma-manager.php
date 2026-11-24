@@ -69,6 +69,13 @@ class GF_RMA_Manager {
      * REST callback for POST /wp-json/gearforge/v1/rma-request.
      */
     public static function handle_submit_rest(WP_REST_Request $request) {
+        if (function_exists('gf_core_check_rate_limit')) {
+            $rl = gf_core_check_rate_limit('rma_submit', 15, 60, 'u' . get_current_user_id());
+            if (is_wp_error($rl)) {
+                return gf_core_rate_limit_rest_response($rl);
+            }
+        }
+
         $order_id = (int) $request->get_param('order_id');
         if ($order_id <= 0 || !function_exists('wc_get_order')) {
             return new WP_REST_Response(['code' => 'gf_invalid_order', 'message' => 'Mã đơn hàng không hợp lệ.'], 400);
@@ -115,6 +122,13 @@ class GF_RMA_Manager {
      */
     public static function handle_status_rest(WP_REST_Request $request) {
         global $wpdb;
+        if (function_exists('gf_core_check_rate_limit')) {
+            $rl = gf_core_check_rate_limit('rma_status', 30, 60, 'u' . get_current_user_id());
+            if (is_wp_error($rl)) {
+                return gf_core_rate_limit_rest_response($rl);
+            }
+        }
+
         self::ensure_table();
 
         $order_id = (int) $request->get_param('order_id');
@@ -179,6 +193,9 @@ class GF_RMA_Manager {
         $clean_reason = sanitize_textarea_field($reason);
         if (mb_strlen($clean_reason) < 5) {
             return new WP_Error('gf_reason_too_short', 'Vui lòng mô tả lý do đổi trả tối thiểu 5 ký tự.');
+        }
+        if (mb_strlen($clean_reason) > 1000) {
+            return new WP_Error('gf_reason_too_long', 'Lý do đổi trả không được vượt quá 1.000 ký tự.');
         }
 
         $clean_serial      = strtoupper(sanitize_text_field($serial_number));

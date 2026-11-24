@@ -221,6 +221,42 @@ try {
         $order->get_status() === 'refunded' && ($app_after['status'] ?? '') === 'CLOSED',
         'Returning all 2/2 S/Ns refunds order and closes installment application'
     );
+
+    // 9. Layer 7 Hardening checks (FIX-15)
+    $inf_calc = GF_Installment_Calc::calculate(INF, 30, 6);
+    gf_assert(is_wp_error($inf_calc) && $inf_calc->get_error_code() === 'gf_invalid_price', 'Calculator blocks INF/NaN price overflow');
+
+    $bad_code = GF_Installment_Review::submit_application(
+        [
+            'order_id'              => $order_id,
+            'user_id'               => $student->ID,
+            'plan_id'               => (int) $calc['plan_id'],
+            'student_code'          => '2452<script>',
+            'student_edu_email'     => '24521027@gm.uit.edu.vn',
+            'cccd_number'           => '079206001234',
+            'downpayment_amount'    => $calc['downpayment_amount'],
+            'monthly_amount'        => $calc['monthly_amount'],
+            'consent_nd13_accepted' => 1,
+        ],
+        ['tmp_name' => ''],
+        ['tmp_name' => '']
+    );
+    gf_assert(is_wp_error($bad_code) && $bad_code->get_error_code() === 'gf_invalid_student_code', 'Installment Review validates student_code format');
+
+    $bad_sn = GF_Serial_Manager::assign_serial($order_id, $item_id, 0, "BAD SERIAL\n<>", $admin->ID);
+    gf_assert(is_wp_error($bad_sn) && $bad_sn->get_error_code() === 'gf_invalid_serial_format', 'Serial Manager rejects invalid S/N format');
+
+    $inj_pdf = $ref_method->invoke(null, ["Customer\n) ET\nBT"]);
+    gf_assert(strpos($inj_pdf, "Customer\n") === false && strpos($inj_pdf, '\) ET BT') !== false, 'Invoice PDF strips control chars to prevent PDF stream injection');
+
+    $rl_id = 'test_subj_' . uniqid();
+    delete_transient('gf_rl_' . md5('test_rl|' . $rl_id));
+    $rl1 = gf_core_check_rate_limit('test_rl', 2, 60, $rl_id, true);
+    $rl2 = gf_core_check_rate_limit('test_rl', 2, 60, $rl_id, true);
+    $rl3 = gf_core_check_rate_limit('test_rl', 2, 60, $rl_id, true);
+    $rl_resp = is_wp_error($rl3) ? gf_core_rate_limit_rest_response($rl3) : null;
+    delete_transient('gf_rl_' . md5('test_rl|' . $rl_id));
+    gf_assert($rl1 === true && $rl2 === true && $rl_resp && $rl_resp->get_status() === 429, 'Role 4 Layer 7 rate limiter blocks bursts with HTTP 429');
 } finally {
     global $wpdb;
     foreach ($created_order_ids as $oid) {
