@@ -13,7 +13,7 @@ export function VideoModal() {
     if (!dlg || !vid) return;
 
     if (videoModalSrc) {
-      setIsLandscape(/(lab-pc|campus-laptop|desk-orbit|pc-build)/.test(videoModalSrc));
+      setIsLandscape(/(lab-pc|campus-laptop|desk-orbit|pc-build|hero-riot|hero-showcase|shop-showcase|ecosystem-flow)/.test(videoModalSrc));
       vid.src = videoModalSrc;
       if (!dlg.open) dlg.showModal();
       vid.play().catch(() => {});
