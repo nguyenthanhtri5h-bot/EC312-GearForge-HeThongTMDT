@@ -10,8 +10,8 @@ sequenceDiagram
 
     SV->>UI: Chọn máy, kỳ hạn (3/6/12 tháng) & tick Consent NĐ 13/2023
     SV->>UI: Upload ảnh CCCD + Thẻ sinh viên
-    UI->>FG: POST /installment/submit (IP, UserID, Files)
-    FG->>DB: Kiểm tra Rate Limit & wp_gf_fraud_blacklist
+    UI->>FG: POST /wp-json/gearforge/v1/installment-apply (order_id, Files)
+    FG->>DB: GET_LOCK & kiểm tra chủ đơn, trạng thái (pending/on-hold), Blacklist
     alt Vi phạm Rate Limit hoặc nằm trong Blacklist
         FG-->>UI: Trả lỗi 429 / 403 Từ chối tiếp nhận
     else Hợp lệ

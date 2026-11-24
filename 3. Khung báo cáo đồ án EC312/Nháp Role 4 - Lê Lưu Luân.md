@@ -65,8 +65,8 @@ sequenceDiagram
 
     SV->>UI: Chọn máy, kỳ hạn (3/6/12 tháng) & tick Consent NĐ 13/2023
     SV->>UI: Upload ảnh CCCD + Thẻ sinh viên
-    UI->>FG: POST /installment/submit (IP, UserID, Files)
-    FG->>DB: Kiểm tra Rate Limit & wp_gf_fraud_blacklist
+    UI->>FG: POST /wp-json/gearforge/v1/installment-apply (order_id, Files)
+    FG->>DB: GET_LOCK & kiểm tra chủ đơn, trạng thái (pending/on-hold), Blacklist
     alt Vi phạm Rate Limit hoặc nằm trong Blacklist
         FG-->>UI: Trả lỗi 429 / 403 Từ chối tiếp nhận
     else Hợp lệ
@@ -120,6 +120,47 @@ sequenceDiagram
     SV->>PDF: Yêu cầu tải Hóa đơn PDF (Nonce + Anti-IDOR)
     PDF->>DB: Lấy thông tin Order, Serial Number & Trạng thái Trả góp
     PDF-->>SV: Xuất file %PDF-1.4 chuẩn T-VAN (MST, S/N, VAT 10%)
+```
+
+---
+
+### 3.7.5. Biểu đồ Tuần tự Đổi trả / Bảo hành (`Sequence Diagram – RMA`)
+
+*(File nguồn: `2. Quy ước và Sơ đồ UML/role4_diagrams/RMA_Sequence_Role4.mmd`)*
+
+```mermaid
+sequenceDiagram
+    actor SV as StudentCustomer
+    participant UI as Storefront / Client
+    participant RMA as GF_RMA_Manager (REST API)
+    participant DB as MySQL (wp_gf_rma_requests / order_serials)
+    actor Admin as StoreAdmin / Reviewer
+    participant WC as WooCommerce (HPOS Order)
+
+    SV->>UI: Gửi yêu cầu Đổi trả / Bảo hành (order_id, type, S/N, reason)
+    UI->>RMA: POST /wp-json/gearforge/v1/rma-request
+    RMA->>WC: Kiểm tra chủ đơn (anti-IDOR) & trạng thái đã giao (completed/shipping)
+    RMA->>DB: Đối chiếu S/N thuộc đơn hàng & hạn 15 ngày (RETURN/EXCHANGE)
+    alt Không hợp lệ hoặc trùng RMA đang mở
+        RMA-->>UI: Trả lỗi 400 / 403 / 409
+    else Hợp lệ
+        RMA->>DB: Tạo bản ghi wp_gf_rma_requests (status = REQUESTED)
+        RMA->>WC: Ghi Order Note tiếp nhận RMA
+        RMA-->>UI: Trả 201 Created (rma_id, REQUESTED)
+    end
+
+    Admin->>DB: Duyệt tiếp nhận (REQUESTED -> APPROVED)
+    Admin->>DB: Hoàn tất xử lý (START TRANSACTION: APPROVED -> COMPLETED)
+    alt Loại yêu cầu là RETURN
+        DB->>DB: Thu hồi S/N khỏi wp_gf_order_serials
+        opt Đã thu hồi hết toàn bộ S/N của đơn
+            DB->>DB: Đóng hồ sơ trả góp (CLOSED) nếu có
+            DB->>WC: Chuyển trạng thái đơn sang refunded
+        end
+    else EXCHANGE / WARRANTY
+        DB->>WC: Ghi Order Note hoàn tất đổi máy / bảo hành
+    end
+    DB-->>Admin: COMMIT Transaction & thông báo thành công
 ```
 
 ---

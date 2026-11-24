@@ -1,0 +1,32 @@
+sequenceDiagram
+    actor SV as StudentCustomer
+    participant UI as Storefront / Client
+    participant RMA as GF_RMA_Manager (REST API)
+    participant DB as MySQL (wp_gf_rma_requests / order_serials)
+    actor Admin as StoreAdmin / Reviewer
+    participant WC as WooCommerce (HPOS Order)
+
+    SV->>UI: Gửi yêu cầu Đổi trả / Bảo hành (order_id, type, S/N, reason)
+    UI->>RMA: POST /wp-json/gearforge/v1/rma-request
+    RMA->>WC: Kiểm tra chủ đơn (anti-IDOR) & trạng thái đã giao (completed/shipping)
+    RMA->>DB: Đối chiếu S/N thuộc đơn hàng & hạn 15 ngày (RETURN/EXCHANGE)
+    alt Không hợp lệ hoặc trùng RMA đang mở
+        RMA-->>UI: Trả lỗi 400 / 403 / 409
+    else Hợp lệ
+        RMA->>DB: Tạo bản ghi wp_gf_rma_requests (status = REQUESTED)
+        RMA->>WC: Ghi Order Note tiếp nhận RMA
+        RMA-->>UI: Trả 201 Created (rma_id, REQUESTED)
+    end
+
+    Admin->>DB: Duyệt tiếp nhận (REQUESTED -> APPROVED)
+    Admin->>DB: Hoàn tất xử lý (START TRANSACTION: APPROVED -> COMPLETED)
+    alt Loại yêu cầu là RETURN
+        DB->>DB: Thu hồi S/N khỏi wp_gf_order_serials
+        opt Đã thu hồi hết toàn bộ S/N của đơn
+            DB->>DB: Đóng hồ sơ trả góp (CLOSED) nếu có
+            DB->>WC: Chuyển trạng thái đơn sang refunded
+        end
+    else EXCHANGE / WARRANTY
+        DB->>WC: Ghi Order Note hoàn tất đổi máy / bảo hành
+    end
+    DB-->>Admin: COMMIT Transaction & thông báo thành công
