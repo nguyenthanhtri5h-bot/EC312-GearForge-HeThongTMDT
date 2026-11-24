@@ -23,7 +23,7 @@ export function vibeUrl(relPath: string): string {
 
 export const VIBE_VIDEOS = {
   heroShowcase: vibeUrl('videos/gf-hero-showcase-1080p.mp4'),
-  heroRiotCinematic: vibeUrl('videos/gf-hero-riot-1080p.mp4?v=5'),
+  heroRiotCinematic: vibeUrl('videos/gf-hero-riot-1080p.mp4?v=6'),
   labPc: vibeUrl('videos/gf-lab-pc-1080p.mp4'),
   campusLaptop: vibeUrl('videos/gf-campus-laptop-1080p.mp4'),
   deskOrbit: vibeUrl('videos/gf-desk-orbit-1080p.mp4'),
@@ -37,7 +37,7 @@ export const VIBE_VIDEOS = {
   reelTour: vibeUrl('videos/gf-reel-tour-1080p.mp4'),
   reelMacro: vibeUrl('videos/gf-reel-macro-1080p.mp4'),
   posterHeroShowcase: vibeUrl('videos/gf-hero-showcase-poster.jpg'),
-  posterHeroRiot: vibeUrl('videos/gf-hero-riot-poster.jpg?v=5'),
+  posterHeroRiot: vibeUrl('videos/gf-hero-riot-poster.jpg?v=6'),
   posterLab: vibeUrl('videos/gf-lab-pc-poster.jpg'),
   posterCampus: vibeUrl('videos/gf-campus-laptop-poster.jpg'),
   posterDeskOrbit: vibeUrl('videos/gf-desk-orbit-poster.jpg'),
