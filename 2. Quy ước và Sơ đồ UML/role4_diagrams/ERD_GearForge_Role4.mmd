@@ -7,6 +7,8 @@ erDiagram
     wp_wc_orders ||--|{ wp_wc_order_items : contains
     wp_wc_orders ||--o| wp_gf_installment_applications : finances
     wp_wc_orders ||--o{ wp_gf_order_serials : tracks
+    wp_wc_orders ||--o{ wp_gf_rma_requests : requests_rma
+    wp_users ||--o{ wp_gf_rma_requests : submits_rma
     wp_wc_order_items ||--o{ wp_gf_order_serials : assigns
     wp_gf_installment_plans ||--o{ wp_gf_installment_applications : defines_terms
 
@@ -95,5 +97,19 @@ erDiagram
         text reason
         bigint created_by FK
         datetime blocked_until
+        datetime created_at
+    }
+
+    wp_gf_rma_requests {
+        bigint rma_id PK
+        bigint order_id FK
+        bigint user_id FK
+        varchar serial_number
+        enum request_type
+        text reason
+        varchar status
+        text admin_note
+        bigint reviewed_by FK
+        datetime reviewed_at
         datetime created_at
     }

@@ -1,6 +1,7 @@
 classDiagram
     class GF_Activator {
         +activate() void
+        +ensure_rma_table() void
         -create_tables() void
         -seed_installment_plans() void
         -ensure_vault_directory() void
@@ -20,6 +21,7 @@ classDiagram
     }
 
     class GF_Installment_Review {
+        +handle_apply_rest(WP_REST_Request req) WP_REST_Response
         +submit_application(array data, array cccd, array card) int
         +review_layer_1(int app_id, int reviewer_id) bool
         +review_layer_2(int app_id, int reviewer_id) bool
@@ -52,8 +54,19 @@ classDiagram
 
     class GF_Admin_Pages {
         +render_installments_page() void
+        +render_rma_page() void
         +handle_review_action() void
+        +handle_rma_action() void
         +handle_view_vault_doc() void
+    }
+
+    class GF_RMA_Manager {
+        +handle_submit_rest(WP_REST_Request req) WP_REST_Response
+        +handle_status_rest(WP_REST_Request req) WP_REST_Response
+        +submit_request(int order_id, int user_id, string type, string reason, string sn) int
+        +approve_request(int rma_id, int reviewer_id, string note) bool
+        +reject_request(int rma_id, int reviewer_id, string note) bool
+        +complete_request(int rma_id, int reviewer_id, string note) bool
     }
 
     GF_Installment_Review --> GF_Vault_Crypto : mã hóa ảnh CCCD/Thẻ SV
@@ -62,4 +75,7 @@ classDiagram
     GF_Invoice_PDF --> GF_Serial_Manager : truy vấn danh sách S/N
     GF_Invoice_PDF ..> GF_Installment_Review : đọc trạng thái trả góp
     GF_Admin_Pages --> GF_Installment_Review : gọi duyệt 2 lớp / từ chối
+    GF_Admin_Pages --> GF_RMA_Manager : duyệt / hoàn tất / từ chối RMA
     GF_Admin_Pages --> GF_Vault_Crypto : giải mã stream ảnh
+    GF_RMA_Manager ..> GF_Serial_Manager : đối chiếu & thu hồi S/N
+    GF_RMA_Manager ..> GF_Installment_Review : đóng hồ sơ trả góp khi trả toàn phần

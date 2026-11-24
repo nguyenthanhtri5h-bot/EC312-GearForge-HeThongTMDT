@@ -13,6 +13,7 @@ class GF_Admin_Pages {
         add_action('admin_menu', [self::class, 'register_menus']);
         add_action('admin_post_gf_review_action', [self::class, 'handle_review_action']);
         add_action('admin_post_gf_view_vault_doc', [self::class, 'handle_view_vault_doc']);
+        add_action('admin_post_gf_rma_action', [self::class, 'handle_rma_action']);
     }
 
     public static function register_menus(): void {
@@ -26,6 +27,15 @@ class GF_Admin_Pages {
             [self::class, 'render_installments_page'],
             'dashicons-id-alt',
             56
+        );
+
+        add_submenu_page(
+            'gf-installments',
+            'Quản lý Đổi trả / RMA',
+            'Đổi trả / RMA',
+            $cap,
+            'gf-rma',
+            [self::class, 'render_rma_page']
         );
     }
 
@@ -215,6 +225,156 @@ class GF_Admin_Pages {
 
     private static function get_reviewer_capability(): string {
         return current_user_can('gf_review_installments') ? 'gf_review_installments' : 'manage_woocommerce';
+    }
+
+    public static function handle_rma_action(): void {
+        if (!self::can_review()) {
+            wp_die('Bạn không có quyền xử lý yêu cầu đổi trả / RMA.', '403 Forbidden', ['response' => 403]);
+        }
+
+        $rma_id = isset($_POST['rma_id']) ? (int) $_POST['rma_id'] : 0;
+        check_admin_referer('gf_rma_' . $rma_id);
+
+        $step        = sanitize_key($_POST['rma_step'] ?? '');
+        $admin_note  = sanitize_textarea_field(wp_unslash($_POST['admin_note'] ?? ''));
+        $reviewer_id = get_current_user_id();
+        $result      = new WP_Error('gf_unknown_action', 'Hành động RMA không hợp lệ.');
+
+        if ($step === 'approve') {
+            $result = GF_RMA_Manager::approve_request($rma_id, $reviewer_id, $admin_note);
+        } elseif ($step === 'complete') {
+            $result = GF_RMA_Manager::complete_request($rma_id, $reviewer_id, $admin_note);
+        } elseif ($step === 'reject') {
+            $result = GF_RMA_Manager::reject_request($rma_id, $reviewer_id, $admin_note);
+        }
+
+        $redirect = admin_url('admin.php?page=gf-rma');
+        if (is_wp_error($result)) {
+            $redirect = add_query_arg('gf_err', urlencode($result->get_error_message()), $redirect);
+        } else {
+            $redirect = add_query_arg('gf_msg', urlencode('Cập nhật yêu cầu RMA #' . $rma_id . ' thành công.'), $redirect);
+        }
+
+        wp_safe_redirect($redirect);
+        exit;
+    }
+
+    public static function render_rma_page(): void {
+        global $wpdb;
+        GF_RMA_Manager::ensure_table();
+
+        $allowed_statuses = [
+            ''          => 'Tất cả',
+            'REQUESTED' => 'Chờ duyệt (REQUESTED)',
+            'APPROVED'  => 'Đã duyệt (APPROVED)',
+            'COMPLETED' => 'Hoàn tất (COMPLETED)',
+            'REJECTED'  => 'Từ chối (REJECTED)',
+        ];
+
+        $raw_status    = sanitize_text_field($_GET['status'] ?? '');
+        $status_filter = array_key_exists($raw_status, $allowed_statuses) ? $raw_status : '';
+        $last_id       = max(0, (int) ($_GET['last_id'] ?? 0));
+        $page_size     = 20;
+        $fetch_limit   = $page_size + 1;
+        $table         = "{$wpdb->prefix}gf_rma_requests";
+
+        $count_rows = $wpdb->get_results("SELECT status, COUNT(*) AS cnt FROM {$table} GROUP BY status", ARRAY_A) ?: [];
+        $counts     = array_column($count_rows, 'cnt', 'status');
+        $total_all  = array_sum(array_map('intval', $counts));
+
+        if ($status_filter !== '' && $last_id > 0) {
+            $rows = $wpdb->get_results(
+                $wpdb->prepare("SELECT * FROM {$table} WHERE status = %s AND rma_id < %d ORDER BY rma_id DESC LIMIT %d", $status_filter, $last_id, $fetch_limit),
+                ARRAY_A
+            );
+        } elseif ($status_filter !== '') {
+            $rows = $wpdb->get_results(
+                $wpdb->prepare("SELECT * FROM {$table} WHERE status = %s ORDER BY rma_id DESC LIMIT %d", $status_filter, $fetch_limit),
+                ARRAY_A
+            );
+        } elseif ($last_id > 0) {
+            $rows = $wpdb->get_results(
+                $wpdb->prepare("SELECT * FROM {$table} WHERE rma_id < %d ORDER BY rma_id DESC LIMIT %d", $last_id, $fetch_limit),
+                ARRAY_A
+            );
+        } else {
+            $rows = $wpdb->get_results(
+                $wpdb->prepare("SELECT * FROM {$table} ORDER BY rma_id DESC LIMIT %d", $fetch_limit),
+                ARRAY_A
+            );
+        }
+
+        $has_more = count($rows) > $page_size;
+        if ($has_more) {
+            array_pop($rows);
+        }
+
+        echo '<div class="wrap"><h1>Quản lý Đổi trả / Bảo hành (RMA)</h1>';
+        echo '<ul class="subsubsub" style="margin-bottom:12px;">';
+        $idx   = 0;
+        $total = count($allowed_statuses);
+        foreach ($allowed_statuses as $key => $label) {
+            $idx++;
+            $cnt   = $key === '' ? $total_all : (int) ($counts[$key] ?? 0);
+            $url   = $key === '' ? admin_url('admin.php?page=gf-rma') : admin_url('admin.php?page=gf-rma&status=' . urlencode($key));
+            $class = $status_filter === $key ? 'current' : '';
+            $sep   = $idx < $total ? ' | ' : '';
+            echo '<li><a href="' . esc_url($url) . '" class="' . esc_attr($class) . '">' . esc_html($label) . ' <span class="count">(' . $cnt . ')</span></a>' . $sep . '</li>';
+        }
+        echo '</ul><div class="clear"></div>';
+
+        if (!empty($_GET['gf_msg'])) {
+            echo '<div class="notice notice-success"><p>' . esc_html(wp_unslash($_GET['gf_msg'])) . '</p></div>';
+        }
+        if (!empty($_GET['gf_err'])) {
+            echo '<div class="notice notice-error"><p>' . esc_html(wp_unslash($_GET['gf_err'])) . '</p></div>';
+        }
+
+        echo '<table class="widefat striped" style="margin-top:12px;">';
+        echo '<thead><tr><th>RMA</th><th>Đơn hàng</th><th>Loại / S/N</th><th>Lý do khách hàng</th><th>Trạng thái</th><th>Thao tác xử lý</th></tr></thead><tbody>';
+
+        if (empty($rows)) {
+            echo '<tr><td colspan="6">Chưa có yêu cầu đổi trả / bảo hành nào.</td></tr>';
+        } else {
+            foreach ($rows as $row) {
+                $id = (int) $row['rma_id'];
+                echo '<tr>';
+                echo '<td>#' . $id . '</td>';
+                echo '<td>#' . (int) $row['order_id'] . '</td>';
+                echo '<td><strong>' . esc_html($row['request_type']) . '</strong><br/>' . (!empty($row['serial_number']) ? '<code>' . esc_html($row['serial_number']) . '</code>' : '<em>Theo đơn</em>') . '</td>';
+                echo '<td>' . esc_html($row['reason']) . (!empty($row['admin_note']) ? '<br/><small>Ghi chú: ' . esc_html($row['admin_note']) . '</small>' : '') . '</td>';
+                echo '<td><code>' . esc_html($row['status']) . '</code></td>';
+                echo '<td>';
+                if (in_array($row['status'], ['REQUESTED', 'APPROVED'], true)) {
+                    echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">';
+                    echo '<input type="hidden" name="action" value="gf_rma_action" />';
+                    echo '<input type="hidden" name="rma_id" value="' . $id . '" />';
+                    wp_nonce_field('gf_rma_' . $id);
+                    echo '<input type="text" name="admin_note" placeholder="Ghi chú / Lý do..." style="max-width:160px;" />';
+                    if ($row['status'] === 'REQUESTED') {
+                        echo '<button class="button button-primary" name="rma_step" value="approve">Duyệt tiếp nhận</button>';
+                        echo '<button class="button button-link-delete" name="rma_step" value="reject">Từ chối</button>';
+                    } elseif ($row['status'] === 'APPROVED') {
+                        echo '<button class="button button-primary" name="rma_step" value="complete">Hoàn tất</button>';
+                    }
+                    echo '</form>';
+                } else {
+                    echo '<em>Đã kết thúc xử lý</em>';
+                }
+                echo '</td></tr>';
+            }
+        }
+        echo '</tbody></table>';
+
+        if (!empty($has_more) && !empty($rows)) {
+            $next_last_id = (int) end($rows)['rma_id'];
+            $next_url     = admin_url('admin.php?page=gf-rma&last_id=' . $next_last_id);
+            if ($status_filter !== '') {
+                $next_url = add_query_arg('status', $status_filter, $next_url);
+            }
+            echo '<p style="margin-top:12px;"><a class="button" href="' . esc_url($next_url) . '">Trang tiếp theo (Keyset &lt; #' . $next_last_id . ') &rarr;</a></p>';
+        }
+        echo '</div>';
     }
 }
 

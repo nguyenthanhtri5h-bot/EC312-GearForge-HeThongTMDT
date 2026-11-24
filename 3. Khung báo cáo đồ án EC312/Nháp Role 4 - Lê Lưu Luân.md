@@ -242,7 +242,7 @@ erDiagram
 
 ---
 
-### 4.2.2. Chuẩn hóa & Từ điển dữ liệu (Data Dictionary – 4 bảng mở rộng `wp_gf_*`)
+### 4.2.2. Chuẩn hóa & Từ điển dữ liệu (Data Dictionary – 5 bảng mở rộng `wp_gf_*`)
 
 #### Bảng 1: `wp_gf_installment_plans` *(Danh mục gói kỳ hạn trả góp sinh viên)*
 Lưu cấu hình các gói trả góp (3 tháng 0%, 6 tháng 1.2%/tháng, 12 tháng 1.5%/tháng).
@@ -325,7 +325,25 @@ Lưu các đối tượng bị chặn tự động hoặc thủ công để bả
 
 ---
 
-### 4.2.3. Script SQL DDL khởi tạo 4 bảng mở rộng (MySQL 8.0)
+#### Bảng 5: `wp_gf_rma_requests` *(Quản lý yêu cầu Đổi trả / Bảo hành – RMA)*
+Lưu các yêu cầu trả hàng (`RETURN`), đổi máy (`EXCHANGE`) hoặc bảo hành (`WARRANTY`) gắn với đơn hàng và `Serial Number`.
+
+| Tên trường (Column) | Kiểu dữ liệu (MySQL 8.0) | Khóa / Ràng buộc | Giá trị mặc định | Mô tả ý nghĩa |
+| :--- | :--- | :--- | :--- | :--- |
+| `rma_id` | `BIGINT UNSIGNED` | `PK`, `AUTO_INCREMENT` | — | Mã yêu cầu RMA. |
+| `order_id` | `BIGINT UNSIGNED` | `NOT NULL`, `INDEX` | — | Khóa ngoại tham chiếu `wp_wc_orders(id)`. |
+| `user_id` | `BIGINT UNSIGNED` | `NOT NULL`, `INDEX` | — | Khóa ngoại tham chiếu `wp_users(ID)`. |
+| `serial_number` | `VARCHAR(100)` | `NULL`, `INDEX` | `NULL` | Mã S/N thiết bị cần đổi trả/bảo hành. |
+| `request_type` | `ENUM('RETURN','EXCHANGE','WARRANTY')` | `NOT NULL` | `'RETURN'` | Loại yêu cầu xử lý hậu mãi. |
+| `reason` | `TEXT` | `NOT NULL` | — | Lý do đổi trả/bảo hành do khách hàng mô tả. |
+| `status` | `VARCHAR(30)` | `NOT NULL`, `INDEX` | `'REQUESTED'` | Trạng thái (`REQUESTED`, `APPROVED`, `COMPLETED`, `REJECTED`). |
+| `admin_note` | `TEXT` | `NULL` | `NULL` | Ghi chú/lý do phản hồi của quản trị viên. |
+| `reviewed_by` | `BIGINT UNSIGNED` | `NULL` | `NULL` | ID quản trị viên xử lý yêu cầu. |
+| `reviewed_at` | `DATETIME` | `NULL` | `NULL` | Thời điểm duyệt/hoàn tất RMA. |
+
+---
+
+### 4.2.3. Script SQL DDL khởi tạo 5 bảng mở rộng (MySQL 8.0)
 
 ```sql
 CREATE TABLE IF NOT EXISTS wp_gf_installment_plans (
@@ -391,6 +409,25 @@ CREATE TABLE IF NOT EXISTS wp_gf_fraud_blacklist (
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY uk_gf_blacklist_target (target_type, target_value)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS wp_gf_rma_requests (
+    rma_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    order_id BIGINT UNSIGNED NOT NULL,
+    user_id BIGINT UNSIGNED NOT NULL,
+    serial_number VARCHAR(100) NULL,
+    request_type ENUM('RETURN', 'EXCHANGE', 'WARRANTY') NOT NULL DEFAULT 'RETURN',
+    reason TEXT NOT NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'REQUESTED',
+    admin_note TEXT NULL,
+    reviewed_by BIGINT UNSIGNED NULL,
+    reviewed_at DATETIME NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_gf_rma_order (order_id),
+    INDEX idx_gf_rma_user (user_id),
+    INDEX idx_gf_rma_status_id (status, rma_id),
+    INDEX idx_gf_rma_serial (serial_number)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ---
@@ -405,6 +442,7 @@ CREATE TABLE IF NOT EXISTS wp_gf_fraud_blacklist (
 classDiagram
     class GF_Activator {
         +activate() void
+        +ensure_rma_table() void
         -create_tables() void
         -seed_installment_plans() void
         -ensure_vault_directory() void
@@ -421,6 +459,7 @@ classDiagram
         -get_encryption_key() string
     }
     class GF_Installment_Review {
+        +handle_apply_rest(WP_REST_Request req) WP_REST_Response
         +submit_application(array data, array cccd, array card) int
         +review_layer_1(int app_id, int reviewer_id) bool
         +review_layer_2(int app_id, int reviewer_id) bool
@@ -449,8 +488,18 @@ classDiagram
     }
     class GF_Admin_Pages {
         +render_installments_page() void
+        +render_rma_page() void
         +handle_review_action() void
+        +handle_rma_action() void
         +handle_view_vault_doc() void
+    }
+    class GF_RMA_Manager {
+        +handle_submit_rest(WP_REST_Request req) WP_REST_Response
+        +handle_status_rest(WP_REST_Request req) WP_REST_Response
+        +submit_request(int order_id, int user_id, string type, string reason, string sn) int
+        +approve_request(int rma_id, int reviewer_id, string note) bool
+        +reject_request(int rma_id, int reviewer_id, string note) bool
+        +complete_request(int rma_id, int reviewer_id, string note) bool
     }
     GF_Installment_Review --> GF_Vault_Crypto : mã hóa ảnh CCCD/Thẻ SV
     GF_Installment_Review ..> GF_Installment_Calc : sử dụng kết quả tính góp
@@ -458,7 +507,10 @@ classDiagram
     GF_Invoice_PDF --> GF_Serial_Manager : truy vấn danh sách S/N
     GF_Invoice_PDF ..> GF_Installment_Review : đọc trạng thái trả góp
     GF_Admin_Pages --> GF_Installment_Review : gọi duyệt 2 lớp / từ chối
+    GF_Admin_Pages --> GF_RMA_Manager : duyệt / hoàn tất / từ chối RMA
     GF_Admin_Pages --> GF_Vault_Crypto : giải mã stream ảnh
+    GF_RMA_Manager ..> GF_Serial_Manager : đối chiếu & thu hồi S/N
+    GF_RMA_Manager ..> GF_Installment_Review : đóng hồ sơ trả góp khi trả toàn phần
 ```
 
 ### 5.2.3. Công cụ tính Trả góp Động, Mã hóa AES-256, Duyệt 2 lớp & Sandbox 3D-Secure

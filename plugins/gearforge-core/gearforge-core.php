@@ -36,6 +36,7 @@ add_action('plugins_loaded', static function (): void {
         'includes/class-gf-payment-sandbox.php',
         'includes/class-gf-serial-manager.php',
         'includes/class-gf-invoice-pdf.php',
+        'includes/class-gf-rma-manager.php',
         'admin/class-gf-admin-pages.php',
     ];
 

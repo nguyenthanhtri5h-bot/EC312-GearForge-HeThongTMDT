@@ -94,11 +94,42 @@ class GF_Activator {
                 created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 UNIQUE KEY uk_gf_blacklist_target (target_type, target_value)
             ) ENGINE=InnoDB {$charset_collate};",
+
+            self::get_rma_table_sql($prefix, $charset_collate),
         ];
 
         foreach ($queries as $sql) {
             $wpdb->query($sql);
         }
+    }
+
+    /**
+     * Ensure wp_gf_rma_requests exists even when plugin was activated on an earlier version.
+     */
+    public static function ensure_rma_table(): void {
+        global $wpdb;
+        $wpdb->query(self::get_rma_table_sql($wpdb->prefix, $wpdb->get_charset_collate()));
+    }
+
+    private static function get_rma_table_sql(string $prefix, string $charset_collate): string {
+        return "CREATE TABLE IF NOT EXISTS {$prefix}gf_rma_requests (
+            rma_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            order_id BIGINT UNSIGNED NOT NULL,
+            user_id BIGINT UNSIGNED NOT NULL,
+            serial_number VARCHAR(100) NULL,
+            request_type ENUM('RETURN', 'EXCHANGE', 'WARRANTY') NOT NULL DEFAULT 'RETURN',
+            reason TEXT NOT NULL,
+            status VARCHAR(30) NOT NULL DEFAULT 'REQUESTED',
+            admin_note TEXT NULL,
+            reviewed_by BIGINT UNSIGNED NULL,
+            reviewed_at DATETIME NULL,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            INDEX idx_gf_rma_order (order_id),
+            INDEX idx_gf_rma_user (user_id),
+            INDEX idx_gf_rma_status_id (status, rma_id),
+            INDEX idx_gf_rma_serial (serial_number)
+        ) ENGINE=InnoDB {$charset_collate};";
     }
 
     /**

@@ -14,6 +14,130 @@ if (!defined('ABSPATH')) {
 
 class GF_Installment_Review {
 
+    public static function init(): void {
+        add_action('rest_api_init', [self::class, 'register_routes']);
+    }
+
+    public static function register_routes(): void {
+        register_rest_route('gearforge/v1', '/installment-apply', [
+            'methods'             => WP_REST_Server::CREATABLE,
+            'callback'            => [self::class, 'handle_apply_rest'],
+            'permission_callback' => static function (): bool {
+                return is_user_logged_in();
+            },
+        ]);
+    }
+
+    /**
+     * REST callback for POST /wp-json/gearforge/v1/installment-apply.
+     * Accepts multipart/form-data with cccd_file & student_card_file, recalculates
+     * installment figures server-side, and prevents IDOR / duplicate applications.
+     */
+    public static function handle_apply_rest(WP_REST_Request $request) {
+        $order_id = (int) $request->get_param('order_id');
+        if ($order_id <= 0 || !function_exists('wc_get_order')) {
+            return new WP_REST_Response(['code' => 'gf_invalid_order', 'message' => 'Mã đơn hàng không hợp lệ.'], 400);
+        }
+
+        $order = wc_get_order($order_id);
+        if (!$order) {
+            return new WP_REST_Response(['code' => 'gf_order_not_found', 'message' => 'Không tìm thấy đơn hàng.'], 404);
+        }
+
+        $current_user_id = get_current_user_id();
+        $is_operator     = current_user_can('manage_woocommerce') || current_user_can('gf_review_installments');
+        if ((int) $order->get_user_id() !== $current_user_id && !$is_operator) {
+            return new WP_REST_Response(['code' => 'gf_forbidden', 'message' => 'Bạn không có quyền nộp hồ sơ trả góp cho đơn hàng này.'], 403);
+        }
+
+        if (!in_array($order->get_status(), ['pending', 'on-hold'], true)) {
+            return new WP_REST_Response(
+                [
+                    'code'    => 'gf_ineligible_order_status',
+                    'message' => sprintf('Đơn hàng #%d ở trạng thái "%s" không thể nộp hồ sơ trả góp (chỉ áp dụng cho đơn pending hoặc on-hold).', $order_id, $order->get_status()),
+                ],
+                400
+            );
+        }
+
+        global $wpdb;
+        $lock_name = 'gf_apply_order_' . $order_id;
+        $locked    = (int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 5)', $lock_name));
+        if ($locked !== 1) {
+            return new WP_REST_Response(['code' => 'gf_lock_busy', 'message' => 'Hệ thống đang xử lý hồ sơ cho đơn hàng này, vui lòng thử lại.'], 409);
+        }
+
+        try {
+            $existing = self::get_application_by_order($order_id);
+            if ($existing && $existing['status'] !== 'REJECTED') {
+                return new WP_REST_Response(
+                    [
+                        'code'    => 'gf_duplicate_application',
+                        'message' => sprintf('Đơn hàng #%d đã có hồ sơ trả góp #%d (trạng thái: %s).', $order_id, (int) $existing['app_id'], $existing['status']),
+                    ],
+                    409
+                );
+            }
+
+            $months   = (int) $request->get_param('months');
+            $down_pct = (float) $request->get_param('down_pct');
+            $calc     = GF_Installment_Calc::calculate((float) $order->get_total(), $down_pct, $months);
+            if (is_wp_error($calc)) {
+                return new WP_REST_Response(['code' => $calc->get_error_code(), 'message' => $calc->get_error_message()], 400);
+            }
+
+            $files        = $request->get_file_params();
+            $cccd_file    = $files['cccd_file'] ?? [];
+            $student_file = $files['student_card_file'] ?? [];
+            if (empty($cccd_file['tmp_name']) || empty($student_file['tmp_name'])) {
+                return new WP_REST_Response(
+                    ['code' => 'gf_missing_files', 'message' => 'Bắt buộc tải lên cả ảnh CCCD (cccd_file) và Thẻ Sinh viên (student_card_file).'],
+                    400
+                );
+            }
+
+            $consent_raw = $request->get_param('consent_nd13_accepted');
+            $consent     = filter_var($consent_raw, FILTER_VALIDATE_BOOLEAN) || (string) $consent_raw === '1';
+
+            $app_id = self::submit_application(
+                [
+                    'order_id'              => $order_id,
+                    'user_id'               => (int) $order->get_user_id() ?: $current_user_id,
+                    'plan_id'               => (int) $calc['plan_id'],
+                    'student_code'          => (string) $request->get_param('student_code'),
+                    'student_edu_email'     => (string) $request->get_param('student_edu_email'),
+                    'cccd_number'           => (string) $request->get_param('cccd_number'),
+                    'downpayment_amount'    => (float) $calc['downpayment_amount'],
+                    'monthly_amount'        => (float) $calc['monthly_amount'],
+                    'consent_nd13_accepted' => $consent ? 1 : 0,
+                ],
+                $cccd_file,
+                $student_file
+            );
+
+            if (is_wp_error($app_id)) {
+                return new WP_REST_Response(['code' => $app_id->get_error_code(), 'message' => $app_id->get_error_message()], 400);
+            }
+
+            $order->add_order_note(sprintf('Đã tiếp nhận hồ sơ trả góp #%d qua REST API (gói %d tháng, trả trước %s VNĐ).', $app_id, $months, number_format((float) $calc['downpayment_amount'])));
+
+            return new WP_REST_Response(
+                [
+                    'app_id'             => $app_id,
+                    'order_id'           => $order_id,
+                    'status'             => 'SUBMITTED',
+                    'plan_id'            => (int) $calc['plan_id'],
+                    'downpayment_amount' => (int) $calc['downpayment_amount'],
+                    'monthly_amount'     => (int) $calc['monthly_amount'],
+                    'message'            => 'Nộp hồ sơ trả góp thành công. Đang chờ duyệt Lớp 1.',
+                ],
+                201
+            );
+        } finally {
+            $wpdb->query($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock_name));
+        }
+    }
+
     /**
      * Submit a new student installment application after validating Decree 13/2023 consent & blacklist.
      *
@@ -250,3 +374,5 @@ class GF_Installment_Review {
         return !empty($found);
     }
 }
+
+GF_Installment_Review::init();
