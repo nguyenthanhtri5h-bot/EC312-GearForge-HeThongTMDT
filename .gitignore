@@ -26,3 +26,8 @@ __pycache__/
 *.pyc
 .vscode/
 .idea/
+
+# Flagship React/Vite build dependencies & cache (keep compiled assets/flagship/ committed)
+themes/gearforge-child/flagship-src/node_modules/
+themes/gearforge-child/flagship-src/.vite/
+themes/gearforge-child/.vite/

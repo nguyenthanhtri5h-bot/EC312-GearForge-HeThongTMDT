@@ -1,0 +1,91 @@
+/* ── Astronaut Guide Rail (mép phải) ── */
+.tc-dd {
+  position: fixed;
+  z-index: 40;
+  right: calc(20 * var(--u, 1px));
+  top: 14vh;
+  height: 52vh;
+  top: 14svh;
+  height: 52svh;
+  width: calc(70 * var(--u, 1px));
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.tc-dd.hien { opacity: 1; }
+
+.tc-dd-ray { position: absolute; right: calc(28 * var(--u, 1px)); top: 0; bottom: 0; width: calc(2 * var(--u, 1px)); border-radius: 2px; background: #cbd5e1; }
+.tc-dd-chi { position: absolute; left: 0; top: 0; width: 100%; height: calc(var(--q, 0) * 100%); border-radius: 2px; background: #2563eb; }
+.tc-dd-moc { list-style: none; margin: 0; padding: 0; position: absolute; inset: 0; }
+.tc-dd-moc li { position: absolute; right: calc(20.5 * var(--u, 1px)); top: var(--t, 0); translate: 0 -50%; pointer-events: auto; }
+.tc-dd-moc a { position: relative; display: block; width: calc(16 * var(--u, 1px)); height: calc(16 * var(--u, 1px)); border-radius: 50%; background: #fff; border: calc(2.5 * var(--u, 1px)) solid #64748b; transition: background 0.25s, border-color 0.25s, scale 0.25s; }
+.tc-dd-moc li.qua a { background: #ffffff; border-color: #2563eb; }
+.tc-dd-moc span { position: absolute; right: calc(30 * var(--u, 1px)); top: 50%; translate: 0 -50%; padding: calc(4 * var(--u, 1px)) calc(12 * var(--u, 1px)); border-radius: 99px; background: #0f172a; color: #fff; font-size: 13px; font-weight: 700; line-height: 1.4; white-space: nowrap; opacity: 0; transition: opacity 0.2s; }
+
+@media (hover: hover) {
+  .tc-dd-moc a:hover { scale: 1.25; }
+  .tc-dd-moc a:hover span { opacity: 1; }
+}
+
+.tc-dd-gau { position: absolute; right: calc(-8 * var(--u, 1px)); top: calc(var(--q, 0) * 100%); width: calc(86 * var(--u, 1px)); height: calc(100 * var(--u, 1px)); translate: 0 -55%; transform-origin: 50% 100%; }
+.tc-dd-gau img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: 50% 100%; filter: drop-shadow(0 8px 10px rgba(42, 15, 74, 0.35)); }
+.tc-dd.di .tc-dd-gau { animation: dd-di 0.5s ease-in-out infinite alternate; }
+@keyframes dd-di { from { transform: translateY(2px) rotate(-4deg); } to { transform: translateY(-4px) rotate(4deg); } }
+
+.tc-dd-nhan { position: absolute; right: calc(100% + 6px); top: 18%; padding: 4px 10px; border-radius: 8px; background: #ffffff; color: #09090b; border: 1px solid #e4e4e7; font-size: 12.5px; font-weight: 700; line-height: 1.3; white-space: nowrap; opacity: 0; translate: 8px 0; transition: opacity 0.25s, translate 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+.tc-dd-nhan.noi { opacity: 1; translate: 0 0; }
+
+/* ── Bottom-left Live Feed ── */
+.notis { position: fixed; bottom: 24px; left: 16px; z-index: 150; font-family: 'Inter', 'Be Vietnam Pro', system-ui, sans-serif; }
+.notis-list { position: absolute; bottom: calc(100% + 10px); left: 0; width: 260px; display: flex; flex-direction: column; gap: 8px; transition: opacity 0.25s ease, transform 0.25s ease; }
+.notis.hide .notis-list { opacity: 0; pointer-events: none; transform: translateX(-110%); }
+.notis-item { padding: 10px; border-radius: 10px; background: rgba(15, 23, 42, 0.94); backdrop-filter: blur(8px); display: flex; align-items: center; gap: 10px; color: #f8fafc; text-decoration: none; border: 1px solid rgba(255, 255, 255, 0.14); box-shadow: 0 8px 24px rgba(15, 23, 42, 0.28); }
+.notis-img { width: 50px; height: 40px; border-radius: 6px; overflow: hidden; flex-shrink: 0; }
+.notis-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.notis-title { font-size: 12px; line-height: 1.38; color: #f4f4f6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.notis-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10b981; margin-right: 6px; vertical-align: middle; }
+.notis-icon { width: 48px; height: 48px; border-radius: 12px; background: #0f172a; border: 1.5px solid rgba(255, 255, 255, 0.24); color: #fff; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; }
+.notis-number { position: absolute; top: -8px; right: -8px; width: 20px; height: 20px; border-radius: 50%; background: #2563eb; color: #ffffff; font-size: 11px; font-weight: 800; display: grid; place-items: center; }
+
+/* ── Bottom-right GearForge Chat ── */
+.mc-bubble { position: fixed; right: 20px; bottom: 20px; width: 52px; height: 52px; border-radius: 50%; background: #0f172a; color: #fff; border: 1.5px solid rgba(59, 130, 246, 0.55); padding: 0; cursor: pointer; box-shadow: 0 8px 28px rgba(15, 23, 42, 0.45); display: flex; align-items: center; justify-content: center; overflow: hidden; z-index: 990; transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.mc-bubble:hover { transform: scale(1.06); border-color: #2563eb; }
+.mc-bubble img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.mc-panel { position: fixed; right: 20px; bottom: 86px; width: min(370px, calc(100vw - 32px)); height: 480px; max-height: calc(100vh - 120px); background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; box-shadow: 0 20px 60px rgba(15, 23, 42, 0.25); z-index: 995; display: flex; flex-direction: column; overflow: hidden; font-family: 'Inter', 'Be Vietnam Pro', system-ui, sans-serif; }
+.mc-panel-head { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: #0f172a; border-bottom: 1px solid rgba(255, 255, 255, 0.14); color: #fff; }
+.mc-panel-head img { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; background: #fff; }
+.mc-panel-head .title { font-weight: 700; font-size: 15px; }
+.mc-panel-head .status { font-size: 11.5px; color: #cbd5e1; }
+.mc-panel-head .close-btn { margin-left: auto; background: rgba(255, 255, 255, 0.14); border: 0; color: #fff; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; }
+.mc-messages { flex: 1; padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #f8fafc; }
+.mc-msg { max-width: 82%; padding: 9px 12px; border-radius: 12px; font-size: 13.5px; line-height: 1.45; }
+.mc-msg.bot { background: #fff; color: #0f172a; align-self: flex-start; border: 1px solid #e2e8f0; }
+.mc-msg.user { background: #2563eb; color: #fff; align-self: flex-end; }
+.mc-composer { display: flex; gap: 8px; padding: 10px; border-top: 1px solid #e2e8f0; background: #fff; }
+.mc-composer input { flex: 1; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 12px; font-family: inherit; font-size: 13.5px; outline: none; }
+.mc-composer button { padding: 0 14px; border: 0; border-radius: 8px; background: #2563eb; color: #fff; font-weight: 700; cursor: pointer; }
+
+/* Video Dialog */
+.tc-xem { width: min(92vw, 440px); max-height: 92dvh; padding: 0; border: 0; border-radius: 20px; background: #000; overflow: visible; }
+.tc-xem.is-wide { width: min(94vw, 1080px); }
+.tc-xem::backdrop { background: rgba(10, 7, 20, 0.84); backdrop-filter: blur(6px); }
+.tc-xem-vid { display: block; width: 100%; max-height: 88dvh; aspect-ratio: 9 / 16; border-radius: 20px; background: #000; }
+.tc-xem-vid.is-wide { aspect-ratio: 16 / 9; }
+.tc-xem-dong { position: absolute; top: -52px; right: 0; width: 44px; height: 44px; border: 0; border-radius: 50%; background: #fff; color: #141018; font-size: 28px; line-height: 1; cursor: pointer; z-index: 5; }
+
+@media (max-width: 1399px) {
+  .tc-dd { right: 0; width: 52px; }
+  .tc-dd-moc { display: none; }
+  .tc-dd-ray { right: 3px; }
+  .tc-dd-gau { width: 50px; height: 60px; right: 6px; translate: 130% -55%; transition: translate 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+  .tc-dd.doi .tc-dd-gau { translate: 0 -55%; }
+}
+
+@media (max-width: 767px) {
+  .tc-dd { display: none; }
+  .notis { display: none; }
+  .mc-bubble { width: 46px; height: 46px; right: 14px; bottom: 72px; }
+  .mc-panel { bottom: 126px; max-height: calc(100vh - 150px); }
+}

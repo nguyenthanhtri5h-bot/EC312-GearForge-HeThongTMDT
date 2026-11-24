@@ -1,0 +1,249 @@
+/* Xgear-Inspired Retail Merchandising Shelves — Crisp Light + Cobalt Theme */
+.xg-strip-sec { padding: 28px 0 36px; background: #f8fafc; }
+
+.xg-quick-grid {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.xg-quick-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 12px 8px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #0f172a;
+  cursor: pointer;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.xg-quick-tile:hover {
+  transform: translateY(-2px);
+  border-color: #2563eb;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.08);
+}
+
+.xg-quick-thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+}
+
+.xg-quick-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.xg-quick-tile span { font-size: 12.5px; font-weight: 600; line-height: 1.3; color: #0f172a; }
+
+.xg-promo-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.xg-promo-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #0f172a;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.xg-promo-card:hover { transform: translateY(-2px); border-color: #2563eb; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08); }
+.xg-promo-card h3 { margin: 4px 0 6px; font-family: 'Be Vietnam Pro', sans-serif; font-size: 16.5px; font-weight: 800; line-height: 1.28; color: #0f172a; }
+.xg-promo-card p { margin: 0; font-size: 12.5px; color: #475569; line-height: 1.4; }
+.xg-promo-badge { display: inline-block; padding: 4px 8px; border-radius: 6px; background: #2563eb; color: #ffffff; font-size: 10.5px; font-weight: 800; letter-spacing: 0.02em; white-space: nowrap; flex-shrink: 0; }
+.xg-promo-img { width: 104px; height: 76px; border-radius: 10px; object-fit: cover; flex-shrink: 0; border: 1px solid #e2e8f0; }
+
+/* Flash Deals Shelf */
+.xg-flash-sec { padding: 14px 0 36px; background: #f8fafc; }
+
+.xg-flash-box {
+  padding: 20px 22px 24px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+}
+
+.xg-flash-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  background: #0f172a;
+  color: #ffffff;
+}
+
+.xg-flash-title { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.xg-flash-title h2 { margin: 0; font-family: 'Be Vietnam Pro', sans-serif; font-size: clamp(19px, 2.1vw, 25px); font-weight: 800; color: #ffffff; }
+.xg-timer { display: flex; align-items: center; gap: 6px; }
+.xg-timer-box { min-width: 48px; padding: 6px 8px; border-radius: 10px; background: #2563eb; color: #ffffff; text-align: center; }
+.xg-timer-box strong { display: block; font-family: 'Be Vietnam Pro', sans-serif; font-size: 16px; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.xg-timer-box span { display: block; font-size: 10px; font-weight: 700; color: #dbeafe; text-transform: uppercase; }
+
+/* Shelf Sections & Header */
+.xg-shelf-block { min-width: 0; max-width: 100%; overflow: hidden; padding: 24px; border-radius: 16px; background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04); }
+.xg-shelf-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; min-width: 0; max-width: 100%; }
+.xg-shelf-heading { display: flex; align-items: center; gap: 10px; margin: 0; font-family: 'Be Vietnam Pro', sans-serif; font-size: clamp(19px, 2vw, 24px); font-weight: 800; color: #0f172a; }
+.xg-shelf-heading::before { content: ''; width: 4px; height: 22px; border-radius: 2px; background: #2563eb; flex-shrink: 0; }
+.xg-brand-tabs { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; max-width: 100%; }
+.xg-link-pill, .xg-shelf-head .gf-mini-pill, .xg-brand-tabs .gf-mini-pill {
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #334155 !important;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.xg-brand-tabs .gf-mini-pill.is-active { background: #2563eb; border-color: #2563eb; color: #ffffff !important; font-weight: 700; }
+.xg-link-pill:hover, .xg-shelf-head .gf-mini-pill:hover { border-color: #2563eb; color: #0f172a !important; background: #ffffff; }
+
+.xg-split-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; min-width: 0; }
+.xg-shelf-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; min-width: 0; }
+.xg-split-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; min-width: 0; }
+.xg-shelf-grid .gf-prod-actions,
+.xg-split-cards .gf-prod-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+.xg-shelf-grid .gf-prod-actions .gf-act-btn.is-primary,
+.xg-split-cards .gf-prod-actions .gf-act-btn.is-primary {
+  grid-column: 1 / -1;
+}
+.xg-shelf-footer { display: flex; justify-content: center; margin-top: 20px; }
+
+/* Xgear Card Spec 2x2 Grid & Discounts */
+.xg-disc-badge { position: absolute; top: 10px; left: 10px; padding: 3px 8px; border-radius: 6px; background: #dc2626; color: #ffffff; font-size: 11.5px; font-weight: 800; z-index: 2; }
+.xg-strike { font-size: 13px; color: #64748b; text-decoration: line-through; font-variant-numeric: tabular-nums; }
+.xg-sv-pill { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 6px; background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; font-size: 11px; font-weight: 700; }
+
+.xg-spec-2x2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  padding: 8px;
+  border-radius: 8px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+}
+
+.xg-spec-cell {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.xg-spec-cell span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.xg-flash-bar { height: 22px; padding: 0 8px; border-radius: 6px; background: #eff6ff; border: 1px solid #bfdbfe; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.xg-flash-fill { position: absolute; left: 0; top: 0; bottom: 0; background: #dbeafe; border-radius: 6px; }
+.xg-flash-bar span { position: relative; z-index: 2; font-size: 10.5px; font-weight: 700; color: #1e40af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Mobile Sticky Bottom Bar */
+.xg-mob-nav { display: none; }
+
+@media (max-width: 1180px) {
+  .xg-quick-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .xg-shelf-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 900px) {
+  .xg-promo-row, .xg-split-grid { grid-template-columns: 1fr; }
+  .xg-shelf-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 767px) {
+  body { padding-bottom: 62px; }
+  .xg-quick-grid { display: flex; overflow-x: auto; gap: 10px; padding-bottom: 6px; scrollbar-width: none; }
+  .xg-quick-tile { flex: 0 0 92px; }
+  .xg-brand-tabs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; width: 100%; max-width: 100%; }
+  .xg-brand-tabs .gf-mini-pill { flex-shrink: 0; }
+  .xg-flash-box { padding: 14px 10px; }
+  .xg-flash-head { padding: 12px 14px; }
+  .xg-shelf-block { padding: 14px 10px; }
+  .xg-shelf-grid, .xg-split-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .xg-shelf-grid .gf-prod-card, .xg-split-cards .gf-prod-card { min-width: 0; max-width: 100%; border-radius: 14px; }
+  .xg-shelf-grid .gf-prod-body, .xg-split-cards .gf-prod-body { padding: 10px 8px; gap: 7px; min-width: 0; }
+  .xg-shelf-grid .gf-prod-title, .xg-split-cards .gf-prod-title { font-size: 13px; line-height: 1.35; min-height: 2.7em; }
+  .xg-shelf-grid .gf-prod-price, .xg-split-cards .gf-prod-price { font-size: 14.5px; }
+  .xg-shelf-grid .xg-strike, .xg-split-cards .xg-strike { font-size: 11px; }
+  .xg-shelf-grid .xg-sv-pill, .xg-split-cards .xg-sv-pill { font-size: 10px; padding: 3px 6px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .xg-shelf-grid .xg-spec-2x2, .xg-split-cards .xg-spec-2x2 { grid-template-columns: minmax(0, 1fr); gap: 3px; padding: 6px; }
+  .xg-shelf-grid .xg-spec-cell, .xg-split-cards .xg-spec-cell { font-size: 10.5px; }
+  .xg-shelf-grid .gf-prod-actions, .xg-split-cards .gf-prod-actions { grid-template-columns: minmax(0, 1fr) !important; gap: 5px; }
+  .xg-shelf-grid .gf-act-btn, .xg-split-cards .gf-act-btn { min-height: 36px; font-size: 12px; padding: 0 8px; }
+  .xg-mob-nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 60px;
+    z-index: 940;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid #e2e8f0;
+    box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.08);
+  }
+  .xg-mob-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    background: none;
+    border: 0;
+    color: #475569;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+  }
+  .xg-mob-btn.is-active { color: #2563eb; font-weight: 700; }
+  .xg-mob-badge {
+    position: absolute;
+    top: 6px;
+    right: calc(50% - 20px);
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 6px;
+    background: #2563eb;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 800;
+    display: grid;
+    place-items: center;
+  }
+}

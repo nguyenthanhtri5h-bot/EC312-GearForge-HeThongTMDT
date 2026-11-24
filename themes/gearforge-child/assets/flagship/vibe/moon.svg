@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" fill="none">
+  <defs>
+    <radialGradient id="mn-aura" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#818cf8" stop-opacity="0.45"/>
+      <stop offset="65%" stop-color="#6366f1" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="#1e1b4b" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="mn-core" cx="32%" cy="28%" r="72%">
+      <stop offset="0%" stop-color="#f5f3ff" stop-opacity="0.95"/>
+      <stop offset="32%" stop-color="#c4b5fd" stop-opacity="0.82"/>
+      <stop offset="72%" stop-color="#6366f1" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#312e81" stop-opacity="0.88"/>
+    </radialGradient>
+  </defs>
+  <circle cx="160" cy="160" r="148" fill="url(#mn-aura)"/>
+  <circle cx="160" cy="160" r="88" fill="url(#mn-core)" stroke="#a5f3fc" stroke-opacity="0.55" stroke-width="2.5"/>
+  <circle cx="132" cy="128" r="16" fill="#4f46e5" fill-opacity="0.22" stroke="#e0e7ff" stroke-opacity="0.28" stroke-width="1.5"/>
+  <circle cx="192" cy="176" r="22" fill="#312e81" fill-opacity="0.22" stroke="#c4b5fd" stroke-opacity="0.22" stroke-width="1.5"/>
+  <circle cx="146" cy="204" r="10" fill="#4338ca" fill-opacity="0.24"/>
+  <path d="M98 118a74 74 0 0 1 82-36" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-opacity="0.55"/>
+  <path d="M258 84l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="#e0f2fe" opacity="0.9"/>
+</svg>

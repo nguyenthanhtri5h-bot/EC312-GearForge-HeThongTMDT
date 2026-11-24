@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 420" fill="none">
+  <defs>
+    <radialGradient id="bg-aura" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.32"/>
+      <stop offset="60%" stop-color="#8b5cf6" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="#1e1b4b" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="fur-grad" x1="25%" y1="10%" x2="75%" y2="95%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="65%" stop-color="#e0e7ff"/>
+      <stop offset="100%" stop-color="#b4c6fc"/>
+    </linearGradient>
+    <linearGradient id="hoodie-grad" x1="15%" y1="0%" x2="85%" y2="100%">
+      <stop offset="0%" stop-color="#312e81"/>
+      <stop offset="55%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="cyan-neon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#67e8f9"/>
+      <stop offset="100%" stop-color="#0057ff"/>
+    </linearGradient>
+    <linearGradient id="goggle-frame" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <filter id="neon-glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+</defs>
+  <circle cx="210" cy="210" r="185" fill="url(#bg-aura)"/>
+
+  <!-- Jetpack Plasma Trail -->
+  <path d="M150 326 L124 398 L166 360 Z" fill="#38bdf8" opacity="0.85" filter="url(#neon-glow)"/>
+  <path d="M270 326 L296 398 L254 360 Z" fill="#a855f7" opacity="0.85" filter="url(#neon-glow)"/>
+
+  <!-- Space Suit Torso -->
+  <rect x="128" y="218" width="164" height="132" rx="54" fill="url(#fur-grad)" stroke="#312e81" stroke-width="4"/>
+  <rect x="166" y="252" width="88" height="52" rx="14" fill="#1e1b4b" stroke="#38bdf8" stroke-width="3"/>
+  <circle cx="192" cy="278" r="9" fill="#22d3ee" filter="url(#neon-glow)"/>
+  <rect x="212" y="270" width="28" height="6" rx="3" fill="#a5f3fc"/>
+  <rect x="212" y="282" width="20" height="6" rx="3" fill="#c084fc"/>
+
+  <!-- Floating Arms & Boots -->
+  <ellipse cx="104" cy="264" rx="28" ry="20" transform="rotate(-24 104 264)" fill="url(#fur-grad)" stroke="#312e81" stroke-width="4"/>
+  <ellipse cx="316" cy="252" rx="28" ry="20" transform="rotate(28 316 252)" fill="url(#fur-grad)" stroke="#312e81" stroke-width="4"/>
+  <rect x="148" y="338" width="44" height="36" rx="16" fill="#312e81" stroke="#38bdf8" stroke-width="3"/>
+  <rect x="228" y="338" width="44" height="36" rx="16" fill="#312e81" stroke="#38bdf8" stroke-width="3"/>
+
+  
+  <g transform="translate(210,148) scale(0.88)">
+    <!-- Ears -->
+    <circle cx="-68" cy="-58" r="32" fill="url(#fur-grad)" stroke="#312e81" stroke-width="4"/>
+    <circle cx="-68" cy="-58" r="17" fill="#818cf8" opacity="0.55"/>
+    <circle cx="68" cy="-58" r="32" fill="url(#fur-grad)" stroke="#312e81" stroke-width="4"/>
+    <circle cx="68" cy="-58" r="17" fill="#818cf8" opacity="0.55"/>
+
+    <!-- Head -->
+    <ellipse cx="0" cy="0" rx="88" ry="76" fill="url(#fur-grad)" stroke="#1e1b4b" stroke-width="4"/>
+    <!-- Cheek shading -->
+    <ellipse cx="-52" cy="18" rx="16" ry="9" fill="#c7d2fe" opacity="0.65"/>
+    <ellipse cx="52" cy="18" rx="16" ry="9" fill="#c7d2fe" opacity="0.65"/>
+
+    <!-- Forehead cyber goggles (NEVER covering eyes!) -->
+    <rect x="-66" y="-66" width="132" height="28" rx="14" fill="#0f172a" stroke="url(#goggle-frame)" stroke-width="3.5"/>
+    <rect x="-54" y="-60" width="44" height="16" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+    <rect x="10" y="-60" width="44" height="16" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+    <line x1="-44" y1="-55" x2="-24" y2="-55" stroke="#67e8f9" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="20" y1="-55" x2="40" y2="-55" stroke="#67e8f9" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- Bright Cyan Anime Eyes -->
+    <ellipse cx="-32" cy="-4" rx="13" ry="15" fill="#0f172a"/>
+    <ellipse cx="-32" cy="-3" rx="9" ry="11" fill="#22d3ee" filter="url(#neon-glow)"/>
+    <circle cx="-35" cy="-7" r="4" fill="#ffffff"/>
+    <circle cx="-28" cy="2" r="2" fill="#e0f2fe"/>
+
+    <ellipse cx="32" cy="-4" rx="13" ry="15" fill="#0f172a"/>
+    <ellipse cx="32" cy="-3" rx="9" ry="11" fill="#22d3ee" filter="url(#neon-glow)"/>
+    <circle cx="29" cy="-7" r="4" fill="#ffffff"/>
+    <circle cx="36" cy="2" r="2" fill="#e0f2fe"/>
+
+    <!-- Snout & friendly grin -->
+    <ellipse cx="0" cy="24" rx="30" ry="22" fill="#ffffff" stroke="#c7d2fe" stroke-width="2"/>
+    <ellipse cx="0" cy="17" rx="11" ry="7.5" fill="#1e1b4b"/>
+    <path d="M-12 31 Q0 41 12 31" stroke="#1e1b4b" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+  </g>
+
+  <!-- Transparent Bubble Space Helmet (clear rim, keeps cyan eyes 100% crisp) -->
+  <circle cx="210" cy="144" r="102" fill="#38bdf8" fill-opacity="0.07" stroke="url(#goggle-frame)" stroke-width="4.5"/>
+  <path d="M138 92 A 84 84 0 0 1 206 58" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-opacity="0.65"/>
+</svg>

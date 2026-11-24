@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 520" fill="none">
+  <defs>
+    <radialGradient id="pl-aura" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#a855f7" stop-opacity="0.45"/>
+      <stop offset="55%" stop-color="#6366f1" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#312e81" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="pl-sphere" cx="34%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#e0e7ff" stop-opacity="0.92"/>
+      <stop offset="28%" stop-color="#a78bfa" stop-opacity="0.82"/>
+      <stop offset="68%" stop-color="#5b21b6" stop-opacity="0.72"/>
+      <stop offset="100%" stop-color="#1e1b4b" stop-opacity="0.88"/>
+    </radialGradient>
+    <linearGradient id="pl-rim" x1="15%" y1="10%" x2="85%" y2="90%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.85"/>
+      <stop offset="50%" stop-color="#c084fc" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#4f46e5" stop-opacity="0.1"/>
+    </linearGradient>
+    <linearGradient id="pl-ring" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.1"/>
+      <stop offset="28%" stop-color="#a5b4fc" stop-opacity="0.8"/>
+      <stop offset="55%" stop-color="#e879f9" stop-opacity="0.9"/>
+      <stop offset="85%" stop-color="#38bdf8" stop-opacity="0.65"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0.05"/>
+    </linearGradient>
+    <clipPath id="pl-clip">
+      <circle cx="260" cy="260" r="136"/>
+    </clipPath>
+    <filter id="pl-blur" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="12"/>
+    </filter>
+  </defs>
+
+  <circle cx="260" cy="260" r="245" fill="url(#pl-aura)"/>
+
+  <!-- Back orbital ring -->
+  <g transform="rotate(-22 260 260)">
+    <path d="M 38 260 A 222 64 0 0 1 482 260" stroke="url(#pl-ring)" stroke-width="14" stroke-linecap="round" opacity="0.45"/>
+    <path d="M 64 260 A 196 52 0 0 1 456 260" stroke="#c4b5fd" stroke-width="2" stroke-dasharray="6 10" opacity="0.5"/>
+  </g>
+
+  <!-- Planet body -->
+  <g clip-path="url(#pl-clip)">
+    <circle cx="260" cy="260" r="136" fill="url(#pl-sphere)"/>
+    <ellipse cx="235" cy="215" rx="165" ry="38" transform="rotate(-14 235 215)" fill="#c4b5fd" opacity="0.18"/>
+    <ellipse cx="285" cy="292" rx="150" ry="30" transform="rotate(-14 285 292)" fill="#38bdf8" opacity="0.14"/>
+    <ellipse cx="215" cy="185" rx="68" ry="44" transform="rotate(-28 215 185)" fill="#ffffff" opacity="0.22" filter="url(#pl-blur)"/>
+  </g>
+  <circle cx="260" cy="260" r="135.5" stroke="url(#pl-rim)" stroke-width="3"/>
+
+  <!-- Front orbital ring -->
+  <g transform="rotate(-22 260 260)">
+    <path d="M 38 260 A 222 64 0 0 0 482 260" stroke="url(#pl-ring)" stroke-width="16" stroke-linecap="round"/>
+    <path d="M 56 262 A 204 54 0 0 0 464 262" stroke="#e0f2fe" stroke-width="2" stroke-opacity="0.75"/>
+    <circle cx="445" cy="285" r="7" fill="#38bdf8"/>
+    <circle cx="445" cy="285" r="14" fill="#38bdf8" opacity="0.28"/>
+    <circle cx="88" cy="292" r="5" fill="#f0abfc"/>
+  </g>
+
+  <!-- Sparkles -->
+  <path d="M108 118l4 10 10 4-10 4-4 10-4-10-10-4 10-4z" fill="#e0f2fe" opacity="0.9"/>
+  <path d="M412 132l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#f5d0fe" opacity="0.85"/>
+  <circle cx="395" cy="396" r="3" fill="#a5f3fc" opacity="0.8"/>
+</svg>

@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="gfShieldBg" x1="6" y1="4" x2="58" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#8b2cf5" />
+      <stop offset="52%" stop-color="#5b18c8" />
+      <stop offset="100%" stop-color="#0057ff" />
+    </linearGradient>
+    <linearGradient id="gfRim" x1="8" y1="4" x2="54" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#e9d5ff" stop-opacity="0.72" />
+      <stop offset="50%" stop-color="#38bdf8" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#ffc83d" stop-opacity="0.5" />
+    </linearGradient>
+    <linearGradient id="gfGearMetal" x1="16" y1="12" x2="48" y2="52" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#d8ccf8" />
+    </linearGradient>
+    <linearGradient id="gfForgeBolt" x1="22" y1="18" x2="42" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffe066" />
+      <stop offset="55%" stop-color="#ffb703" />
+      <stop offset="100%" stop-color="#38bdf8" />
+    </linearGradient>
+    <linearGradient id="gfSheen" x1="10" y1="6" x2="44" y2="34" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.26" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <rect x="2" y="2" width="60" height="60" rx="17" fill="url(#gfShieldBg)" />
+  <rect x="2.75" y="2.75" width="58.5" height="58.5" rx="16.25" stroke="url(#gfRim)" stroke-width="1.5" />
+  <path d="M18 4H46C53.2 4 59 9.8 59 17V24C44 19 25 22 5 33V17C5 9.8 10.8 4 18 4Z" fill="url(#gfSheen)" />
+
+  <!-- 8-tooth precision forged hardware gear -->
+  <path
+    fill-rule="evenodd"
+    clip-rule="evenodd"
+    d="M28.6 11H35.4L36.8 16.1C38.4 16.5 39.9 17.2 41.2 18L45.9 15.4L50.6 20.1L48 24.8C48.8 26.1 49.5 27.6 49.9 29.2L55 30.6V37.4L49.9 38.8C49.5 40.4 48.8 41.9 48 43.2L50.6 47.9L45.9 52.6L41.2 50C39.9 50.8 38.4 51.5 36.8 51.9L35.4 57H28.6L27.2 51.9C25.6 51.5 24.1 50.8 22.8 50L18.1 52.6L13.4 47.9L16 43.2C15.2 41.9 14.5 40.4 14.1 38.8L9 37.4V30.6L14.1 29.2C14.5 27.6 15.2 26.1 16 24.8L13.4 20.1L18.1 15.4L22.8 18C24.1 17.2 25.6 16.5 27.2 16.1L28.6 11ZM32 22.5C25.65 22.5 20.5 27.65 20.5 34C20.5 40.35 25.65 45.5 32 45.5C38.35 45.5 43.5 40.35 43.5 34C43.5 27.65 38.35 22.5 32 22.5Z"
+    fill="url(#gfGearMetal)"
+    transform="translate(0 -2)"
+  />
+
+  <!-- Inner cosmic forge core & kinetic spark -->
+  <circle cx="32" cy="32" r="10.2" fill="#130926" fill-opacity="0.88" />
+  <path
+    d="M34.2 21.5L24.5 33.4H31.2L29.4 42.5L39.6 30.2H32.6L34.2 21.5Z"
+    fill="url(#gfForgeBolt)"
+  />
+  <circle cx="48.5" cy="15.5" r="2.2" fill="#38bdf8" />
+</svg>

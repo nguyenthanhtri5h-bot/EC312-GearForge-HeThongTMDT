@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 844" fill="none">
+  <defs>
+    <linearGradient id="ph-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d1a"/>
+      <stop offset="100%" stop-color="#171235"/>
+    </linearGradient>
+    <linearGradient id="ph-accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0057ff"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+    <linearGradient id="ph-violet" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+</defs>
+  <rect width="390" height="844" fill="url(#ph-bg)"/>
+  <!-- Status bar & Dynamic Island -->
+  <rect x="135" y="18" width="120" height="28" rx="14" fill="#000000"/>
+  <text x="34" y="38" font-family="system-ui,sans-serif" font-weight="700" font-size="14" fill="#e2e8f0">09:41</text>
+  <text x="312" y="38" font-family="system-ui,sans-serif" font-weight="700" font-size="13" fill="#38bdf8">5G · UIT</text>
+
+  <!-- App Header -->
+  <rect x="20" y="66" width="350" height="58" rx="18" fill="#ffffff" fill-opacity="0.06" stroke="#ffffff" stroke-opacity="0.12"/>
+  <rect x="34" y="80" width="32" height="32" rx="10" fill="url(#ph-accent)"/>
+  <text x="50" y="101" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="14" fill="#ffffff">01</text>
+  <text x="78" y="94" font-family="system-ui,sans-serif" font-weight="800" font-size="15" fill="#ffffff">Chọn Laptop / PC &amp; Cấu hình</text>
+  <text x="78" y="112" font-family="system-ui,sans-serif" font-weight="600" font-size="11" fill="#94a3b8">GearForge Flagship App · ĐHQG-HCM</text>
+
+  
+  <!-- Search & Filter Pills -->
+  <rect x="20" y="142" width="350" height="44" rx="14" fill="#1e293b" stroke="#38bdf8" stroke-opacity="0.35"/>
+  <text x="42" y="169" font-family="system-ui,sans-serif" font-size="13" fill="#94a3b8">Tìm trong 520 sản phẩm RTX 50 / M4...</text>
+  <rect x="20" y="200" width="96" height="32" rx="16" fill="#0057ff"/>
+  <text x="68" y="220" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="700" font-size="12" fill="#ffffff">Tất cả 520</text>
+  <rect x="124" y="200" width="116" height="32" rx="16" fill="#ffffff" fill-opacity="0.08"/>
+  <text x="182" y="220" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="600" font-size="12" fill="#cbd5e1">Laptop Gaming</text>
+  <rect x="248" y="200" width="122" height="32" rx="16" fill="#ffffff" fill-opacity="0.08"/>
+  <text x="309" y="220" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="600" font-size="12" fill="#cbd5e1">Trả góp 0% SV</text>
+
+  <!-- Featured Product Card -->
+  <rect x="20" y="250" width="350" height="360" rx="24" fill="#1e1b4b" fill-opacity="0.72" stroke="#8b5cf6" stroke-opacity="0.45" stroke-width="1.5"/>
+  <rect x="36" y="268" width="114" height="26" rx="13" fill="#ec4899" fill-opacity="0.22" stroke="#f472b6"/>
+  <text x="93" y="285" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="11" fill="#fbcfe8">0% LÃI SUẤT SV</text>
+  <rect x="256" y="268" width="98" height="26" rx="13" fill="#059669" fill-opacity="0.25"/>
+  <text x="305" y="285" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="700" font-size="11" fill="#6ee7b7">Sẵn kho UIT</text>
+
+  <!-- Stylized Laptop Graphic -->
+  <rect x="75" y="314" width="240" height="132" rx="14" fill="#0f172a" stroke="#38bdf8" stroke-width="2.5"/>
+  <polygon points="195,338 228,358 228,392 195,412 162,392 162,358" fill="#0057ff" fill-opacity="0.35" stroke="#38bdf8" stroke-width="2"/>
+  <text x="195" y="381" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="16" fill="#e0f2fe">ROG G16</text>
+  <path d="M55 448 L335 448 L348 462 L42 462 Z" fill="#334155"/>
+
+  <text x="36" y="498" font-family="system-ui,sans-serif" font-weight="800" font-size="20" fill="#ffffff">ASUS ROG Zephyrus G16</text>
+  <text x="36" y="522" font-family="system-ui,sans-serif" font-size="13" fill="#cbd5e1">Ultra 9 285H · RTX 5070 8GB · 32GB · 1TB</text>
+  <text x="36" y="562" font-family="system-ui,sans-serif" font-weight="900" font-size="26" fill="#38bdf8">48.990.000 đ</text>
+  <text x="234" y="562" font-family="system-ui,sans-serif" font-weight="700" font-size="13" fill="#f472b6">3.266K/tháng</text>
+  <rect x="36" y="576" width="318" height="20" rx="6" fill="#ffffff" fill-opacity="0.06"/>
+  <text x="48" y="590" font-family="system-ui,sans-serif" font-weight="600" font-size="11" fill="#94a3b8">Đã kiểm định 3DMark + Bảo hành chính hãng 24T</text>
+
+  <!-- Secondary item -->
+  <rect x="20" y="628" width="350" height="86" rx="20" fill="#ffffff" fill-opacity="0.05" stroke="#ffffff" stroke-opacity="0.1"/>
+  <text x="38" y="660" font-family="system-ui,sans-serif" font-weight="800" font-size="15" fill="#ffffff">Lenovo Legion Pro 5 · RTX 5060</text>
+  <text x="38" y="684" font-family="system-ui,sans-serif" font-size="12" fill="#94a3b8">38.490.000 đ · So sánh 2 máy trực tiếp</text>
+
+  <rect x="20" y="734" width="350" height="54" rx="18" fill="url(#ph-accent)"/>
+  <text x="195" y="766" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="15" fill="#ffffff">Tính Trả Góp 0% Ngay →</text>
+
+
+  <!-- Bottom Home Indicator -->
+  <rect x="135" y="818" width="120" height="5" rx="2.5" fill="#ffffff" fill-opacity="0.4"/>
+</svg>

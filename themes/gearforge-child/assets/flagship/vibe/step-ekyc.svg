@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 844" fill="none">
+  <defs>
+    <linearGradient id="ph-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d1a"/>
+      <stop offset="100%" stop-color="#171235"/>
+    </linearGradient>
+    <linearGradient id="ph-accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0057ff"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+    <linearGradient id="ph-violet" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+</defs>
+  <rect width="390" height="844" fill="url(#ph-bg)"/>
+  <!-- Status bar & Dynamic Island -->
+  <rect x="135" y="18" width="120" height="28" rx="14" fill="#000000"/>
+  <text x="34" y="38" font-family="system-ui,sans-serif" font-weight="700" font-size="14" fill="#e2e8f0">09:41</text>
+  <text x="312" y="38" font-family="system-ui,sans-serif" font-weight="700" font-size="13" fill="#38bdf8">5G · UIT</text>
+
+  <!-- App Header -->
+  <rect x="20" y="66" width="350" height="58" rx="18" fill="#ffffff" fill-opacity="0.06" stroke="#ffffff" stroke-opacity="0.12"/>
+  <rect x="34" y="80" width="32" height="32" rx="10" fill="url(#ph-accent)"/>
+  <text x="50" y="101" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="14" fill="#ffffff">03</text>
+  <text x="78" y="94" font-family="system-ui,sans-serif" font-weight="800" font-size="15" fill="#ffffff">eKYC &amp; Bảo Vệ NĐ 13/2023</text>
+  <text x="78" y="112" font-family="system-ui,sans-serif" font-weight="600" font-size="11" fill="#94a3b8">GearForge Flagship App · ĐHQG-HCM</text>
+
+  
+  <!-- Verified Student Card -->
+  <rect x="20" y="144" width="350" height="214" rx="24" fill="#1e1b4b" stroke="#38bdf8" stroke-width="2"/>
+  <rect x="38" y="164" width="64" height="80" rx="14" fill="#312e81" stroke="#67e8f9" stroke-width="1.5"/>
+  <circle cx="70" cy="194" r="14" fill="#a5f3fc"/>
+  <path d="M48 232c4-14 40-14 44 0" fill="#67e8f9"/>
+
+  <text x="118" y="182" font-family="system-ui,sans-serif" font-weight="800" font-size="12" fill="#38bdf8">ĐẠI HỌC QUỐC GIA TP.HCM</text>
+  <text x="118" y="206" font-family="system-ui,sans-serif" font-weight="800" font-size="17" fill="#ffffff">NGUYỄN MINH KHANG</text>
+  <text x="118" y="228" font-family="system-ui,sans-serif" font-size="13" fill="#cbd5e1">MSSV: 22520642 · ĐH CNTT (UIT)</text>
+  <rect x="118" y="242" width="166" height="24" rx="12" fill="#059669" fill-opacity="0.28" stroke="#34d399"/>
+  <text x="201" y="258" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="11" fill="#6ee7b7">✓ Thẻ SV &amp; CCCD Hợp Lệ</text>
+
+  <line x1="38" y1="284" x2="352" y2="284" stroke="#ffffff" stroke-opacity="0.14"/>
+  <text x="38" y="312" font-family="system-ui,sans-serif" font-size="12" fill="#94a3b8">Hạn mức duyệt tự động</text>
+  <text x="38" y="338" font-family="system-ui,sans-serif" font-weight="900" font-size="22" fill="#34d399">50.000.000 đ</text>
+  <text x="352" y="338" text-anchor="end" font-family="system-ui,sans-serif" font-weight="700" font-size="12" fill="#a5f3fc">Duyệt trong 45s</text>
+
+  <!-- ND 13/2023 Compliance Card -->
+  <rect x="20" y="378" width="350" height="202" rx="22" fill="#064e3b" fill-opacity="0.32" stroke="#10b981" stroke-width="1.5"/>
+  <rect x="38" y="398" width="28" height="28" rx="8" fill="#10b981"/>
+  <text x="52" y="418" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="16" fill="#ffffff">✓</text>
+  <text x="78" y="416" font-family="system-ui,sans-serif" font-weight="800" font-size="15" fill="#ffffff">Tuân thủ Nghị định 13/2023/NĐ-CP</text>
+  <text x="38" y="452" font-family="system-ui,sans-serif" font-size="12.5" fill="#d1fae5">• Dữ liệu CCCD chỉ dùng để thẩm định hợp đồng.</text>
+  <text x="38" y="476" font-family="system-ui,sans-serif" font-size="12.5" fill="#d1fae5">• Mã hóa AES-256 &amp; xóa ảnh gốc sau khi đối soát.</text>
+  <text x="38" y="500" font-family="system-ui,sans-serif" font-size="12.5" fill="#d1fae5">• Quyền rút lại đồng ý dữ liệu cá nhân bất kỳ lúc nào.</text>
+  <rect x="38" y="520" width="314" height="40" rx="12" fill="#10b981" fill-opacity="0.2" stroke="#34d399" stroke-opacity="0.5"/>
+  <text x="195" y="545" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="12" fill="#6ee7b7">🔒 Đã ký đồng thuận điện tử (Timestamp Verified)</text>
+
+  <!-- Signature Pill -->
+  <rect x="20" y="600" width="350" height="114" rx="20" fill="#ffffff" fill-opacity="0.06" stroke="#ffffff" stroke-opacity="0.1"/>
+  <text x="38" y="632" font-family="system-ui,sans-serif" font-weight="700" font-size="14" fill="#ffffff">Trạng thái hồ sơ #EKYC-8842</text>
+  <text x="38" y="660" font-family="system-ui,sans-serif" font-size="13" fill="#38bdf8">100% Online · Không gọi người thân · Nhận máy ngay</text>
+  <rect x="38" y="678" width="314" height="10" rx="5" fill="#059669"/>
+
+  <rect x="20" y="734" width="350" height="54" rx="18" fill="url(#ph-accent)"/>
+  <text x="195" y="766" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="15" fill="#ffffff">Theo Dõi OMS 7 Bước →</text>
+
+
+  <!-- Bottom Home Indicator -->
+  <rect x="135" y="818" width="120" height="5" rx="2.5" fill="#ffffff" fill-opacity="0.4"/>
+</svg>

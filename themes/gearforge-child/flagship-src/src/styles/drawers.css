@@ -1,0 +1,225 @@
+/* ── Crisp Light Catalog Shelf + Drawers + OMS Stepper ── */
+.gf-cat-sec {
+  position: relative;
+  scroll-margin-top: 84px;
+  padding-block: calc(64 * var(--u, 1px));
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+#gf-oms-contact { scroll-margin-top: 84px; }
+
+.gf-cat-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 24px; }
+.gf-cat-head .tc-h2 { color: #0f172a; max-width: 22ch; }
+.gf-cat-sub { color: #475569; font-size: 16px; margin-top: 8px; }
+.gf-cat-count { padding: 8px 14px; border-radius: 8px; background: #ffffff; border: 1px solid #cbd5e1; font-size: 13.5px; font-weight: 700; color: #0f172a; white-space: nowrap; }
+
+.gf-cat-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  margin-bottom: 24px;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+}
+
+.gf-cat-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.gf-cat-pill {
+  min-height: 40px;
+  padding: 0 15px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #334155;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s, color 0.18s;
+}
+.gf-cat-pill.is-active { background: #2563eb; color: #ffffff; border-color: #2563eb; font-weight: 700; }
+
+.gf-cat-controls { display: grid; grid-template-columns: minmax(200px, 1.5fr) repeat(4, minmax(120px, 1fr)); gap: 10px; }
+.gf-cat-bar .gf-cat-input,
+.gf-cat-bar .gf-cat-select,
+.gf-drawer-panel .gf-dark-input,
+.gf-drawer-panel .gf-dark-select {
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  background-color: #ffffff;
+  color: #0f172a;
+  font-family: inherit;
+  font-size: 14px;
+}
+.gf-cat-bar .gf-cat-input::placeholder,
+.gf-drawer-panel .gf-dark-input::placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+
+.gf-cat-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+
+.gf-prod-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+  transition: transform 0.22s var(--ease), border-color 0.22s, box-shadow 0.22s;
+}
+.gf-prod-card:hover { transform: translateY(-2px); border-color: #2563eb; box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08); }
+
+.gf-prod-media { position: relative; aspect-ratio: 16 / 10; background: #f1f5f9; overflow: hidden; border-bottom: 1px solid #f1f5f9; }
+.gf-prod-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gf-prod-cat { position: absolute; top: 10px; left: 10px; padding: 3px 8px; border-radius: 6px; background: rgba(15, 23, 42, 0.85); color: #ffffff; font-size: 11px; font-weight: 700; }
+
+.gf-prod-body { display: flex; flex-direction: column; flex: 1; padding: 16px; gap: 10px; }
+.gf-prod-title { font-family: 'Be Vietnam Pro', 'Inter', sans-serif; font-size: 15.5px; font-weight: 700; line-height: 1.44; color: #0f172a; }
+.gf-prod-specs { display: flex; flex-wrap: wrap; gap: 6px; }
+.gf-spec-chip { padding: 4px 8px; border-radius: 6px; background: #f1f5f9; border: 1px solid #e2e8f0; color: #334155; font-size: 12px; font-weight: 600; }
+
+.gf-prod-price-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-top: auto; }
+.gf-prod-price { font-family: 'Be Vietnam Pro', 'Inter', sans-serif; font-size: 19px; font-weight: 800; color: #0f172a; font-variant-numeric: tabular-nums; letter-spacing: -0.015em; }
+.gf-prod-inst { font-size: 12px; font-weight: 600; color: #475569; }
+
+.gf-prod-actions { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; }
+.tc .gf-act-btn,
+.gf-drawer-backdrop .gf-act-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color 0.18s, background 0.18s, color 0.18s;
+}
+.tc .gf-act-btn:hover,
+.gf-drawer-backdrop .gf-act-btn:hover { border-color: #2563eb; background: #eff6ff; color: #1d4ed8; }
+.tc .gf-act-btn.is-primary,
+.gf-drawer-backdrop .gf-act-btn.is-primary { background: #2563eb; border-color: #2563eb; color: #ffffff; font-weight: 700; }
+.tc .gf-act-btn.is-primary:hover,
+.gf-drawer-backdrop .gf-act-btn.is-primary:hover { background: #1d4ed8; border-color: #1d4ed8; color: #ffffff; }
+.tc .gf-act-btn.is-active,
+.gf-drawer-backdrop .gf-act-btn.is-active { background: #0f172a; border-color: #0f172a; color: #ffffff; }
+
+.gf-cat-pager { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 28px; }
+
+/* ── Crisp Light Slide-over Drawers ── */
+.gf-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: rgba(15, 23, 42, 0.56);
+  backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.gf-drawer-panel {
+  width: min(680px, 100vw);
+  height: 100%;
+  background: #ffffff;
+  color: #0f172a;
+  border-left: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -20px 0 50px rgba(15, 23, 42, 0.18);
+  font-family: 'Inter', 'Be Vietnam Pro', system-ui, sans-serif;
+}
+
+.gf-drawer-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 24px; border-bottom: 1px solid #e2e8f0; background: #ffffff; }
+.gf-drawer-head h3 { margin: 0; font-family: 'Be Vietnam Pro', 'Inter', sans-serif; font-size: 20px; font-weight: 800; color: #0f172a; }
+.gf-drawer-close { width: 42px; height: 42px; border-radius: 10px; border: 1px solid #cbd5e1; background: #f8fafc; color: #0f172a; font-size: 22px; cursor: pointer; }
+.gf-drawer-body { flex: 1; overflow-y: auto; padding: 22px 24px; display: flex; flex-direction: column; gap: 18px; }
+.gf-drawer-foot { padding: 16px 24px; border-top: 1px solid #e2e8f0; background: #f8fafc; }
+
+/* 3-Col Compare Matrix */
+.gf-cmp-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.gf-cmp-table th, .gf-cmp-table td { padding: 10px 12px; border: 1px solid #e2e8f0; text-align: left; vertical-align: top; color: #0f172a; }
+.gf-cmp-table th { background: #f8fafc; color: #334155; font-weight: 700; width: 110px; }
+.gf-cmp-table tr.is-diff td { background: #eff6ff; }
+
+/* Installment Studio + NĐ 13/2023 Consent */
+.gf-inst-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.gf-inst-stat { padding: 12px; border-radius: 12px; background: #f8fafc; border: 1px solid #e2e8f0; }
+.gf-inst-stat span { display: block; font-size: 12px; color: #475569; }
+.gf-inst-stat strong { display: block; margin-top: 4px; font-size: 17px; font-family: 'Be Vietnam Pro', 'Inter', sans-serif; font-weight: 800; font-variant-numeric: tabular-nums; color: #0f172a; }
+
+.gf-nd13-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+.gf-nd13-box input[type='checkbox'] { width: 20px; height: 20px; margin-top: 2px; flex: none; accent-color: #2563eb; }
+
+.gf-submit-btn {
+  width: 100%;
+  min-height: 46px;
+  border-radius: 10px;
+  border: 0;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+.gf-submit-btn:hover { background: #1d4ed8; }
+.gf-submit-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* OMS 7-Step Progress Bar */
+.gf-oms-panel { display: flex; flex-direction: column; gap: 14px; }
+.gf-oms-track { height: 6px; border-radius: 99px; background: #e2e8f0; overflow: hidden; }
+.gf-oms-fill { height: 100%; background: #2563eb; transition: width 0.35s ease; }
+.gf-oms-steps { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.gf-oms-step { padding: 8px 6px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; font-size: 11px; font-weight: 700; color: #475569; text-align: center; }
+.gf-oms-step.is-done { background: #ecfdf5; border-color: #10b981; color: #065f46; }
+.gf-oms-step.is-active { background: #eff6ff; border-color: #2563eb; color: #1d4ed8; }
+.gf-serial-chip { display: inline-block; padding: 4px 10px; border-radius: 6px; background: #0f172a; color: #ffffff; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; font-weight: 700; }
+
+.gf-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1400;
+  padding: 11px 18px;
+  border-radius: 10px;
+  background: #0f172a;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.3);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+@media (max-width: 1024px) {
+  .gf-cat-controls { grid-template-columns: 1fr 1fr; }
+  .gf-cat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .gf-cat-controls, .gf-cat-grid, .gf-inst-summary, .gf-oms-steps { grid-template-columns: 1fr; }
+  .gf-prod-actions { grid-template-columns: 1fr; }
+  .gf-drawer-head, .gf-drawer-body, .gf-drawer-foot { padding-inline: 16px; }
+}

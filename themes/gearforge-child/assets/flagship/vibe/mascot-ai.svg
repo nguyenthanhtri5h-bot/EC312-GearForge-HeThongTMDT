@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 480" fill="none">
+  <defs>
+    <radialGradient id="bg-aura" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.32"/>
+      <stop offset="60%" stop-color="#8b5cf6" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="#1e1b4b" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="fur-grad" x1="25%" y1="10%" x2="75%" y2="95%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="65%" stop-color="#e0e7ff"/>
+      <stop offset="100%" stop-color="#b4c6fc"/>
+    </linearGradient>
+    <linearGradient id="hoodie-grad" x1="15%" y1="0%" x2="85%" y2="100%">
+      <stop offset="0%" stop-color="#312e81"/>
+      <stop offset="55%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="cyan-neon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#67e8f9"/>
+      <stop offset="100%" stop-color="#0057ff"/>
+    </linearGradient>
+    <linearGradient id="goggle-frame" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <filter id="neon-glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+</defs>
+  <circle cx="240" cy="255" r="205" fill="url(#bg-aura)"/>
+  <path d="M126 286 C126 230 174 214 240 214 C306 214 354 230 354 286 L364 388 C364 404 348 416 324 416 L156 416 C132 416 116 404 116 388 Z" fill="url(#hoodie-grad)" stroke="#a855f7" stroke-width="3.5"/>
+  
+  <g transform="translate(240,154) scale(0.94)">
+    <!-- Ears -->
+    <circle cx="-68" cy="-58" r="32" fill="url(#fur-grad)" stroke="#312e81" stroke-width="4"/>
+    <circle cx="-68" cy="-58" r="17" fill="#818cf8" opacity="0.55"/>
+    <circle cx="68" cy="-58" r="32" fill="url(#fur-grad)" stroke="#312e81" stroke-width="4"/>
+    <circle cx="68" cy="-58" r="17" fill="#818cf8" opacity="0.55"/>
+
+    <!-- Head -->
+    <ellipse cx="0" cy="0" rx="88" ry="76" fill="url(#fur-grad)" stroke="#1e1b4b" stroke-width="4"/>
+    <!-- Cheek shading -->
+    <ellipse cx="-52" cy="18" rx="16" ry="9" fill="#c7d2fe" opacity="0.65"/>
+    <ellipse cx="52" cy="18" rx="16" ry="9" fill="#c7d2fe" opacity="0.65"/>
+
+    <!-- Forehead cyber goggles (NEVER covering eyes!) -->
+    <rect x="-66" y="-66" width="132" height="28" rx="14" fill="#0f172a" stroke="url(#goggle-frame)" stroke-width="3.5"/>
+    <rect x="-54" y="-60" width="44" height="16" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+    <rect x="10" y="-60" width="44" height="16" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+    <line x1="-44" y1="-55" x2="-24" y2="-55" stroke="#67e8f9" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="20" y1="-55" x2="40" y2="-55" stroke="#67e8f9" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- Bright Cyan Anime Eyes -->
+    <ellipse cx="-32" cy="-4" rx="13" ry="15" fill="#0f172a"/>
+    <ellipse cx="-32" cy="-3" rx="9" ry="11" fill="#22d3ee" filter="url(#neon-glow)"/>
+    <circle cx="-35" cy="-7" r="4" fill="#ffffff"/>
+    <circle cx="-28" cy="2" r="2" fill="#e0f2fe"/>
+
+    <ellipse cx="32" cy="-4" rx="13" ry="15" fill="#0f172a"/>
+    <ellipse cx="32" cy="-3" rx="9" ry="11" fill="#22d3ee" filter="url(#neon-glow)"/>
+    <circle cx="29" cy="-7" r="4" fill="#ffffff"/>
+    <circle cx="36" cy="2" r="2" fill="#e0f2fe"/>
+
+    <!-- Snout & friendly grin -->
+    <ellipse cx="0" cy="24" rx="30" ry="22" fill="#ffffff" stroke="#c7d2fe" stroke-width="2"/>
+    <ellipse cx="0" cy="17" rx="11" ry="7.5" fill="#1e1b4b"/>
+    <path d="M-12 31 Q0 41 12 31" stroke="#1e1b4b" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+  </g>
+  <!-- Floating Holo Tablet -->
+  <g transform="translate(132, 266)">
+    <rect x="0" y="0" width="216" height="128" rx="18" fill="#0f172a" fill-opacity="0.92" stroke="url(#cyan-neon)" stroke-width="3.5" filter="url(#neon-glow)"/>
+    <rect x="18" y="20" width="84" height="12" rx="6" fill="#22d3ee"/>
+    <rect x="18" y="42" width="144" height="10" rx="5" fill="#818cf8" opacity="0.7"/>
+    <rect x="18" y="62" width="112" height="10" rx="5" fill="#a855f7" opacity="0.65"/>
+    <rect x="18" y="86" width="180" height="24" rx="8" fill="#0057ff"/>
+    <text x="108" y="102" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="12" fill="#ffffff">GEARFORGE AI SPEC · 0%</text>
+  </g>
+  <ellipse cx="136" cy="342" rx="23" ry="17" fill="url(#fur-grad)" stroke="#1e1b4b" stroke-width="3.5"/>
+  <ellipse cx="344" cy="342" rx="23" ry="17" fill="url(#fur-grad)" stroke="#1e1b4b" stroke-width="3.5"/>
+</svg>
