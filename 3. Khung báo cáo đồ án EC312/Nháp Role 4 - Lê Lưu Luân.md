@@ -490,6 +490,8 @@ CREATE TABLE IF NOT EXISTS wp_gf_rma_requests (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
+*(Ảnh minh chứng triển khai thực tế 5 bảng `wp_gf_*` trên MySQL 8.0 / phpMyAdmin: `Ảnh minh chứng Role 4/6_phpMyAdmin_5_Tables.png`)*
+
 ---
 
 ## MỤC 5.1 & 5.2.3 – 5.2.4: KIẾN TRÚC LỚP BACKEND & KẾT QUẢ DEMO CÁC CHỨC NĂNG CSDL
@@ -629,4 +631,4 @@ Trên nền tảng kiến trúc Microkernel (`gearforge-core`) đã chuẩn hóa
 | :--- | :--- | :--- | :--- | :--- |
 | **WordPress Admin** (`StoreAdmin` / `InstallmentReviewer`) | `http://localhost:8080/wp-admin` | `admin` | `admin123` | Quản lý sản phẩm, Duyệt hồ sơ trả góp 2 lớp, Gán S/N, Xuất PDF T-VAN |
 | **Tài khoản Sinh viên** (`StudentCustomer`) | `http://localhost:8080/wp-login.php` | `user` (`24521027@gm.uit.edu.vn`) | `admin123` | Đăng nhập khách hàng sinh viên test đặt hàng, trả góp, theo dõi OMS |
-| **phpMyAdmin** (MySQL 8.0) | `http://localhost:8081` | `gf_user` | `admin123` | Kiểm tra trực tiếp 5 bảng mở rộng `wp_gf_*` và dữ liệu seed |
+| **phpMyAdmin** (MySQL 8.0 – DB `gearforge_db`) | `http://localhost:8081` | `gf_user` | `admin123` | Kiểm tra trực tiếp 5 bảng mở rộng `wp_gf_*` và dữ liệu seed |
