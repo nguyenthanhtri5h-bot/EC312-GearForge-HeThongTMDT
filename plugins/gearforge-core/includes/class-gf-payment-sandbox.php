@@ -230,7 +230,12 @@ class GF_Payment_Sandbox {
                 $txn_ref = strtoupper($provider) . '-' . gmdate('YmdHis') . '-' . $order_id;
                 $result  = self::finalize_verified_payment($order_id, $amount, $provider, $mode, $txn_ref);
                 if (!is_wp_error($result)) {
-                    wp_safe_redirect(add_query_arg('gf_paid', '1', home_url('/')));
+                    $redirect_url = apply_filters(
+                        'gf_sandbox_success_redirect_url',
+                        add_query_arg(['order_id' => $order_id, 'gf_paid' => '1'], home_url('/tra-cuu-don-hang/')),
+                        $order_id
+                    );
+                    wp_safe_redirect($redirect_url);
                     exit;
                 }
                 $error_msg = $result->get_error_message();

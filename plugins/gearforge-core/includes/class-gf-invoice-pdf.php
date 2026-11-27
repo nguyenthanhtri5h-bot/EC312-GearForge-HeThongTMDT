@@ -3,7 +3,7 @@
  * T-VAN Compliant PDF Invoice Generator (UC-12 / FR-10).
  *
  * Generates valid %PDF-1.4 documents containing seller Tax ID (MST), customer info,
- * order items with bound Serial Numbers (S/N), VAT breakdown (10%), and installment terms.
+ * order items with bound Serial Numbers (S/N), VAT breakdown (8% - 10%), and installment terms.
  * Also hooks into WP Overnight PDF Invoices if installed.
  */
 
@@ -14,7 +14,7 @@ if (!defined('ABSPATH')) {
 class GF_Invoice_PDF {
 
     private const SELLER_NAME = 'CONG TY TNHH CONG NGHE GEARFORGE';
-    private const SELLER_MST  = '0312345678';
+    private const SELLER_MST  = '0318202607';
     private const VAT_RATE    = 0.10;
 
     public static function init(): void {
@@ -121,8 +121,13 @@ class GF_Invoice_PDF {
         $serial_list = array_column($serials, 'serial_number');
         $serial_text = !empty($serial_list) ? implode(', ', $serial_list) : 'N/A';
 
+        $raw_mst        = sanitize_text_field((string) get_option('gf_seller_mst', self::SELLER_MST));
+        $seller_mst     = self::ascii_safe($raw_mst) ?: self::SELLER_MST;
+        $vat_rate       = self::get_vat_rate();
+        $vat_pct_label  = rtrim(rtrim(number_format($vat_rate * 100, 2, '.', ''), '0'), '.');
+
         $total_incl_vat = (float) $order->get_total();
-        $pre_tax        = round($total_incl_vat / (1 + self::VAT_RATE));
+        $pre_tax        = round($total_incl_vat / (1 + $vat_rate));
         $vat_amount     = $total_incl_vat - $pre_tax;
 
         $app          = class_exists('GF_Installment_Review') ? GF_Installment_Review::get_application_by_order($order_id) : null;
@@ -130,7 +135,7 @@ class GF_Invoice_PDF {
 
         $lines = [
             'HOA DON DIEN TU CHUAN T-VAN (ND 123/2020/ND-CP)',
-            'Don vi ban: ' . self::SELLER_NAME . ' | MST: ' . self::SELLER_MST,
+            'Don vi ban: ' . self::SELLER_NAME . ' | MST: ' . $seller_mst,
             'Ma don hang: #' . $order_id . ' | Ngay lap: ' . gmdate('Y-m-d H:i:s') . ' UTC',
             'Khach hang: ' . self::ascii_safe($order->get_formatted_billing_full_name() ?: 'Khach hang Sinh vien'),
             'Hinh thuc thanh toan: ' . self::ascii_safe($payment_mode),
@@ -149,7 +154,7 @@ class GF_Invoice_PDF {
         $lines[] = 'Serial Number (S/N): ' . self::ascii_safe($serial_text);
         $lines[] = '----------------------------------------------------------------';
         $lines[] = 'Tien hang truoc thue: ' . number_format($pre_tax) . ' VND';
-        $lines[] = 'Thue suat VAT (10%):  ' . number_format($vat_amount) . ' VND';
+        $lines[] = sprintf('Thue suat VAT (%s%%):  %s VND', $vat_pct_label, number_format($vat_amount));
         $lines[] = 'Tong thanh toan:      ' . number_format($total_incl_vat) . ' VND';
 
         return self::render_minimal_pdf($lines);
@@ -204,9 +209,56 @@ class GF_Invoice_PDF {
         return $pdf;
     }
 
+    private static function get_vat_rate(): float {
+        $raw_opt = get_option('gf_vat_rate', null);
+        if ($raw_opt === null || $raw_opt === false) {
+            return self::VAT_RATE;
+        }
+        $trimmed = rtrim(trim((string) $raw_opt), "% \t\n\r\0\x0B");
+        if ($trimmed === '' || !is_numeric($trimmed)) {
+            return self::VAT_RATE;
+        }
+        $raw = (float) $trimmed;
+        if ($raw > 1 && $raw <= 25) {
+            $raw = $raw / 100;
+        }
+        if (!is_finite($raw) || $raw < 0 || $raw > 0.25) {
+            return self::VAT_RATE;
+        }
+        return $raw;
+    }
+
     private static function ascii_safe(string $text): string {
-        $converted = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $text);
-        return $converted !== false ? preg_replace('/[^\x20-\x7E]/', '', $converted) : $text;
+        static $vi_map = [
+            'à' => 'a', 'á' => 'a', 'ả' => 'a', 'ã' => 'a', 'ạ' => 'a',
+            'ă' => 'a', 'ằ' => 'a', 'ắ' => 'a', 'ẳ' => 'a', 'ẵ' => 'a', 'ặ' => 'a',
+            'â' => 'a', 'ầ' => 'a', 'ấ' => 'a', 'ẩ' => 'a', 'ẫ' => 'a', 'ậ' => 'a',
+            'À' => 'A', 'Á' => 'A', 'Ả' => 'A', 'Ã' => 'A', 'Ạ' => 'A',
+            'Ă' => 'A', 'Ằ' => 'A', 'Ắ' => 'A', 'Ẳ' => 'A', 'Ẵ' => 'A', 'Ặ' => 'A',
+            'Â' => 'A', 'Ầ' => 'A', 'Ấ' => 'A', 'Ẩ' => 'A', 'Ẫ' => 'A', 'Ậ' => 'A',
+            'è' => 'e', 'é' => 'e', 'ẻ' => 'e', 'ẽ' => 'e', 'ẹ' => 'e',
+            'ê' => 'e', 'ề' => 'e', 'ế' => 'e', 'ể' => 'e', 'ễ' => 'e', 'ệ' => 'e',
+            'È' => 'E', 'É' => 'E', 'Ẻ' => 'E', 'Ẽ' => 'E', 'Ẹ' => 'E',
+            'Ê' => 'E', 'Ề' => 'E', 'Ế' => 'E', 'Ể' => 'E', 'Ễ' => 'E', 'Ệ' => 'E',
+            'ì' => 'i', 'í' => 'i', 'ỉ' => 'i', 'ĩ' => 'i', 'ị' => 'i',
+            'Ì' => 'I', 'Í' => 'I', 'Ỉ' => 'I', 'Ĩ' => 'I', 'Ị' => 'I',
+            'ò' => 'o', 'ó' => 'o', 'ỏ' => 'o', 'õ' => 'o', 'ọ' => 'o',
+            'ô' => 'o', 'ồ' => 'o', 'ố' => 'o', 'ổ' => 'o', 'ỗ' => 'o', 'ộ' => 'o',
+            'ơ' => 'o', 'ờ' => 'o', 'ớ' => 'o', 'ở' => 'o', 'ỡ' => 'o', 'ợ' => 'o',
+            'Ò' => 'O', 'Ó' => 'O', 'Ỏ' => 'O', 'Õ' => 'O', 'Ọ' => 'O',
+            'Ô' => 'O', 'Ồ' => 'O', 'Ố' => 'O', 'Ổ' => 'O', 'Ỗ' => 'O', 'Ộ' => 'O',
+            'Ơ' => 'O', 'Ờ' => 'O', 'Ớ' => 'O', 'Ở' => 'O', 'Ỡ' => 'O', 'Ợ' => 'O',
+            'ù' => 'u', 'ú' => 'u', 'ủ' => 'u', 'ũ' => 'u', 'ụ' => 'u',
+            'ư' => 'u', 'ừ' => 'u', 'ứ' => 'u', 'ử' => 'u', 'ữ' => 'u', 'ự' => 'u',
+            'Ù' => 'U', 'Ú' => 'U', 'Ủ' => 'U', 'Ũ' => 'U', 'Ụ' => 'U',
+            'Ư' => 'U', 'Ừ' => 'U', 'Ứ' => 'U', 'Ử' => 'U', 'Ữ' => 'U', 'Ự' => 'U',
+            'ỳ' => 'y', 'ý' => 'y', 'ỷ' => 'y', 'ỹ' => 'y', 'ỵ' => 'y',
+            'Ỳ' => 'Y', 'Ý' => 'Y', 'Ỷ' => 'Y', 'Ỹ' => 'Y', 'Ỵ' => 'Y',
+            'đ' => 'd', 'Đ' => 'D',
+        ];
+        $normalized = strtr($text, $vi_map);
+        $converted  = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $normalized);
+        return $converted !== false ? preg_replace('/[^\x20-\x7E]/', '', $converted) : preg_replace('/[^\x20-\x7E]/', '', $normalized);
     }
 }
 

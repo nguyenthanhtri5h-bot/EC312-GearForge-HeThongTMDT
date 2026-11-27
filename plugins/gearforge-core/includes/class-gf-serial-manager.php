@@ -111,7 +111,7 @@ class GF_Serial_Manager {
             return;
         }
 
-        $protected_targets = ['gf-shipping', 'shipping', 'completed'];
+        $protected_targets = ['gf-shipping', 'shipping', 'gf-delivered', 'completed'];
         if (!in_array($new_status, $protected_targets, true)) {
             return;
         }
@@ -263,10 +263,47 @@ class GF_Serial_Manager {
         if (empty($terms) || is_wp_error($terms)) {
             return true;
         }
+        $exempt_slugs = apply_filters('gf_serial_exempt_category_slugs', [
+            'phu-kien',
+            'accessory',
+            'accessories',
+            'gear',
+            'ban-phim',
+            'ban-phim-co',
+            'chuot',
+            'chuot-gaming',
+            'lot-chuot',
+            'tai-nghe',
+            'ram-ssd',
+            'linh-kien',
+            'cpu',
+            'ram',
+            'vga',
+            'balo-de-tan-nhiet',
+            'balo',
+            'de-tan-nhiet',
+        ]);
+
+        $normalized_exempt = array_values(array_unique(array_filter(array_map(
+            static fn($s): string => strtolower(trim((string) $s)),
+            is_array($exempt_slugs) ? $exempt_slugs : []
+        ))));
+
         foreach ($terms as $term) {
-            $slug = strtolower($term->slug);
-            if (strpos($slug, 'phu-kien') !== false || strpos($slug, 'accessory') !== false) {
+            $slug = strtolower((string) $term->slug);
+            if (in_array($slug, $normalized_exempt, true)) {
                 return false;
+            }
+            if (strpos($slug, 'phu-kien') !== false || strpos($slug, 'accessory') !== false || strpos($slug, 'accessories') !== false) {
+                return false;
+            }
+            if (!empty($term->term_id) && function_exists('get_ancestors')) {
+                foreach (get_ancestors((int) $term->term_id, 'product_cat', 'taxonomy') as $ancestor_id) {
+                    $ancestor = get_term((int) $ancestor_id, 'product_cat');
+                    if ($ancestor && !is_wp_error($ancestor) && in_array(strtolower((string) $ancestor->slug), $normalized_exempt, true)) {
+                        return false;
+                    }
+                }
             }
         }
         return true;

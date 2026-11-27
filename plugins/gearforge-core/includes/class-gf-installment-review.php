@@ -15,7 +15,32 @@ if (!defined('ABSPATH')) {
 class GF_Installment_Review {
 
     public static function init(): void {
+        add_action('init', [self::class, 'register_custom_order_status']);
+        add_filter('wc_order_statuses', [self::class, 'append_custom_order_status']);
+        add_filter('woocommerce_valid_order_statuses_for_payment_complete', [self::class, 'allow_installment_status_for_payment']);
+        add_filter('woocommerce_valid_order_statuses_for_payment', [self::class, 'allow_installment_status_for_payment']);
         add_action('rest_api_init', [self::class, 'register_routes']);
+    }
+
+    public static function allow_installment_status_for_payment(array $statuses): array {
+        if (!in_array('gf-installment', $statuses, true)) {
+            $statuses[] = 'gf-installment';
+        }
+        return $statuses;
+    }
+
+    public static function register_custom_order_status(): void {
+        register_post_status('wc-gf-installment', [
+            'label'                     => 'Chờ duyệt trả góp (INSTALLMENT)',
+            'public'                    => true,
+            'show_in_admin_status_list' => true,
+            'label_count'               => _n_noop('Chờ duyệt trả góp (%s)', 'Chờ duyệt trả góp (%s)'),
+        ]);
+    }
+
+    public static function append_custom_order_status(array $statuses): array {
+        $statuses['wc-gf-installment'] = 'Chờ duyệt trả góp (INSTALLMENT)';
+        return $statuses;
     }
 
     public static function register_routes(): void {
@@ -106,6 +131,10 @@ class GF_Installment_Review {
             $consent_raw = $request->get_param('consent_nd13_accepted');
             $consent     = filter_var($consent_raw, FILTER_VALIDATE_BOOLEAN) || (string) $consent_raw === '1';
 
+            $raw_phone = trim((string) $request->get_param('phone'));
+            $phone     = self::normalize_phone($raw_phone !== '' ? sanitize_text_field($raw_phone) : sanitize_text_field((string) $order->get_billing_phone()));
+            $client_ip = sanitize_text_field($_SERVER['REMOTE_ADDR'] ?? '');
+
             $app_id = self::submit_application(
                 [
                     'order_id'              => $order_id,
@@ -114,6 +143,8 @@ class GF_Installment_Review {
                     'student_code'          => (string) $request->get_param('student_code'),
                     'student_edu_email'     => (string) $request->get_param('student_edu_email'),
                     'cccd_number'           => (string) $request->get_param('cccd_number'),
+                    'phone'                 => $phone,
+                    'client_ip'             => $client_ip,
                     'downpayment_amount'    => (float) $calc['downpayment_amount'],
                     'monthly_amount'        => (float) $calc['monthly_amount'],
                     'consent_nd13_accepted' => $consent ? 1 : 0,
@@ -123,10 +154,16 @@ class GF_Installment_Review {
             );
 
             if (is_wp_error($app_id)) {
-                return new WP_REST_Response(['code' => $app_id->get_error_code(), 'message' => $app_id->get_error_message()], 400);
+                $status_code = $app_id->get_error_code() === 'gf_blacklisted' ? 403 : 400;
+                return new WP_REST_Response(['code' => $app_id->get_error_code(), 'message' => $app_id->get_error_message()], $status_code);
             }
 
-            $order->add_order_note(sprintf('Đã tiếp nhận hồ sơ trả góp #%d qua REST API (gói %d tháng, trả trước %s VNĐ).', $app_id, $months, number_format((float) $calc['downpayment_amount'])));
+            if ($phone !== '' && $phone !== (string) $order->get_billing_phone()) {
+                $order->set_billing_phone($phone);
+            }
+
+            $note = sprintf('Đã tiếp nhận hồ sơ trả góp #%d qua REST API (gói %d tháng, trả trước %s VNĐ).', $app_id, $months, number_format((float) $calc['downpayment_amount']));
+            $order->update_status('gf-installment', $note);
 
             return new WP_REST_Response(
                 [
@@ -173,7 +210,15 @@ class GF_Installment_Review {
         }
 
         $cccd_hash = self::hash_cccd($cccd_number);
-        if (self::is_blacklisted('CCCD_HASH', $cccd_hash) || self::is_blacklisted('USER', (string) ($data['user_id'] ?? 0))) {
+        $phone     = self::normalize_phone((string) ($data['phone'] ?? ''));
+        $client_ip = trim((string) ($data['client_ip'] ?? ''));
+
+        $is_blocked = self::is_blacklisted('CCCD_HASH', $cccd_hash)
+            || self::is_blacklisted('USER', (string) ($data['user_id'] ?? 0))
+            || ($phone !== '' && self::is_blacklisted('PHONE', $phone))
+            || ($client_ip !== '' && self::is_blacklisted('IP', $client_ip));
+
+        if ($is_blocked) {
             return new WP_Error('gf_blacklisted', 'Hồ sơ hoặc tài khoản nằm trong danh sách hạn chế gian lận.');
         }
 
@@ -378,13 +423,26 @@ class GF_Installment_Review {
         );
     }
 
+    private static function normalize_phone(string $phone): string {
+        $clean = preg_replace('/[\s.\-()]+/', '', trim($phone));
+        if ($clean === '' || $clean === null) {
+            return '';
+        }
+        if (strpos($clean, '+84') === 0) {
+            $clean = '0' . substr($clean, 3);
+        } elseif (strpos($clean, '84') === 0 && strlen($clean) >= 11) {
+            $clean = '0' . substr($clean, 2);
+        }
+        return $clean;
+    }
+
     private static function is_blacklisted(string $type, string $value): bool {
         global $wpdb;
         $found = $wpdb->get_var(
             $wpdb->prepare(
                 "SELECT blacklist_id FROM {$wpdb->prefix}gf_fraud_blacklist
                  WHERE target_type = %s AND target_value = %s
-                   AND (blocked_until IS NULL OR blocked_until > NOW())
+                   AND (blocked_until IS NULL OR blocked_until > UTC_TIMESTAMP())
                  LIMIT 1",
                 $type,
                 $value

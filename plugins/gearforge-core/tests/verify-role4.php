@@ -34,8 +34,10 @@ if (!$student || !$admin) {
     exit(1);
 }
 
-$created_order_ids = [];
-$created_vault     = [];
+$created_order_ids   = [];
+$created_vault       = [];
+$created_product_ids = [];
+$created_term_ids    = [];
 
 try {
     // 1. Vault Crypto v2 + legacy v1 compatibility
@@ -257,8 +259,235 @@ try {
     $rl_resp = is_wp_error($rl3) ? gf_core_rate_limit_rest_response($rl3) : null;
     delete_transient('gf_rl_' . md5('test_rl|' . $rl_id));
     gf_assert($rl1 === true && $rl2 === true && $rl_resp && $rl_resp->get_status() === 429, 'Role 4 Layer 7 rate limiter blocks bursts with HTTP 429');
+
+    // 10. Integration patch checks (wc-gf-installment, PHONE/IP blacklist, gf-delivered, MST/VAT/VN translit)
+    $wc_statuses = wc_get_order_statuses();
+    gf_assert(isset($wc_statuses['wc-gf-installment']), 'wc-gf-installment custom order status is registered');
+
+    $test_phone = '0909' . wp_rand(100000, 999999);
+    $test_ip    = '203.0.113.' . wp_rand(10, 250);
+    $wpdb->insert("{$wpdb->prefix}gf_fraud_blacklist", [
+        'target_type'  => 'PHONE',
+        'target_value' => $test_phone,
+        'reason'       => 'Verify test PHONE',
+        'created_by'   => $admin->ID,
+    ]);
+    $wpdb->insert("{$wpdb->prefix}gf_fraud_blacklist", [
+        'target_type'  => 'IP',
+        'target_value' => $test_ip,
+        'reason'       => 'Verify test IP',
+        'created_by'   => $admin->ID,
+    ]);
+
+    $bl_phone_res = GF_Installment_Review::submit_application(
+        [
+            'order_id'              => $order_id,
+            'user_id'               => $student->ID,
+            'plan_id'               => (int) $calc['plan_id'],
+            'student_code'          => '24521027',
+            'student_edu_email'     => '24521027@gm.uit.edu.vn',
+            'cccd_number'           => '079206001234',
+            'phone'                 => '+84-' . substr($test_phone, 1),
+            'client_ip'             => '198.51.100.1',
+            'downpayment_amount'    => $calc['downpayment_amount'],
+            'monthly_amount'        => $calc['monthly_amount'],
+            'consent_nd13_accepted' => 1,
+        ],
+        ['tmp_name' => ''],
+        ['tmp_name' => '']
+    );
+    $bl_ip_res = GF_Installment_Review::submit_application(
+        [
+            'order_id'              => $order_id,
+            'user_id'               => $student->ID,
+            'plan_id'               => (int) $calc['plan_id'],
+            'student_code'          => '24521027',
+            'student_edu_email'     => '24521027@gm.uit.edu.vn',
+            'cccd_number'           => '079206001234',
+            'phone'                 => '0901000001',
+            'client_ip'             => $test_ip,
+            'downpayment_amount'    => $calc['downpayment_amount'],
+            'monthly_amount'        => $calc['monthly_amount'],
+            'consent_nd13_accepted' => 1,
+        ],
+        ['tmp_name' => ''],
+        ['tmp_name' => '']
+    );
+    gf_assert(
+        is_wp_error($bl_phone_res) && $bl_phone_res->get_error_code() === 'gf_blacklisted'
+        && is_wp_error($bl_ip_res) && $bl_ip_res->get_error_code() === 'gf_blacklisted',
+        'Installment Review blocks blacklisted PHONE (including +84 format) and IP'
+    );
+
+    // Check REST /installment-apply -> gf-installment -> finalize_verified_payment -> processing (TC-14)
+    $p_inst = new WC_Product_Simple();
+    $p_inst->set_name('Laptop Installment Payment Complete Test');
+    $p_inst->set_regular_price(20000000);
+    $p_inst->save();
+    $created_product_ids[] = $p_inst->get_id();
+
+    $order_inst = wc_create_order(['customer_id' => $student->ID]);
+    $order_inst->add_product($p_inst, 1);
+    $order_inst->calculate_totals();
+    $order_inst->set_status('pending');
+    $order_inst->save();
+    $order_inst_id       = $order_inst->get_id();
+    $created_order_ids[] = $order_inst_id;
+
+    $f_inst1 = GF_Vault_Crypto::encrypt_bytes('CCCD_INST_BYTES', 'image/png');
+    $f_inst2 = GF_Vault_Crypto::encrypt_bytes('CARD_INST_BYTES', 'image/png');
+    $created_vault[] = $f_inst1;
+    $created_vault[] = $f_inst2;
+    $wpdb->insert(
+        "{$wpdb->prefix}gf_installment_applications",
+        [
+            'order_id'                    => $order_inst_id,
+            'user_id'                     => $student->ID,
+            'plan_id'                     => (int) $calc['plan_id'],
+            'student_code'                => '24521027',
+            'student_edu_email'           => '24521027@gm.uit.edu.vn',
+            'cccd_hash'                   => GF_Installment_Review::hash_cccd('079206008888'),
+            'cccd_encrypted_path'         => $f_inst1,
+            'student_card_encrypted_path' => $f_inst2,
+            'downpayment_amount'          => 6000000,
+            'monthly_amount'              => 2501000,
+            'consent_nd13_accepted'       => 1,
+            'consent_accepted_at'         => current_time('mysql'),
+            'status'                      => 'APPROVED_WAITING_DOWNPAYMENT',
+        ]
+    );
+    $order_inst->update_status('gf-installment');
+    $inst_pay_res = GF_Payment_Sandbox::finalize_verified_payment($order_inst_id, 6000000, 'vnpay', 'downpayment', 'TXN-INST-' . $order_inst_id);
+    $order_inst   = wc_get_order($order_inst_id);
+    gf_assert(
+        $inst_pay_res === true
+        && $order_inst
+        && $order_inst->get_status() === 'processing'
+        && $order_inst->is_paid(),
+        'TC-14 payment_complete transitions gf-installment order to processing and marks paid'
+    );
+
+    // Check REST /installment-apply returns HTTP 403 for blacklisted PHONE
+    wp_set_current_user($student->ID);
+    $order_bl_rest = wc_create_order(['customer_id' => $student->ID]);
+    $order_bl_rest->set_total(20000000);
+    $order_bl_rest->set_status('pending');
+    $order_bl_rest->save();
+    $created_order_ids[] = $order_bl_rest->get_id();
+    $tmp_png_1 = tempnam(sys_get_temp_dir(), 'gf_cccd_');
+    $tmp_png_2 = tempnam(sys_get_temp_dir(), 'gf_card_');
+    file_put_contents($tmp_png_1, "\x89PNG\r\n\x1a\nTEST1");
+    file_put_contents($tmp_png_2, "\x89PNG\r\n\x1a\nTEST2");
+    $req_bl = new WP_REST_Request('POST', '/gearforge/v1/installment-apply');
+    $req_bl->set_param('order_id', $order_bl_rest->get_id());
+    $req_bl->set_param('months', 6);
+    $req_bl->set_param('down_pct', 30);
+    $req_bl->set_param('student_code', '24521027');
+    $req_bl->set_param('student_edu_email', '24521027@gm.uit.edu.vn');
+    $req_bl->set_param('cccd_number', '079206001234');
+    $req_bl->set_param('phone', $test_phone);
+    $req_bl->set_param('consent_nd13_accepted', '1');
+    $req_bl->set_file_params([
+        'cccd_file'         => ['name' => 'cccd.png', 'type' => 'image/png', 'tmp_name' => $tmp_png_1, 'error' => 0, 'size' => 13],
+        'student_card_file' => ['name' => 'card.png', 'type' => 'image/png', 'tmp_name' => $tmp_png_2, 'error' => 0, 'size' => 13],
+    ]);
+    $res_bl = rest_do_request($req_bl);
+    @unlink($tmp_png_1);
+    @unlink($tmp_png_2);
+    gf_assert($res_bl->get_status() === 403, 'TC-08 REST /installment-apply returns HTTP 403 when PHONE is blacklisted');
+
+    // Check Serial exemption: cpu/gear exempt, gearforge-laptop NOT falsely exempt
+    $term_gearforge = wp_insert_term('GearForge Laptop Test', 'product_cat', ['slug' => 'gearforge-laptop-test']);
+    $term_cpu       = get_term_by('slug', 'cpu', 'product_cat') ?: wp_insert_term('CPU Test', 'product_cat', ['slug' => 'cpu']);
+    $tid_gf_laptop  = is_array($term_gearforge) ? (int) $term_gearforge['term_id'] : (is_object($term_gearforge) ? 0 : 0);
+    if ($tid_gf_laptop > 0) {
+        $created_term_ids[] = $tid_gf_laptop;
+    } else {
+        $existing_gfl  = get_term_by('slug', 'gearforge-laptop-test', 'product_cat');
+        $tid_gf_laptop = $existing_gfl ? (int) $existing_gfl->term_id : 0;
+    }
+    $tid_cpu = is_array($term_cpu) ? (int) $term_cpu['term_id'] : ($term_cpu instanceof WP_Term ? (int) $term_cpu->term_id : 0);
+    if (is_array($term_cpu) && $tid_cpu > 0) {
+        $created_term_ids[] = $tid_cpu;
+    }
+    $p_laptop = new WC_Product_Simple();
+    $p_laptop->set_name('Test GearForge Laptop');
+    $p_laptop->set_regular_price(20000000);
+    $p_laptop->save();
+    wp_set_object_terms($p_laptop->get_id(), [$tid_gf_laptop], 'product_cat');
+    $created_product_ids[] = $p_laptop->get_id();
+
+    $p_cpu = new WC_Product_Simple();
+    $p_cpu->set_name('Test CPU Component');
+    $p_cpu->set_regular_price(5000000);
+    $p_cpu->save();
+    wp_set_object_terms($p_cpu->get_id(), [$tid_cpu], 'product_cat');
+    $created_product_ids[] = $p_cpu->get_id();
+
+    $ref_req_sn = new ReflectionMethod(GF_Serial_Manager::class, 'requires_serial_number');
+    $ref_req_sn->setAccessible(true);
+    gf_assert(
+        $ref_req_sn->invoke(null, $p_laptop->get_id()) === true
+        && $ref_req_sn->invoke(null, $p_cpu->get_id()) === false,
+        'Serial exemption skips cpu component but enforces S/N on gearforge-laptop-test slug'
+    );
+
+    // Check gf-delivered guard when order lacks S/N
+    $order_guard = wc_create_order(['customer_id' => $student->ID]);
+    $item_guard  = new WC_Order_Item_Product();
+    $item_guard->set_name('Laptop Guard Delivered Test');
+    $item_guard->set_quantity(1);
+    $item_guard->set_subtotal(15000000);
+    $item_guard->set_total(15000000);
+    $order_guard->add_item($item_guard);
+    $order_guard->set_total(15000000);
+    $order_guard->set_status('processing');
+    $order_guard->save();
+    $created_order_ids[] = $order_guard->get_id();
+    $order_guard->update_status('gf-delivered');
+    $order_guard = wc_get_order($order_guard->get_id());
+    gf_assert($order_guard->get_status() !== 'gf-delivered', 'Serial guard blocks transitioning to gf-delivered without S/N');
+
+    // Check Invoice MST 0318202607, configurable VAT 8%, empty VAT fallback 10%, and Vietnamese transliteration
+    $prev_vat = get_option('gf_vat_rate', null);
+    update_option('gf_vat_rate', 0.08);
+    $pdf_vat8 = GF_Invoice_PDF::generate_tvan_invoice_pdf($order_id);
+    update_option('gf_vat_rate', '');
+    $pdf_vat_empty = GF_Invoice_PDF::generate_tvan_invoice_pdf($order_id);
+    if ($prev_vat === null) {
+        delete_option('gf_vat_rate');
+    } else {
+        update_option('gf_vat_rate', $prev_vat);
+    }
+    $ref_ascii = new ReflectionMethod(GF_Invoice_PDF::class, 'ascii_safe');
+    $ref_ascii->setAccessible(true);
+    $vn_clean = $ref_ascii->invoke(null, 'Đơn hàng Điều khiển GearForge');
+    gf_assert(
+        is_string($pdf_vat8)
+        && strpos($pdf_vat8, 'MST: 0318202607') !== false
+        && strpos($pdf_vat8, 'VAT \\(8%\\)') !== false
+        && is_string($pdf_vat_empty)
+        && strpos($pdf_vat_empty, 'VAT \\(10%\\)') !== false
+        && $vn_clean === 'Don hang Dieu khien GearForge',
+        'Invoice PDF uses MST 0318202607, configurable 8% VAT, safe 10% fallback on empty option, and clean Vietnamese transliteration'
+    );
 } finally {
     global $wpdb;
+    if (!empty($test_phone)) {
+        $wpdb->delete("{$wpdb->prefix}gf_fraud_blacklist", ['target_type' => 'PHONE', 'target_value' => $test_phone], ['%s', '%s']);
+    }
+    if (!empty($test_ip)) {
+        $wpdb->delete("{$wpdb->prefix}gf_fraud_blacklist", ['target_type' => 'IP', 'target_value' => $test_ip], ['%s', '%s']);
+    }
+    foreach ($created_product_ids as $pid) {
+        $p = wc_get_product($pid);
+        if ($p) {
+            $p->delete(true);
+        }
+    }
+    foreach ($created_term_ids as $tid) {
+        wp_delete_term($tid, 'product_cat');
+    }
     foreach ($created_order_ids as $oid) {
         $wpdb->delete("{$wpdb->prefix}gf_rma_requests", ['order_id' => $oid], ['%d']);
         $wpdb->delete("{$wpdb->prefix}gf_order_serials", ['order_id' => $oid], ['%d']);
