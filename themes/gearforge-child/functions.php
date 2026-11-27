@@ -588,7 +588,12 @@ add_action('wp_footer', static function (): void {
 
         <div class="gf-sec-ft-bottom">
             <span>© 2026 GEARFORGE VIETNAM — HỆ THỐNG LAPTOP, PC &amp; GEAR SINH VIÊN ĐHQG TP.HCM</span>
-            <span>KTX KHU B ĐHQG-HCM • GIAO NHANH 2H • BẢO HÀNH ĐIỆN TỬ S/N</span>
+            <span class="gf-sec-ft-legal" style="display:inline-flex;flex-wrap:wrap;gap:8px 16px;">
+                <a href="<?php echo esc_url(home_url('/chinh-sach-bao-hanh/')); ?>" style="color:#A1A1AA;text-decoration:none;">Chính sách bảo hành</a>
+                <a href="<?php echo esc_url(home_url('/chinh-sach-doi-tra/')); ?>" style="color:#A1A1AA;text-decoration:none;">Đổi trả 15 ngày</a>
+                <a href="<?php echo esc_url(home_url('/chinh-sach-bao-mat-nd13/')); ?>" style="color:#A1A1AA;text-decoration:none;">Bảo mật NĐ 13/2023</a>
+                <a href="<?php echo esc_url(home_url('/dieu-khoan-su-dung/')); ?>" style="color:#A1A1AA;text-decoration:none;">Điều khoản &amp; BCT</a>
+            </span>
         </div>
     </footer>
 

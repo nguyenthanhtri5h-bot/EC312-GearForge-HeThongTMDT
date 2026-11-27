@@ -12,6 +12,13 @@ const FOOTER_LINKS = [
   { label: 'LIÊN HỆ 1900 6868', mode: 'ecosystem' as const },
 ];
 
+const LEGAL_LINKS = [
+  { label: 'Chính sách bảo hành', href: '/chinh-sach-bao-hanh/' },
+  { label: 'Đổi trả 15 ngày', href: '/chinh-sach-doi-tra/' },
+  { label: 'Bảo mật NĐ 13/2023', href: '/chinh-sach-bao-mat-nd13/' },
+  { label: 'Điều khoản & BCT', href: '/dieu-khoan-su-dung/' },
+];
+
 export function FooterSection() {
   const { navigateToPage, openDrawer } = useGearForgeStore();
 
@@ -58,6 +65,12 @@ export function FooterSection() {
               <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.38.55A3.02 3.02 0 0 0 .5 6.19 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.81 3.02 3.02 0 0 0 2.12 2.14c1.88.55 9.38.55 9.38.55s7.5 0 9.38-.55a3.02 3.02 0 0 0 2.12-2.14A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-5.81zM9.6 15.6V8.4l6.27 3.6-6.27 3.6z"/></svg>
             </a>
           </div>
+        </div>
+
+        <div className="gf-riot-ft-legal" aria-label="Chính sách và pháp lý GearForge">
+          {LEGAL_LINKS.map((lk) => (
+            <a key={lk.href} href={lk.href}>{lk.label}</a>
+          ))}
         </div>
 
         <div className="gf-riot-ft-bottom">
