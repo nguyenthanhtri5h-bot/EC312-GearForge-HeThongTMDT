@@ -198,7 +198,7 @@ class GF_Payment_Sandbox {
             $txn_ref = $order ? (string) $order->get_meta('_gf_transaction_ref') : '';
             header('Content-Type: text/html; charset=utf-8');
             echo '<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><title>Đã thanh toán thành công</title></head>';
-            echo '<body style="font-family:sans-serif;max-width:480px;margin:48px auto;padding:24px;border:1px solid #28a745;border-radius:8px;background:#f4fbf6;">';
+            echo '<body style="font-family:\'Inter\',system-ui,sans-serif;max-width:480px;margin:48px auto;padding:24px;border:1px solid #28a745;border-radius:8px;background:#f4fbf6;">';
             echo '<h2 style="color:#1e7e34;">Đơn hàng #' . $order_id . ' đã thanh toán thành công!</h2>';
             echo '<p>Hệ thống đã nhận xác nhận giao dịch qua kênh đối soát IPN (Mã GD: <code>' . esc_html($txn_ref ?: 'N/A') . '</code>).</p>';
             echo '<p>Phiên thanh toán này đã được khóa tự động để đảm bảo bạn <strong>không bị trừ tiền lần 2</strong>.</p>';
@@ -230,7 +230,12 @@ class GF_Payment_Sandbox {
                 $txn_ref = strtoupper($provider) . '-' . gmdate('YmdHis') . '-' . $order_id;
                 $result  = self::finalize_verified_payment($order_id, $amount, $provider, $mode, $txn_ref);
                 if (!is_wp_error($result)) {
-                    wp_safe_redirect(add_query_arg('gf_paid', '1', home_url('/')));
+                    $redirect_url = apply_filters(
+                        'gf_sandbox_success_redirect_url',
+                        add_query_arg(['order_id' => $order_id, 'gf_paid' => '1'], home_url('/tra-cuu-don-hang/')),
+                        $order_id
+                    );
+                    wp_safe_redirect($redirect_url);
                     exit;
                 }
                 $error_msg = $result->get_error_message();
@@ -239,7 +244,7 @@ class GF_Payment_Sandbox {
 
         header('Content-Type: text/html; charset=utf-8');
         echo '<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><title>GearForge Sandbox 3D-Secure</title></head>';
-        echo '<body style="font-family:sans-serif;max-width:460px;margin:48px auto;padding:24px;border:1px solid #ddd;border-radius:8px;">';
+        echo '<body style="font-family:\'Inter\',system-ui,sans-serif;max-width:460px;margin:48px auto;padding:24px;border:1px solid #ddd;border-radius:8px;">';
         echo '<h2>Cổng Thanh toán Sandbox (' . esc_html(strtoupper($provider)) . ' 3D-Secure)</h2>';
         echo '<p>Đơn hàng: <strong>#' . $order_id . '</strong> | Chế độ: <code>' . esc_html($mode) . '</code></p>';
         echo '<p>Số tiền thanh toán: <strong style="color:#d9534f;">' . number_format($amount) . ' VNĐ</strong></p>';

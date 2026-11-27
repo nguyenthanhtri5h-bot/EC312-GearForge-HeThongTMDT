@@ -1,15 +1,15 @@
 import { useGearForgeStore } from '../hooks/useGearForgeStore';
-import { BrandLogo } from './BrandLogo';
+import { CrestIcon } from './BrandLogo';
 
 const FOOTER_LINKS = [
   { label: 'KHO SẢN PHẨM', mode: 'shop' as const },
   { label: 'TRẢ GÓP 0%', drawer: 'installment' as const },
-  { label: 'TRA CỨU ĐƠN OMS', drawer: 'oms' as const },
+  { label: 'TRA CỨU ĐƠN OMS', mode: 'tracking' as const },
   { label: 'GÓC MÁY SV ĐHQG', mode: 'gallery' as const },
   { label: 'HỆ SINH THÁI AI', mode: 'ecosystem' as const },
   { label: 'SO SÁNH CẤU HÌNH', drawer: 'compare' as const },
-  { label: 'BẢO HÀNH ĐIỆN TỬ', drawer: 'oms' as const },
-  { label: 'LIÊN HỆ ĐHQG 1900 6868', mode: 'ecosystem' as const },
+  { label: 'BẢO HÀNH ĐIỆN TỬ', mode: 'tracking' as const },
+  { label: 'LIÊN HỆ 1900 6868', mode: 'ecosystem' as const },
 ];
 
 export function FooterSection() {
@@ -19,17 +19,14 @@ export function FooterSection() {
     <footer className="footer gf-riot-ft" id="lien-he">
       <div className="gf-riot-ft-wrap">
         <div className="gf-riot-ft-top">
-          <div className="gf-riot-ft-mark">
-            <BrandLogo
-              height={30}
-              tone="light"
-              stacked={false}
-              onClick={(e) => {
-                e.preventDefault();
-                navigateToPage('showcase');
-              }}
-            />
-          </div>
+          <button
+            type="button"
+            className="gf-riot-ft-mark"
+            aria-label="Về trang chủ GearForge"
+            onClick={() => navigateToPage('showcase')}
+          >
+            <CrestIcon size={36} />
+          </button>
 
           <nav className="gf-riot-ft-nav" aria-label="Điều hướng chân trang">
             {FOOTER_LINKS.map((item) => (
@@ -48,7 +45,7 @@ export function FooterSection() {
           </nav>
 
           <div className="gf-riot-ft-socials" aria-label="Kênh cộng đồng GearForge">
-            <a href="#diem-nong" onClick={(e) => { e.preventDefault(); navigateToPage('showcase', undefined, '#diem-nong'); }} aria-label="Tin tức">
+            <a href="/#diem-nong" onClick={(e) => { e.preventDefault(); navigateToPage('showcase', undefined, '#diem-nong'); }} aria-label="Tin tức">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
             </a>
             <a href="/he-sinh-thai/" onClick={(e) => { e.preventDefault(); navigateToPage('ecosystem'); }} aria-label="Instagram ĐHQG">

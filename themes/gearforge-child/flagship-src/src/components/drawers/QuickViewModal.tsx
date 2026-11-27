@@ -43,10 +43,10 @@ export function QuickViewModal() {
         if (e.target === e.currentTarget) setQuickViewProduct(null);
       }}
     >
-      <div className="gf-drawer-panel" style={{ width: 'min(720px, 100%)', borderRadius: 16, margin: 'auto', maxHeight: '90vh' }}>
+      <div className="gf-drawer-panel" style={{ width: 'min(720px, calc(100vw - 24px))', borderRadius: 12, margin: 'auto', maxHeight: '90vh' }}>
         <div className="gf-drawer-head">
           <div>
-            <span style={{ fontSize: 11.5, fontWeight: 700, color: '#64748b' }}>{p.category}</span>
+            <span style={{ fontSize: 11.5, fontWeight: 700, color: '#52525B' }}>{p.category}</span>
             <h3 id="gf-qv-title" style={{ marginTop: 2 }}>{p.name}</h3>
           </div>
           <button type="button" className="gf-drawer-close" aria-label="Đóng xem nhanh" onClick={() => setQuickViewProduct(null)}>
@@ -59,17 +59,18 @@ export function QuickViewModal() {
             <img
               src={p.image}
               alt={p.name}
-              style={{ width: '100%', aspectRatio: '16/10', objectFit: 'cover', borderRadius: 12, border: '1px solid #e2e8f0' }}
+              referrerPolicy="no-referrer"
+              style={{ width: '100%', aspectRatio: '16/10', objectFit: 'contain', background: '#FFFFFF', borderRadius: 10, border: '1px solid #DFDEDC' }}
             />
             <div style={{ display: 'grid', gap: 10 }}>
-              <div style={{ fontSize: 28, fontWeight: 800, color: '#0f172a', fontFamily: "'Be Vietnam Pro', sans-serif", fontVariantNumeric: 'tabular-nums' }}>
+              <div style={{ fontSize: 28, fontWeight: 800, color: '#D13639', fontFamily: 'var(--gf-font-display)', fontVariantNumeric: 'tabular-nums' }}>
                 {formatVnd(p.price)}
               </div>
               <div style={{ fontSize: 13.5, color: '#047857', fontWeight: 700 }}>
                 Trả góp 0% (3 tháng): chỉ từ {formatVnd(monthly3m)}/tháng
               </div>
-              <div style={{ fontSize: 13, color: '#475569' }}>
-                Tình trạng: <strong style={{ color: '#0f172a' }}>{p.stockStatus === 'outofstock' ? 'Tạm hết hàng' : 'Còn hàng — Giao KTX 2 giờ'}</strong>
+              <div style={{ fontSize: 13, color: '#52525B' }}>
+                Tình trạng: <strong style={{ color: '#0A0A0A' }}>{p.stockStatus === 'outofstock' ? 'Tạm hết hàng' : 'Còn hàng — Giao KTX 2 giờ'}</strong>
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 4 }}>
                 <button
@@ -97,14 +98,14 @@ export function QuickViewModal() {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 10 }}>
             {specsList.map(([label, val]) => (
-              <div key={label} style={{ padding: '10px 12px', borderRadius: 12, background: '#f8fafc', border: '1px solid #e2e8f0' }}>
-                <div style={{ fontSize: 11.5, color: '#64748b' }}>{label}</div>
-                <div style={{ fontSize: 13.5, fontWeight: 700, color: '#0f172a', marginTop: 3 }}>{val}</div>
+              <div key={label} style={{ padding: '10px 12px', borderRadius: 8, background: '#F5F4F0', border: '1px solid #DFDEDC' }}>
+                <div style={{ fontSize: 11.5, color: '#52525B' }}>{label}</div>
+                <div style={{ fontSize: 13.5, fontWeight: 700, color: '#0A0A0A', marginTop: 3 }}>{val}</div>
               </div>
             ))}
           </div>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'space-between', alignItems: 'center', paddingTop: 12, borderTop: '1px solid #e2e8f0' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'space-between', alignItems: 'center', paddingTop: 12, borderTop: '1px solid #DFDEDC' }}>
             <button
               type="button"
               className="gf-act-btn"

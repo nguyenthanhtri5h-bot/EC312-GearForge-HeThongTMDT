@@ -82,7 +82,7 @@ export const VIBE_STATIONS: VibeStationAsset[] = [
   },
   {
     id: 4,
-    mascot: vibeUrl('mascot-ai-chat.png'),
+    mascot: vibeUrl('mascot-ai-chat.png?v=2'),
     preview: vibeUrl('step-calc.svg'),
     alt: 'Trợ lý AI gợi ý cấu hình & tính trả góp 0% sinh viên',
   },
@@ -145,10 +145,10 @@ export const VIBE_PARTNERS: VibePartnerAsset[] = [
 export const VIBE_BEAR_GUIDE = {
   avatar: vibeUrl('guide-astronaut.png'),
   avatarVector: vibeUrl('guide-astronaut.svg'),
-  aiBadge: vibeUrl('mascot-ai-chat.png'),
+  aiBadge: vibeUrl('mascot-ai-chat.png?v=2'),
   vibeStack: vibeUrl('mascot-vibe-stack.png'),
   laptopMascot: vibeUrl('mascot-laptop.png'),
   pcMascot: vibeUrl('mascot-pc.png'),
-  shopRig: vibeUrl('scene-shop-rig.png'),
-  ecosystemHub: vibeUrl('scene-ecosystem-hub.png'),
+  shopRig: vibeUrl('branch-cad.jpg'),
+  ecosystemHub: vibeUrl('branch-ai.jpg'),
 } as const;

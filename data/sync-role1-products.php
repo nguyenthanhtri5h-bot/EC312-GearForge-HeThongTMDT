@@ -208,13 +208,21 @@ while (($row = fgetcsv($handle)) !== false) {
     $cat_raw       = $get_col($row, 'Categories');
     $img_raw       = $get_col($row, 'Images');
 
+    $old_slug = $product->get_slug();
+    $target_slug = sanitize_title($name);
+    if ($old_slug && $old_slug !== $target_slug) {
+        add_post_meta($product->get_id(), '_wp_old_slug', $old_slug, false);
+    }
     $product->set_name($name);
+    $product->set_slug($target_slug);
     $product->set_status($published === '0' ? 'draft' : 'publish');
     $product->set_catalog_visibility($get_col($row, 'Visibility in catalog') ?: 'visible');
     $product->set_featured($get_col($row, 'Is featured?') === '1');
     if ($short_desc !== '') {
         $product->set_short_description($short_desc);
     }
+    $clean_desc = $name . ($short_desc !== '' ? ' — ' . $short_desc : '') . '. Chính hãng tại GearForge ĐHQG-HCM, hỗ trợ trả góp 0% thẻ sinh viên .edu.vn và bảo hành onsite KTX.';
+    $product->set_description($clean_desc);
 
     if ($regular_price !== '' && (float) $regular_price > 0) {
         $product->set_regular_price($regular_price);

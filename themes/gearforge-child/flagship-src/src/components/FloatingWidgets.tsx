@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { VIBE_BEAR_GUIDE } from '../data/vibeAssets';
 import { useGearForgeStore } from '../hooks/useGearForgeStore';
+import { CrestIcon } from './BrandLogo';
 
 const QUICK_PROMPTS = [
   { label: 'Gợi ý Laptop AI/Dev', action: 'shop-ai' as const },
@@ -17,9 +17,10 @@ export function FloatingWidgets() {
       const y = window.scrollY;
       const docH = document.documentElement.scrollHeight;
       const winH = window.innerHeight;
-      const nearFooter = y + winH >= docH - 360;
-      const pastHero = pageMode !== 'showcase' || y > 540;
-      setShowBubble(pastHero && !nearFooter);
+      const atFooter = docH > winH + 220 && y + winH >= docH - 260;
+      const isMobile = winH > 0 && window.innerWidth <= 767;
+      const minScroll = pageMode === 'showcase' ? 540 : isMobile ? 240 : 0;
+      setShowBubble(y >= minScroll && !atFooter);
     };
     checkScroll();
     window.addEventListener('scroll', checkScroll, { passive: true });
@@ -32,7 +33,7 @@ export function FloatingWidgets() {
   const [messages, setMessages] = useState<{ from: 'bot' | 'user'; text: string }[]>([
     {
       from: 'bot',
-      text: 'Chào bạn! Mình là Cyber Bear GearForge. Bạn cần tìm Laptop Gaming/Dev, Build PC hay tính lịch trả góp 0% ĐHQG-HCM?',
+      text: 'Chào bạn! Mình là GearForge AI Advisor. Bạn cần tìm Laptop Gaming/Dev, Build PC hay tính lịch trả góp 0% ĐHQG-HCM?',
     },
   ]);
   const [input, setInput] = useState('');
@@ -57,7 +58,7 @@ export function FloatingWidgets() {
       openDrawer('installment');
     } else {
       setChatOpen(false);
-      openDrawer('oms');
+      navigateToPage('tracking');
     }
   };
 
@@ -87,16 +88,18 @@ export function FloatingWidgets() {
       {chatOpen && (
         <div className="mc-panel" role="dialog" aria-label="Trợ lý tư vấn GearForge">
           <div className="mc-panel-head">
-            <img src={VIBE_BEAR_GUIDE.aiBadge} alt="Cyber Bear GearForge" />
+            <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 38, height: 38, borderRadius: '50%', background: '#18181B', border: '1px solid rgba(209,54,57,0.45)', flexShrink: 0 }}>
+              <CrestIcon size={24} />
+            </span>
             <div>
-              <div className="title">Cyber Bear · Trợ lý chọn máy</div>
+              <div className="title">GearForge AI · Trợ lý chọn máy</div>
               <div className="status">Tư vấn cấu hình &amp; Trả góp 0%</div>
             </div>
             <button type="button" className="close-btn" onClick={() => setChatOpen(false)} aria-label="Đóng chat">✕</button>
           </div>
           <div style={{ padding: '6px 12px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0', fontSize: 11.5, color: '#475569', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span>Hỗ trợ sinh viên ĐHQG-HCM 8h–22h</span>
-            <button type="button" onClick={() => { setChatOpen(false); navigateToPage('ecosystem'); }} style={{ background: 'none', border: 0, color: '#D13639', fontWeight: 700, cursor: 'pointer', fontSize: 11.5, textDecoration: 'underline' }}>
+            <button type="button" onClick={() => { setChatOpen(false); navigateToPage('ecosystem'); }} style={{ background: 'none', border: 0, color: '#D13639', fontWeight: 700, cursor: 'pointer', fontSize: 11.5, textDecoration: 'underline', whiteSpace: 'nowrap', flexShrink: 0 }}>
               Chọn theo ngành →
             </button>
           </div>
@@ -141,7 +144,7 @@ export function FloatingWidgets() {
           aria-label={chatOpen ? 'Đóng trợ lý tư vấn' : 'Mở trợ lý tư vấn'}
           onClick={() => setChatOpen(!chatOpen)}
         >
-          <img src={VIBE_BEAR_GUIDE.aiBadge} alt="Cyber Bear GearForge" />
+          <CrestIcon size={26} />
         </button>
       )}
     </>

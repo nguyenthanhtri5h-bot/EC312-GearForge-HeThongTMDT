@@ -1,7 +1,10 @@
 import { useState } from 'react';
-import { VIBE_PORTFOLIO_CARDS, VIBE_VIDEOS } from '../data/vibeAssets';
+import { GALLERY_MEDIA_DATA } from '../data/subpageBandsData';
+import { VIBE_PORTFOLIO_CARDS } from '../data/vibeMedia';
 import { useGearForgeStore } from '../hooks/useGearForgeStore';
-import './ecosystem/ecosystem.css';
+import { CrestIcon } from './BrandLogo';
+import { SubpageMediaBand } from './subpages/SubpageMediaBand';
+import '../styles/gallery-page.css';
 
 interface SetupShowcase {
   id: string;
@@ -16,144 +19,156 @@ interface SetupShowcase {
 
 const hw = VIBE_PORTFOLIO_CARDS.hardware;
 const SETUPS: SetupShowcase[] = [
-  { id: 'ai-uit', tag: 'AI & Deep Learning', campus: 'UIT · Khoa KHMT', title: 'ROG Strix G16 AI Lab Rig', specs: 'Core i7-13650HX · RTX 4060 · 32GB', img: hw.campusUitAi, cat: 'laptop-gaming', quote: 'Chạy PyTorch & model vision mượt, trả góp 0% qua thẻ SV.' },
-  { id: 'watercool-bk', tag: 'Custom PC RTX', campus: 'Bách Khoa · Cơ Điện Tử', title: 'Workstation CAD & Robotics', specs: 'i7-14700K · RTX 4070 Ti · 64GB', img: hw.campusBkCad, cat: 'pc-workstation', quote: 'Kiểm tra SolidWorks ổn định 24h trước khi giao KTX.' },
-  { id: 'creator-media', tag: 'Creator OLED', campus: 'Media Club UIT', title: 'OLED 240Hz Studio Rig', specs: '27" QHD OLED · DCI-P3 99% · M4', img: hw.monitorOled, cat: 'gear', quote: 'Dựng video 4K chuẩn màu điện ảnh, bảo hành theo số Serial.' },
-  { id: 'ktx-desk', tag: 'KTX Compact', campus: 'KTX Khu B ĐHQG', title: 'Mini-ITX Dorm PC Setup', specs: 'Ryzen 5 5600G · Mesh ITX · 2TB', img: hw.pcMiniItx, cat: 'pc-workstation', quote: 'Gọn bàn học ký túc xá, giao trong 2 giờ.' },
-  { id: 'rog-dev', tag: 'KTPM & Dev', campus: 'UIT · Kỹ Thuật Phần Mềm', title: 'Gaming Laptop ROG RGB Dev', specs: 'Core Ultra 9 · RTX 4070 · 32GB', img: hw.laptopRogRgb, cat: 'laptop-gaming', quote: 'Docker + IDE + Android Studio mở song song không giật.' },
-  { id: 'gear-pro', tag: 'Gaming Gear', campus: 'CLB Esports Làng ĐH', title: 'Combo Phím Cơ & Audio Hub', specs: 'Custom Gasket RGB · Headset 2.4G', img: hw.galleryEsportsDesk, cat: 'gear', quote: 'Combo phím chuột tai nghe êm chuẩn phòng KTX & đấu giải.' },
+  { id: 'ai-uit', tag: 'AI & Deep Learning', campus: 'UIT · Khoa KHMT', title: 'ROG Strix G16 AI Lab Rig', specs: 'Core i7-13650HX · RTX 4060 · 32GB', img: hw.galAiUit, cat: 'laptop-gaming', quote: 'Chạy PyTorch & model vision mượt, trả góp 0% qua thẻ SV.' },
+  { id: 'watercool-bk', tag: 'Custom PC RTX', campus: 'Bách Khoa · Cơ Điện Tử', title: 'Workstation CAD & Robotics', specs: 'i7-14700K · RTX 4070 Ti · 64GB', img: hw.galBkCad, cat: 'pc-workstation', quote: 'Kiểm tra SolidWorks ổn định 24h trước khi giao KTX.' },
+  { id: 'creator-media', tag: 'Creator OLED', campus: 'Media Club UIT', title: 'OLED 240Hz Studio Rig', specs: '27" QHD OLED · DCI-P3 99% · M4', img: hw.galCreatorOled, cat: 'gear', quote: 'Dựng video 4K chuẩn màu điện ảnh, bảo hành theo số Serial.' },
+  { id: 'ktx-desk', tag: 'KTX Compact', campus: 'KTX Khu B ĐHQG', title: 'Mini-ITX Dorm PC Setup', specs: 'Ryzen 5 5600G · Mesh ITX · 2TB', img: hw.galKtxMini, cat: 'pc-workstation', quote: 'Gọn bàn học ký túc xá, giao trong 2 giờ.' },
+  { id: 'rog-dev', tag: 'KTPM & Dev', campus: 'UIT · Kỹ Thuật Phần Mềm', title: 'Gaming Laptop ROG RGB Dev', specs: 'Core Ultra 9 · RTX 4070 · 32GB', img: hw.galDevRog, cat: 'laptop-gaming', quote: 'Docker + IDE + Android Studio mở song song không giật.' },
+  { id: 'gear-pro', tag: 'Gaming Gear', campus: 'CLB Esports Làng ĐH', title: 'Combo Phím Cơ & Audio Hub', specs: 'Custom Gasket RGB · Headset 2.4G', img: hw.galEsportsGear, cat: 'gear', quote: 'Combo phím chuột tai nghe êm chuẩn phòng KTX & đấu giải.' },
 ];
 
-const KPIS = [
-  { v: '100%', l: 'Hàng chính hãng VAT' },
-  { v: '0%', l: 'Lãi suất SV 3 tháng' },
-  { v: '1:1', l: 'Định danh Serial S/N' },
-  { v: '2 Giờ', l: 'Giao KTX Khu A & B' },
-  { v: '36T', l: 'Bảo hành điện tử' },
-  { v: '6', l: 'Trường thành viên ĐHQG' },
-];
+const TAGS = ['Tất cả', 'AI & Deep Learning', 'Custom PC RTX', 'Creator OLED', 'KTX Compact', 'KTPM & Dev', 'Gaming Gear'];
 
 export function SetupGalleryPageView() {
   const { navigateToPage } = useGearForgeStore();
   const [filterTag, setFilterTag] = useState('Tất cả');
   const [query, setQuery] = useState('');
 
-  const tags = ['Tất cả', 'AI & Deep Learning', 'Custom PC RTX', 'Creator OLED', 'KTX Compact', 'KTPM & Dev', 'Gaming Gear'];
   const visible = SETUPS.filter((s) => {
     const matchTag = filterTag === 'Tất cả' || s.tag === filterTag;
     const q = query.trim().toLowerCase();
     return matchTag && (!q || `${s.title} ${s.specs} ${s.campus}`.toLowerCase().includes(q));
   });
 
-  return (
-    <main className="tc" id="tc-gallery" style={{ paddingTop: 78, background: '#F1F0EC', color: '#0A0A0A' }}>
-      <section className="gf-eco-hero" style={{ position: 'relative', overflow: 'hidden', paddingBottom: 32 }}>
-        <video
-          src={VIBE_VIDEOS.deskOrbit}
-          poster={VIBE_VIDEOS.posterDeskOrbit}
-          autoPlay
-          muted
-          loop
-          playsInline
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            opacity: 0.16,
-            pointerEvents: 'none',
-          }}
-        />
-        <div className="tc-wrap" style={{ position: 'relative', zIndex: 2 }}>
-          <div style={{ fontSize: 13, color: '#A1A1AA', marginBottom: 10 }}>
-            <button type="button" onClick={() => navigateToPage('showcase')} style={{ background: 'none', border: 0, color: '#ffffff', fontWeight: 700, cursor: 'pointer', padding: 0 }}>
-              &larr; Trang chủ
-            </button> / Góc Máy Thực Tế Sinh Viên ĐHQG-HCM
-          </div>
-          <h1 className="tc-h1" style={{ color: '#fff', fontSize: 'clamp(28px, 3.5vw, 44px)' }}>
-            Góc Máy Thực Tế Đã Bàn Giao Cho <span className="tc-dan">Sinh Viên ĐHQG</span>
-          </h1>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 16, marginTop: 22, padding: '14px 0', borderTop: '1px solid rgba(255,255,255,0.12)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>
-            {KPIS.map((k) => (
-              <div key={k.l} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <strong style={{ color: '#FFFFFF', fontSize: 20, fontWeight: 700 }}>{k.v}</strong>
-                <span style={{ fontSize: 12.5, color: '#A1A1AA' }}>{k.l}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+  const lead = visible[0];
+  const rest = visible.slice(1);
 
-      <section className="tc-sec" style={{ paddingBlock: 36, background: '#F1F0EC' }}>
+  return (
+    <main className="tc gf-news-page" id="tc-gallery">
+      <section className="gf-news-hero">
+        <svg className="gf-news-shards" viewBox="0 0 1440 360" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <path d="M320 62L575 154L748 128L918 54L994 0L940 74L1095 20L1005 112L1168 96L1035 162L1142 292L984 184L868 278L882 192L714 218L562 298L640 198L486 154Z" fill="#18181B" />
+          <path d="M1230 14L1130 112L1265 92L1178 164L1385 118L1440 82L1440 162L1278 216L1372 320L1215 224L1128 336L1142 204L1068 154Z" fill="#1D1D21" />
+          <path d="M902 0L978 86L1072 22L1012 118L1118 228L992 146L914 212L948 122L836 68Z" fill="#0B0B0D" />
+        </svg>
+
         <div className="tc-wrap">
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {tags.map((t) => (
-                <button key={t} type="button" className={`gf-cat-pill ${filterTag === t ? 'is-active' : ''}`} onClick={() => setFilterTag(t)}>
+          <button type="button" className="gf-news-crumb" onClick={() => navigateToPage('showcase')}>
+            &larr; Trang chủ / Góc máy sinh viên ĐHQG
+          </button>
+          <h1 className="gf-news-h1">Góc Máy Sinh Viên</h1>
+
+          <div className="gf-news-bar">
+            <nav className="gf-news-tabs" aria-label="Lọc góc máy theo nhu cầu">
+              {TAGS.map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  className={`gf-news-tab ${filterTag === t ? 'is-active' : ''}`}
+                  onClick={() => setFilterTag(t)}
+                >
                   {t}
                 </button>
               ))}
-            </div>
+            </nav>
+
             <input
               type="search"
-              className="gf-cat-input"
-              style={{ width: 290, minHeight: 42, padding: '0 14px', borderRadius: 10, background: '#ffffff', color: '#0A0A0A', border: '1px solid #DFDEDC' }}
-              placeholder="Tìm góc máy theo trường, RTX, M4..."
+              aria-label="Tìm góc máy theo trường, GPU hoặc cấu hình"
+              className="gf-news-search"
+              placeholder="Tìm trường, RTX, M4..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
           </div>
+        </div>
 
-          {visible.length === 0 ? (
-            <div style={{ padding: 40, borderRadius: 14, background: '#1F1F1F', color: '#FFFFFF', textAlign: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
-              <p style={{ margin: '0 0 14px', fontSize: 15, color: '#D4D4D8' }}>
-                Không tìm thấy góc máy phù hợp với từ khóa "{query}".
-              </p>
-              <button
-                type="button"
-                className="gf-riot-red-pill"
-                style={{ height: 40, padding: '0 20px', fontSize: 13 }}
-                onClick={() => { setFilterTag('Tất cả'); setQuery(''); }}
-              >
-                Đặt lại bộ lọc
-              </button>
-            </div>
-          ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))', gap: 18 }}>
-              {visible.map((s) => (
-                <article
-                  key={s.id}
-                  className="gf-chrome-card"
-                  style={{ background: '#1F1F1F', borderColor: 'rgba(255,255,255,0.1)', color: '#F4F4F5', borderRadius: 10 }}
+        <svg className="gf-news-tear" viewBox="0 0 1440 58" preserveAspectRatio="none" aria-hidden="true">
+          <path
+            d="M0 32C95 48 178 14 282 26C395 39 468 48 592 31C718 14 824 8 960 22C1098 36 1212 46 1335 28C1382 21 1416 14 1440 18L1440 58L0 58Z"
+            fill="#F1F0EC"
+          />
+        </svg>
+      </section>
+
+      <div className="tc-wrap">
+        {!lead ? (
+          <div className="gf-news-empty">
+            <p style={{ margin: '0 0 14px', fontSize: 15, color: '#52525B' }}>
+              Không tìm thấy góc máy phù hợp với từ khóa &ldquo;{query}&rdquo;.
+            </p>
+            <button
+              type="button"
+              className="gf-news-cta"
+              onClick={() => { setFilterTag('Tất cả'); setQuery(''); }}
+            >
+              Đặt lại bộ lọc &rarr;
+            </button>
+          </div>
+        ) : (
+          <>
+            <article className="gf-news-featured">
+              <div className="gf-news-lead-media">
+                <img src={lead.img} alt={lead.title} />
+              </div>
+
+              <div className="gf-news-lead-copy">
+                <span className="gf-news-meta">
+                  <CrestIcon size={16} />
+                  <span>{lead.campus} · {lead.tag}</span>
+                </span>
+                <h2 className="gf-news-lead-title">{lead.title}</h2>
+                <p className="gf-news-lead-specs">{lead.specs}</p>
+                <p className="gf-news-lead-quote">&ldquo;{lead.quote}&rdquo;</p>
+                <button
+                  type="button"
+                  className="gf-news-cta"
+                  onClick={() => navigateToPage('shop', { category: lead.cat })}
                 >
-                  <div style={{ position: 'relative' }}>
-                    <img src={s.img} alt={s.title} style={{ width: '100%', aspectRatio: '16/10', objectFit: 'cover', display: 'block' }} />
-                    <span style={{ position: 'absolute', top: 12, left: 12, fontSize: 11.5, fontWeight: 700, padding: '4px 9px', borderRadius: 6, background: 'rgba(10, 10, 12, 0.88)', color: '#FFFFFF' }}>
-                      {s.tag}
+                  Tìm cấu hình tương tự &rarr;
+                </button>
+              </div>
+            </article>
+
+            {rest.length > 0 && (
+              <section className="gf-news-grid" aria-label="Danh sách góc máy bàn giao">
+                {rest.map((s) => (
+                  <article key={s.id} className="gf-news-card">
+                    <div className="gf-news-card-media">
+                      <img src={s.img} alt={s.title} />
+                    </div>
+                    <span className="gf-news-meta">
+                      <CrestIcon size={14} />
+                      <span>{s.campus} · {s.tag}</span>
                     </span>
-                  </div>
-                  <div style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: '#F87171', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{s.campus}</span>
-                    <h2 style={{ margin: 0, fontFamily: "'Be Vietnam Pro', sans-serif", fontSize: 18, fontWeight: 800, color: '#FFFFFF' }}>{s.title}</h2>
-                    <div style={{ fontSize: 13, color: '#D4D4D8', fontWeight: 600 }}>{s.specs}</div>
-                    <p style={{ margin: 0, fontSize: 13.5, color: '#A1A1AA', lineHeight: 1.5 }}>&ldquo;{s.quote}&rdquo;</p>
+                    <h3 className="gf-news-card-title">{s.title}</h3>
+                    <p className="gf-news-card-specs">{s.specs} — {s.quote}</p>
                     <button
                       type="button"
-                      className="gf-act-btn is-primary"
-                      style={{ marginTop: 'auto' }}
+                      className="gf-news-cta"
                       onClick={() => navigateToPage('shop', { category: s.cat })}
                     >
-                      Tìm cấu hình tương tự →
+                      Tìm cấu hình tương tự &rarr;
                     </button>
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+                  </article>
+                ))}
+              </section>
+            )}
+          </>
+        )}
+      </div>
+
+      <SubpageMediaBand
+        kicker={GALLERY_MEDIA_DATA.kicker}
+        heading={GALLERY_MEDIA_DATA.heading}
+        desc={GALLERY_MEDIA_DATA.desc}
+        videoSrc={GALLERY_MEDIA_DATA.videoSrc}
+        posterSrc={GALLERY_MEDIA_DATA.posterSrc}
+        verticalReel
+        facts={GALLERY_MEDIA_DATA.facts}
+        ctaLabel="Đặt lịch build & giao KTX"
+        onCta={() => navigateToPage('ecosystem')}
+      />
     </main>
   );
 }

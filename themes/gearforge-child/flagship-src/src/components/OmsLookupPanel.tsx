@@ -32,12 +32,20 @@ const STATUS_VI: Record<string, string> = {
   REFUNDED: 'Đã hoàn tiền',
 };
 
-export function OmsLookupPanel({ initialOrderId = 542 }: { initialOrderId?: number }) {
-  const { boot, lookupOmsOrder } = useGearForgeStore();
+export function OmsLookupPanel({
+  initialOrderId = 542,
+  compact = false,
+  paidRedirect = false,
+}: {
+  initialOrderId?: number;
+  compact?: boolean;
+  paidRedirect?: boolean;
+}) {
+  const { boot, lookupOmsOrder, navigateToPage } = useGearForgeStore();
   const [queryId, setQueryId] = useState<string>('');
   const [order, setOrder] = useState<OmsOrder | null>(() => {
     const samples = boot.sampleOrders || [];
-    return samples.find((o) => o.orderId === initialOrderId) || samples[0] || null;
+    return samples.find((o) => o.orderId === initialOrderId) || null;
   });
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -64,11 +72,11 @@ export function OmsLookupPanel({ initialOrderId = 542 }: { initialOrderId?: numb
   };
 
   useEffect(() => {
-    if (!order && initialOrderId > 0) {
+    if (initialOrderId > 0 && order?.orderId !== initialOrderId) {
       void runLookup(initialOrderId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [initialOrderId]);
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
@@ -96,7 +104,7 @@ export function OmsLookupPanel({ initialOrderId = 542 }: { initialOrderId?: numb
           type="number"
           min={1}
           className="gf-oms-input"
-          placeholder="Nhập mã đơn hàng của bạn..."
+          placeholder="Nhập mã đơn hàng (VD: 542, 543)..."
           value={queryId}
           onChange={(e) => setQueryId(e.target.value)}
         />
@@ -105,27 +113,53 @@ export function OmsLookupPanel({ initialOrderId = 542 }: { initialOrderId?: numb
         </button>
       </form>
 
+      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px 14px', margin: '10px 0 12px', fontSize: 12.5, color: '#656462' }}>
+        <span>Đơn mẫu ĐHQG:</span>
+        {[542, 543].map((demoId) => (
+          <button
+            key={demoId}
+            type="button"
+            className={`gf-oms-chip-btn ${order?.orderId === demoId ? 'is-active' : ''}`}
+            onClick={() => {
+              setQueryId(String(demoId));
+              void runLookup(demoId);
+            }}
+          >
+            #{demoId}
+          </button>
+        ))}
+      </div>
+
+      {paidRedirect && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 10, padding: '12px 14px', marginBottom: 12, background: '#ECFDF5', borderLeft: '3px solid #047857', borderRadius: 6, color: '#065F46', fontSize: 13.5, fontWeight: 600 }}>
+          <span>Đã tiếp nhận giao dịch từ cổng Sandbox 3DS. Hệ thống đang hiển thị trạng thái thực tế từ máy chủ cho đơn #{order?.orderId || initialOrderId}.</span>
+          <button type="button" className="gf-oms-chip-btn" onClick={() => void runLookup(order?.orderId || initialOrderId)} disabled={loading}>
+            {loading ? 'Đang cập nhật...' : 'Làm mới trạng thái'}
+          </button>
+        </div>
+      )}
+
       {errorMsg && (
-        <div style={{ padding: '10px 12px', borderRadius: 10, background: '#fef2f2', color: '#b91c1c', fontSize: 13, fontWeight: 700 }}>
+        <div className="gf-oms-msg-err">
           {errorMsg}
         </div>
       )}
 
       {order && (
         <div className="gf-oms-card">
-          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'baseline', gap: 10 }}>
             <div>
-              <strong style={{ fontSize: 15 }}>
+              <strong style={{ fontSize: 16 }}>
                 Đơn hàng #{order.orderId} · {formatVnd(order.total)}
               </strong>
-              <div style={{ fontSize: 12, color: '#475569' }}>
+              <div style={{ fontSize: 12.5, color: '#656462', marginTop: 2 }}>
                 {order.customerName || 'Sinh viên ĐHQG-HCM'} {order.createdAt ? `· ${order.createdAt}` : ''}
               </div>
             </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
               <span className="gf-oms-badge">{STATUS_VI[order.status] || order.status}</span>
               {order.installment?.status && (
-                <span className="gf-oms-badge" style={{ background: '#fef2f2', color: '#991b1b', borderColor: '#fca5a5' }}>
+                <span className="gf-oms-badge is-crimson">
                   {STATUS_VI[order.installment.status] || order.installment.status}
                 </span>
               )}
@@ -143,33 +177,51 @@ export function OmsLookupPanel({ initialOrderId = 542 }: { initialOrderId?: numb
             <div className="gf-oms-fill" style={{ width: `${progressPct}%` }} />
           </div>
 
-          <div className="gf-oms-steps" role="list" aria-label="Tiến độ xử lý đơn hàng">
-            {OMS_STEPS.map((st, idx) => {
-              const isDone = activeIdx >= 0 && idx < activeIdx;
-              const isActive = idx === activeIdx;
-              return (
-                <div
-                  key={st.key}
-                  role="listitem"
-                  className={`gf-oms-step ${isDone ? 'is-done' : ''} ${isActive ? 'is-active' : ''}`}
-                >
-                  {st.label}
-                </div>
-              );
-            })}
-          </div>
-
-          {order.installment && (
-            <div style={{ fontSize: 12.5, color: '#334155', display: 'flex', flexWrap: 'wrap', gap: '4px 12px' }}>
-              <span>Trả góp: <strong>{STATUS_VI[order.installment.status] || order.installment.status}</strong></span>
-              {order.installment.monthly_amount ? (
-                <span>Mỗi tháng: <strong>{formatVnd(order.installment.monthly_amount)}/th</strong></span>
-              ) : null}
+          {compact ? (
+            <div className="gf-oms-compact-foot">
+              <span>
+                Tiến độ hiện tại: <strong>{OMS_STEPS[activeIdx]?.label || STATUS_VI[order.status] || order.status}</strong>
+                {order.installment?.monthly_amount ? ` · Góp ${formatVnd(order.installment.monthly_amount)}/th` : ''}
+              </span>
+              <button
+                type="button"
+                className="gf-oms-link-cta"
+                onClick={() => navigateToPage('tracking')}
+              >
+                Mở 7 bước, Hóa đơn VAT &amp; Bảo hành Serial &rarr;
+              </button>
             </div>
-          )}
+          ) : (
+            <>
+              <div className="gf-oms-steps" role="list" aria-label="Tiến độ xử lý đơn hàng">
+                {OMS_STEPS.map((st, idx) => {
+                  const isDone = activeIdx >= 0 && idx < activeIdx;
+                  const isActive = idx === activeIdx;
+                  return (
+                    <div
+                      key={st.key}
+                      role="listitem"
+                      className={`gf-oms-step ${isDone ? 'is-done' : ''} ${isActive ? 'is-active' : ''}`}
+                    >
+                      {st.label}
+                    </div>
+                  );
+                })}
+              </div>
 
-          <OmsSandboxBox order={order} onOrderRefresh={runLookup} />
-          <OmsWarrantyCard order={order} />
+              {order.installment && (
+                <div style={{ fontSize: 13, color: '#2B2A29', display: 'flex', flexWrap: 'wrap', gap: '4px 16px' }}>
+                  <span>Trả góp: <strong>{STATUS_VI[order.installment.status] || order.installment.status}</strong></span>
+                  {order.installment.monthly_amount ? (
+                    <span>Mỗi tháng: <strong>{formatVnd(order.installment.monthly_amount)}/th</strong></span>
+                  ) : null}
+                </div>
+              )}
+
+              <OmsSandboxBox order={order} onOrderRefresh={runLookup} />
+              <OmsWarrantyCard order={order} />
+            </>
+          )}
         </div>
       )}
     </div>

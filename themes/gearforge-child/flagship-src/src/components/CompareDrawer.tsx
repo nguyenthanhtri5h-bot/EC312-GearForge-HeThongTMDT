@@ -75,7 +75,7 @@ export function CompareDrawer() {
         <div className="gf-drawer-head">
           <div>
             <h3 id="gf-compare-drawer-title">So sánh cấu hình ({compareItems.length}/3)</h3>
-            <span style={{ fontSize: 12.5, color: '#475569' }}>
+            <span style={{ fontSize: 12.5, color: '#52525B' }}>
               Đối chiếu trực quan thông số kỹ thuật &amp; ước tính trả góp 0%
             </span>
           </div>
@@ -100,7 +100,7 @@ export function CompareDrawer() {
           ) : (
             <>
               <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: 10, alignItems: 'center' }}>
-                <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 13.5, fontWeight: 700, cursor: 'pointer', color: '#0f172a' }}>
+                <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 13.5, fontWeight: 700, cursor: 'pointer', color: '#0A0A0A' }}>
                   <input
                     type="checkbox"
                     checked={diffOnly}
@@ -126,7 +126,7 @@ export function CompareDrawer() {
                               Xóa
                             </button>
                             <img src={it.image} alt={it.name} />
-                            <a href={it.permalink || '#'} style={{ color: '#0f172a', fontWeight: 800, fontSize: 13, lineHeight: 1.35 }}>
+                            <a href={it.permalink || '#'} style={{ color: '#0A0A0A', fontWeight: 800, fontSize: 13, lineHeight: 1.35 }}>
                               {it.name}
                             </a>
                           </div>
@@ -146,7 +146,7 @@ export function CompareDrawer() {
                             <td
                               key={idx}
                               style={
-                                row.label.startsWith('Giá') || row.label.startsWith('Trả trước')
+                                row.label.startsWith('Giá') || row.label.startsWith('Trả góp')
                                   ? { fontFamily: "'JetBrains Mono', monospace", fontWeight: 800, color: '#D13639' }
                                   : undefined
                               }
@@ -188,7 +188,7 @@ export function CompareDrawer() {
         </div>
 
         <div className="gf-drawer-foot" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-          <span style={{ fontSize: 12.5, color: '#475569' }}>Hỗ trợ tối đa 3 thiết bị cùng lúc</span>
+          <span style={{ fontSize: 12.5, color: '#52525B' }}>Hỗ trợ tối đa 3 thiết bị cùng lúc</span>
           <a href={boot.routes.compare} className="gf-act-btn is-active" style={{ display: 'inline-flex', alignItems: 'center' }}>
             Mở bảng toàn trang →
           </a>

@@ -23,19 +23,26 @@ export function RiotDealsBento() {
   const heroDeal = flashDeals[0];
   const hw = VIBE_PORTFOLIO_CARDS.hardware;
 
-  const shortName = heroDeal?.name ? heroDeal.name.split('(')[0].trim() : 'MSI Katana 15 RTX 4070';
+  const cleanShortName = (raw?: string, fallback = 'Lenovo IdeaPad Slim 3') => {
+    if (!raw) return fallback;
+    const base = raw.split('(')[0].replace(/\b[A-Z0-9]{6,}\b/g, '').replace(/\s+/g, ' ').trim();
+    return base.length > 42 ? `${base.slice(0, 39)}...` : base;
+  };
+  const shortName = cleanShortName(heroDeal?.name, 'Lenovo IdeaPad Slim 3 RTX');
 
   const deal2Cat = (flashDeals[1]?.category || 'PC RTX').toUpperCase();
   const deal3Cat = (flashDeals[2]?.category || 'ĐHQG').toUpperCase();
+  const isDeal2Pc = (flashDeals[1]?.category || '').toLowerCase().includes('pc') || (flashDeals[1]?.name || '').toLowerCase().includes('pc');
+  const isDeal3Pc = (flashDeals[2]?.category || '').toLowerCase().includes('pc') || (flashDeals[2]?.name || '').toLowerCase().includes('pc');
 
   const sideItems: NewsRowItem[] = [
     {
       id: 'deal-2',
       tag: `TIN TỨC · ${deal2Cat}`,
       title: flashDeals[1]
-        ? `${flashDeals[1].name.split('(')[0].trim()} · ${formatVnd(flashDeals[1].price)}`
+        ? `${cleanShortName(flashDeals[1].name)} · ${formatVnd(flashDeals[1].price)}`
         : 'Custom PC Nova RTX 4070 Super AI Build',
-      thumb: hw.riotEcoAiBuilder,
+      thumb: isDeal2Pc ? hw.bentoPc : hw.bentoLaptop,
       action: () =>
         flashDeals[1]
           ? setQuickViewProduct(flashDeals[1])
@@ -45,9 +52,9 @@ export function RiotDealsBento() {
       id: 'deal-3',
       tag: `TIN TỨC · ${deal3Cat}`,
       title: flashDeals[2]
-        ? `${flashDeals[2].name.split('(')[0].trim()} · ${formatVnd(flashDeals[2].price)}`
-        : 'Ultrabook Dev Linux Pin 14h Cho Sinh Viên IT',
-      thumb: hw.campusUitAi,
+        ? `${cleanShortName(flashDeals[2].name)} · ${formatVnd(flashDeals[2].price)}`
+        : 'Ultrabook Dev Pin 14h Cho Sinh Viên IT',
+      thumb: isDeal3Pc ? hw.bentoPc : hw.bentoLaptop,
       action: () =>
         flashDeals[2]
           ? setQuickViewProduct(flashDeals[2])
@@ -65,7 +72,7 @@ export function RiotDealsBento() {
       tag: 'TIN TỨC · BẢO HÀNH',
       title: 'Tra Cứu Serial Chính Hãng & Hóa Đơn VAT ĐHQG',
       thumb: hw.riotNewsOmsSerial,
-      action: () => openDrawer('oms'),
+      action: () => navigateToPage('tracking'),
     },
   ];
 
@@ -93,12 +100,12 @@ export function RiotDealsBento() {
           >
             <div className="gf-riot-bento-lead-media">
               <img
-                src={hw.riotNewsLead}
+                src={hw.bentoLead}
                 alt={heroDeal?.name || 'Cộng đồng sinh viên ĐHQG trải nghiệm máy GearForge'}
               />
             </div>
             <h3 className="gf-riot-lead-title">
-              {`Mùa Tựu Trường ĐHQG 2026 | ${shortName} (${heroDeal ? formatVnd(heroDeal.price) : '30.590.000đ'})`}
+              {`Mùa Tựu Trường ĐHQG 2026 | ${shortName}`}
             </h3>
             <span className="gf-riot-meta-row">
               <CrestIcon size={16} />

@@ -1,6 +1,10 @@
 import { useEffect, useRef } from 'react';
+import { SHOP_BRANCH_CARDS, SHOP_MEDIA_DATA } from '../data/subpageBandsData';
 import { useGearForgeStore } from '../hooks/useGearForgeStore';
 import { CatalogSection } from './CatalogSection';
+import { RiotSubpageHero } from './RiotSubpageHero';
+import { SubpageCardsBand } from './subpages/SubpageCardsBand';
+import { SubpageMediaBand } from './subpages/SubpageMediaBand';
 import './drawers/drawers-extra.css';
 
 const SHOP_TABS = [
@@ -27,7 +31,7 @@ function resolveInitialCategoryFromUrl(): string {
 }
 
 export function ShopPageView() {
-  const { openDrawer, navigateToPage, fetchCatalog, filters } = useGearForgeStore();
+  const { openDrawer, fetchCatalog, filters, products, totalPages, navigateToPage } = useGearForgeStore();
   const syncedUrlRef = useRef(false);
 
   useEffect(() => {
@@ -35,90 +39,84 @@ export function ShopPageView() {
     syncedUrlRef.current = true;
     const initCat = resolveInitialCategoryFromUrl();
     if (initCat && filters.category !== initCat) {
-      void fetchCatalog({ category: initCat, page: 1 });
+      void fetchCatalog({ category: initCat, page: 1, perPage: 24 });
+    } else if (!initCat && (products.length !== 24 || totalPages <= 1)) {
+      void fetchCatalog({ category: '', page: 1, perPage: 24 });
     }
-  }, [fetchCatalog, filters.category]);
+  }, [fetchCatalog, filters.category, products.length, totalPages]);
 
   return (
-    <main className="tc" id="tc-shop" style={{ paddingTop: 78, background: '#F1F0EC', color: '#0A0A0A' }}>
-      <section
-        className="gf-riot-topo"
-        style={{
-          backgroundColor: '#0A0A0A',
-          color: '#FFFFFF',
-          padding: '44px 0 34px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-        }}
+    <main className="tc" id="tc-shop" style={{ paddingTop: 0, background: '#F1F0EC', color: '#0A0A0A' }}>
+      <RiotSubpageHero
+        crumbLabel="Trang chủ / Kho Sản Phẩm"
+        title="Kho Cấu Hình ĐHQG"
+        action={
+          <button
+            type="button"
+            className="gf-shop-hero-cta"
+            onClick={() => openDrawer('installment')}
+          >
+            Trả góp 0% · Duyệt .edu.vn
+          </button>
+        }
       >
-        <div className="tc-wrap">
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between', gap: 18 }}>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, color: '#A1A1AA', marginBottom: 10 }}>
-                <button
-                  type="button"
-                  onClick={() => navigateToPage('showcase')}
-                  style={{ background: 'none', border: 0, color: '#FFFFFF', fontWeight: 700, cursor: 'pointer', padding: 0 }}
-                >
-                  &larr; Trang chủ
-                </button>
-                <span>/</span>
-                <span>Kho Sản Phẩm</span>
-              </div>
-              <h1
+        <div className="gf-shop-tabs">
+          {SHOP_TABS.map((t) => {
+            const isOn = (filters.category || '') === t.slug;
+            return (
+              <button
+                key={t.label}
+                type="button"
+                onClick={() => void fetchCatalog({ category: t.slug, page: 1 })}
                 style={{
-                  margin: 0,
-                  fontFamily: "var(--gf-font-display, 'Be Vietnam Pro', sans-serif)",
-                  fontSize: 'clamp(28px, 3.2vw, 42px)',
-                  fontWeight: 700,
-                  lineHeight: 1.24,
-                  letterSpacing: '-0.015em',
-                  color: '#FFFFFF',
+                  background: 'none',
+                  border: 0,
+                  minHeight: 44,
+                  padding: '8px 0',
+                  borderBottom: isOn ? '2px solid #D13639' : '2px solid transparent',
+                  color: isOn ? '#FFFFFF' : '#A1A1AA',
+                  fontSize: 12,
+                  fontWeight: 800,
+                  letterSpacing: '0.08em',
+                  cursor: 'pointer',
                 }}
               >
-                Kho Cấu Hình ĐHQG
-              </h1>
-            </div>
-
-            <button
-              type="button"
-              className="gf-shop-hero-cta"
-              onClick={() => openDrawer('installment')}
-            >
-              Trả góp 0% · Duyệt .edu.vn
-            </button>
-          </div>
-
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 22, marginTop: 26 }}>
-            {SHOP_TABS.map((t) => {
-              const isOn = (filters.category || '') === t.slug;
-              return (
-                <button
-                  key={t.label}
-                  type="button"
-                  onClick={() => void fetchCatalog({ category: t.slug, page: 1 })}
-                  style={{
-                    background: 'none',
-                    border: 0,
-                    padding: '6px 0',
-                    borderBottom: isOn ? '2px solid #D13639' : '2px solid transparent',
-                    color: isOn ? '#FFFFFF' : '#A1A1AA',
-                    fontSize: 12,
-                    fontWeight: 800,
-                    letterSpacing: '0.08em',
-                    cursor: 'pointer',
-                  }}
-                >
-                  {t.label}
-                </button>
-              );
-            })}
-          </div>
+                {t.label}
+              </button>
+            );
+          })}
         </div>
-      </section>
+      </RiotSubpageHero>
 
       <div style={{ background: '#F1F0EC', paddingBlock: 12 }}>
         <CatalogSection hideCategoryTabs />
       </div>
+
+      <SubpageMediaBand
+        kicker={SHOP_MEDIA_DATA.kicker}
+        heading={SHOP_MEDIA_DATA.heading}
+        desc={SHOP_MEDIA_DATA.desc}
+        videoSrc={SHOP_MEDIA_DATA.videoSrc}
+        posterSrc={SHOP_MEDIA_DATA.posterSrc}
+        facts={SHOP_MEDIA_DATA.facts}
+        ctaLabel="Chọn máy theo ngành học"
+        onCta={() => navigateToPage('ecosystem')}
+      />
+
+      <SubpageCardsBand
+        kicker="CHỌN NHANH THEO NHÓM NGÀNH ĐHQG"
+        heading="Lọc Bộ Sưu Tập Theo Nhu Cầu Giảng Đường"
+        cards={SHOP_BRANCH_CARDS.map((b) => ({
+          id: b.id,
+          tag: b.tag,
+          title: b.title,
+          img: b.img,
+          onClick: () => {
+            void fetchCatalog({ category: b.category, page: 1 });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          },
+        }))}
+      />
     </main>
   );
 }

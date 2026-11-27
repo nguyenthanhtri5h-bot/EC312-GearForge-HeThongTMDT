@@ -16,6 +16,7 @@ export interface GearForgeProduct {
   regularPrice?: number;
   salePrice?: number;
   image: string;
+  galleryImages?: string[];
   category: string;
   categorySlug: string;
   specs: ProductSpecs;
@@ -95,7 +96,7 @@ export interface FilterParams {
 }
 
 export type DrawerKind = 'compare' | 'installment' | 'cart' | 'oms' | null;
-export type FlagshipPageMode = 'showcase' | 'shop' | 'ecosystem' | 'gallery';
+export type FlagshipPageMode = 'showcase' | 'shop' | 'ecosystem' | 'gallery' | 'tracking' | 'installment' | 'compare' | 'cart';
 
 export interface GearForgeContextValue {
   boot: GearForgeBoot;

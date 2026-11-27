@@ -1,15 +1,15 @@
 import { useEffect } from 'react';
-import { CartCheckoutDrawer } from './components/CartCheckoutDrawer';
-import { CompareDrawer } from './components/CompareDrawer';
+import { CartPageView } from './components/CartPageView';
+import { ComparePageView } from './components/ComparePageView';
 import { CommandSearchModal } from './components/drawers/CommandSearchModal';
-import { OmsLookupDrawer } from './components/drawers/OmsLookupDrawer';
 import { QuickViewModal } from './components/drawers/QuickViewModal';
 import { EcosystemPageView } from './components/EcosystemPageView';
 import { FloatingWidgets } from './components/FloatingWidgets';
 import { FooterSection } from './components/FooterSection';
 import { Header } from './components/Header';
 import { HeroSection } from './components/HeroSection';
-import { InstallmentDrawer } from './components/InstallmentDrawer';
+import { InstallmentPageView } from './components/InstallmentPageView';
+import { OmsTrackingPageView } from './components/OmsTrackingPageView';
 import { RiotDealsBento } from './components/riot/RiotDealsBento';
 import { RiotEcosystemStrip, RiotStudentSplit } from './components/riot/RiotEcosystemAndSplit';
 import { RiotProductsShowcase } from './components/riot/RiotProductsShowcase';
@@ -32,7 +32,7 @@ function ShowcaseMain() {
 }
 
 function FlagshipShell() {
-  const { toast, pageMode, navigateToPage, closeDrawer, openDrawer } = useGearForgeStore();
+  const { toast, pageMode, navigateToPage, closeDrawer } = useGearForgeStore();
 
   useEffect(() => {
     const onDocClick = (e: MouseEvent) => {
@@ -56,10 +56,22 @@ function FlagshipShell() {
         e.preventDefault();
         closeDrawer();
         navigateToPage('gallery');
-      } else if (href === '#gf-installment') {
+      } else if (href === '/tra-cuu-don-hang/' || href.startsWith('/tra-cuu-don-hang?')) {
         e.preventDefault();
         closeDrawer();
-        openDrawer('installment');
+        navigateToPage('tracking');
+      } else if (href === '#gf-installment' || href === '/tra-gop/') {
+        e.preventDefault();
+        closeDrawer();
+        navigateToPage('installment');
+      } else if (href === '/so-sanh-cau-hinh/') {
+        e.preventDefault();
+        closeDrawer();
+        navigateToPage('compare');
+      } else if (href === '/gio-hang-sv/') {
+        e.preventDefault();
+        closeDrawer();
+        navigateToPage('cart');
       } else if (href === '#gf-oms-contact') {
         e.preventDefault();
         const target = document.getElementById('gf-oms-contact');
@@ -67,32 +79,43 @@ function FlagshipShell() {
           closeDrawer();
           target.scrollIntoView({ behavior: 'smooth' });
         } else {
-          openDrawer('oms');
+          navigateToPage('tracking');
         }
       }
     };
     document.addEventListener('click', onDocClick);
     return () => document.removeEventListener('click', onDocClick);
-  }, [closeDrawer, navigateToPage, openDrawer]);
+  }, [closeDrawer, navigateToPage]);
+
+  const renderMain = () => {
+    switch (pageMode) {
+      case 'shop':
+        return <ShopPageView />;
+      case 'ecosystem':
+        return <EcosystemPageView />;
+      case 'gallery':
+        return <SetupGalleryPageView />;
+      case 'tracking':
+        return <OmsTrackingPageView />;
+      case 'installment':
+        return <InstallmentPageView />;
+      case 'compare':
+        return <ComparePageView />;
+      case 'cart':
+        return <CartPageView />;
+      default:
+        return <ShowcaseMain />;
+    }
+  };
 
   return (
     <>
       <Header />
-      {pageMode === 'shop'
-        ? <ShopPageView />
-        : pageMode === 'ecosystem'
-          ? <EcosystemPageView />
-          : pageMode === 'gallery'
-            ? <SetupGalleryPageView />
-            : <ShowcaseMain />}
+      {renderMain()}
       <FooterSection />
       <FloatingWidgets />
       <MobileBottomBar />
       <VideoModal />
-      <CompareDrawer />
-      <InstallmentDrawer />
-      <CartCheckoutDrawer />
-      <OmsLookupDrawer />
       <QuickViewModal />
       <CommandSearchModal />
 

@@ -13,7 +13,9 @@ if (!defined('ABSPATH')) {
 <head>
     <meta charset="<?php bloginfo('charset'); ?>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/png" href="/wp-content/themes/gearforge-child/assets/flagship/vibe/gearforge-emblem-128.png" />
+    <link rel="icon" type="image/svg+xml" href="/wp-content/themes/gearforge-child/assets/flagship/vibe/gearforge-crest.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <?php wp_head(); ?>
 </head>
 <body <?php body_class('gf-flagship-front'); ?>>

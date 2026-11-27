@@ -27,7 +27,7 @@ export const SIMPLE_DROPDOWNS: Record<string, NavSubItem[]> = {
     { label: 'Ước Tính Trả Góp 0% Thẻ Sinh Viên', href: '#gf-installment', drawer: 'installment', icon: VIBE_PORTFOLIO_CARDS.hardware.galleryEsportsDesk },
   ],
   support: [
-    { label: 'Tra cứu nhanh đơn hàng (OMS)', href: '/tra-cuu-don-hang/', drawer: 'oms' },
+    { label: 'Tra cứu đơn hàng & S/N (OMS)', href: '/tra-cuu-don-hang/' },
     { label: 'So sánh cấu hình (tối đa 3 máy)', href: '/so-sanh-cau-hinh/', drawer: 'compare' },
     { label: 'Ước tính Trả góp 0% (.edu.vn)', href: '#gf-installment', drawer: 'installment' },
   ],

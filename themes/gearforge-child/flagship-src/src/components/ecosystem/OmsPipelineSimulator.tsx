@@ -1,15 +1,33 @@
 import { useEffect, useRef, useState } from 'react';
-import { useGearForgeStore } from '../../hooks/useGearForgeStore';
 
 const SERVICE_STEPS = [
-  { id: 'pick', title: '1. Đặt hàng & Chọn trả góp', detail: 'Đặt trực tiếp hoặc nộp hồ sơ qua email .edu.vn — bảo mật thông tin tuyệt đối.' },
-  { id: 'verify', title: '2. Xác nhận sinh viên nhanh', detail: 'Đối chiếu thông tin thẻ SV ĐHQG-HCM trong giờ hành chính, không giữ giấy tờ.' },
-  { id: 'check', title: '3. Kiểm máy & Gắn bảo hành', detail: 'Kỹ thuật viên test tải nặng 30 phút & kích hoạt bảo hành điện tử theo số Serial.' },
-  { id: 'deliver', title: '4. Giao KTX 2h & Hóa đơn VAT', detail: 'Cài sẵn phần mềm chuyên ngành, xuất hóa đơn điện tử VAT & giao tận phòng.' },
+  {
+    id: 'pick',
+    num: '01',
+    title: 'Đặt hàng & Chọn trả góp',
+    detail: 'Đặt trực tiếp hoặc gửi hồ sơ qua email .edu.vn — bảo mật dữ liệu tuyệt đối.',
+  },
+  {
+    id: 'verify',
+    num: '02',
+    title: 'Xác nhận SV nhanh',
+    detail: 'Đối chiếu thẻ SV ĐHQG-HCM trực tuyến, không giữ bản gốc giấy tờ.',
+  },
+  {
+    id: 'check',
+    num: '03',
+    title: 'Test 30p & Gắn Serial',
+    detail: 'Kỹ thuật viên stress-test tải nặng & kích hoạt bảo hành điện tử theo S/N.',
+  },
+  {
+    id: 'deliver',
+    num: '04',
+    title: 'Giao KTX 2h & VAT',
+    detail: 'Cài sẵn phần mềm chuyên ngành, xuất hóa đơn điện tử & giao tận phòng.',
+  },
 ];
 
 export function OmsPipelineSimulator() {
-  const { navigateToPage, openDrawer } = useGearForgeStore();
   const [activeIdx, setActiveIdx] = useState(0);
   const [running, setRunning] = useState(false);
   const timerRef = useRef<number | null>(null);
@@ -26,57 +44,55 @@ export function OmsPipelineSimulator() {
   const runPreview = () => {
     if (running) return;
     setRunning(true);
-    let idx = 0;
-    const tick = () => {
+    setActiveIdx(0);
+    const stepNext = (idx: number) => {
       if (!mountedRef.current) return;
+      if (idx >= SERVICE_STEPS.length) {
+        setRunning(false);
+        return;
+      }
       setActiveIdx(idx);
-      idx += 1;
-      if (idx < SERVICE_STEPS.length) timerRef.current = window.setTimeout(tick, 750);
-      else setRunning(false);
+      timerRef.current = window.setTimeout(() => stepNext(idx + 1), 650);
     };
-    timerRef.current = window.setTimeout(tick, 120);
+    timerRef.current = window.setTimeout(() => stepNext(1), 650);
   };
 
   return (
-    <div className="gf-sim-box">
-      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+    <section className="gf-pipe" aria-label="Quy trình đặt hàng đến nhận máy KTX">
+      <div className="gf-pipe__head">
         <div>
-          <span className="gf-live-badge"><i /> Cam kết dịch vụ GearForge ĐHQG-HCM</span>
-          <h3 style={{ margin: '10px 0 4px', fontFamily: "'Be Vietnam Pro', sans-serif", fontSize: 22, fontWeight: 800 }}>
-            Quy Trình Kiểm Định, Giao KTX 2h &amp; Bảo Hành 4 Bước
-          </h3>
+          <span className="gf-est-kicker">QUY TRÌNH GIAO NHẬN CHUẨN ĐHQG</span>
+          <h3 className="gf-pipe__title">4 Bước Từ Lúc Đặt Đến Khi Nhận Máy</h3>
         </div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-          <button type="button" className="gf-act-btn is-primary" disabled={running} onClick={runPreview}>
-            ▶ Xem quy trình
-          </button>
-          <button type="button" className="gf-act-btn" onClick={() => openDrawer('installment')}>
-            Tính trả góp 0%
-          </button>
-          <button type="button" className="gf-act-btn" onClick={() => navigateToPage('shop')}>
-            Chọn sản phẩm →
-          </button>
-        </div>
+        <button type="button" className="gf-pipe__btn" onClick={runPreview} disabled={running}>
+          {running ? 'Đang chạy quy trình...' : 'Xem mô phỏng 4 bước →'}
+        </button>
       </div>
 
-      <div className="gf-sim-steps">
+      <div className="gf-pipe__grid">
         {SERVICE_STEPS.map((st, idx) => {
-          const cls = idx < activeIdx || (!running && activeIdx === 3 && idx === 3)
-            ? 'is-done' : idx === activeIdx && running ? 'is-running' : idx === activeIdx ? 'is-done' : '';
+          const isActive = idx === activeIdx;
           return (
-            <button
+            <div
               key={st.id}
-              type="button"
-              onClick={() => !running && setActiveIdx(idx)}
-              className={`gf-sim-step ${cls}`}
-              style={{ textAlign: 'left', cursor: 'pointer' }}
+              role="button"
+              tabIndex={0}
+              className={`gf-pipe__step ${isActive ? 'is-active' : ''}`}
+              onClick={() => setActiveIdx(idx)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setActiveIdx(idx);
+                }
+              }}
             >
-              <div style={{ fontSize: 13.5, fontWeight: 800, color: '#0f172a' }}>{st.title}</div>
-              <div style={{ fontSize: 12.5, color: '#475569', marginTop: 6, lineHeight: 1.45 }}>{st.detail}</div>
-            </button>
+              <span className="gf-est-kicker" style={{ marginBottom: 4 }}>BƯỚC {st.num}</span>
+              <h4>{st.title}</h4>
+              <p>{st.detail}</p>
+            </div>
           );
         })}
       </div>
-    </div>
+    </section>
   );
 }

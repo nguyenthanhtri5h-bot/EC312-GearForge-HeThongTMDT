@@ -141,27 +141,35 @@ export function InstallmentForm({ product, downPct, months }: Props) {
       <div className="gf-form-grid-2">
         <div className="gf-field-col">
           <label htmlFor="gf-ekyc-cccd-file" className="gf-field-label">Ảnh CCCD (JPG/PNG/PDF) *</label>
-          <input
-            id="gf-ekyc-cccd-file"
-            name="cccd_file"
-            type="file"
-            accept=".jpg,.jpeg,.png,.pdf"
-            className="gf-dark-input"
-            onChange={(e) => setCccdFile(e.target.files?.[0] || null)}
-            required
-          />
+          <div className="gf-tool-file-row">
+            <input
+              id="gf-ekyc-cccd-file"
+              name="cccd_file"
+              type="file"
+              accept=".jpg,.jpeg,.png,.pdf"
+              className="gf-tool-file-native"
+              onChange={(e) => setCccdFile(e.target.files?.[0] || null)}
+              required
+            />
+            <label htmlFor="gf-ekyc-cccd-file" className="gf-tool-file-btn">Chọn ảnh CCCD</label>
+            <span className="gf-tool-file-name">{cccdFile ? cccdFile.name : 'Chưa chọn tệp'}</span>
+          </div>
         </div>
         <div className="gf-field-col">
           <label htmlFor="gf-ekyc-sv-file" className="gf-field-label">Ảnh Thẻ Sinh viên (JPG/PNG/PDF) *</label>
-          <input
-            id="gf-ekyc-sv-file"
-            name="student_card_file"
-            type="file"
-            accept=".jpg,.jpeg,.png,.pdf"
-            className="gf-dark-input"
-            onChange={(e) => setSvCardFile(e.target.files?.[0] || null)}
-            required
-          />
+          <div className="gf-tool-file-row">
+            <input
+              id="gf-ekyc-sv-file"
+              name="student_card_file"
+              type="file"
+              accept=".jpg,.jpeg,.png,.pdf"
+              className="gf-tool-file-native"
+              onChange={(e) => setSvCardFile(e.target.files?.[0] || null)}
+              required
+            />
+            <label htmlFor="gf-ekyc-sv-file" className="gf-tool-file-btn">Chọn ảnh Thẻ SV</label>
+            <span className="gf-tool-file-name">{svCardFile ? svCardFile.name : 'Chưa chọn tệp'}</span>
+          </div>
         </div>
       </div>
 

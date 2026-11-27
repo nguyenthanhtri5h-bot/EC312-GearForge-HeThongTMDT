@@ -127,7 +127,7 @@ export function OmsWarrantyCard({ order }: { order: OmsOrder }) {
         <button
           type="button"
           className="gf-oms-chip-btn"
-          style={{ marginLeft: 'auto', background: '#FEF2F2', color: '#B91C1C', borderColor: '#FECACA' }}
+          style={{ marginLeft: 'auto', color: '#D13639', borderBottomColor: '#D13639' }}
           onClick={() => setShowInvoice((v) => !v)}
         >
           {showInvoice ? 'Ẩn hóa đơn VAT' : 'Xem hóa đơn điện tử'}
@@ -159,38 +159,45 @@ export function OmsWarrantyCard({ order }: { order: OmsOrder }) {
         </div>
       )}
 
-      <form className="gf-oms-search" onSubmit={(e) => void handleWarrantySubmit(e)}>
-        <select
-          aria-label="Loại yêu cầu hậu mãi"
-          className="gf-oms-input"
-          style={{ maxWidth: 132, flex: '0 0 auto' }}
-          value={requestType}
-          onChange={(e) => setRequestType(e.target.value as 'WARRANTY' | 'EXCHANGE' | 'RETURN')}
-        >
-          <option value="WARRANTY">Bảo hành</option>
-          <option value="EXCHANGE">Đổi máy mới</option>
-          <option value="RETURN">Hoàn trả</option>
-        </select>
-        <input
-          type="text"
-          className="gf-oms-input"
-          style={{ maxWidth: 165 }}
-          value={serialNumber}
-          onChange={(e) => setSerialNumber(e.target.value)}
-          aria-label="Mã Serial sản phẩm"
-          placeholder="Mã Serial..."
-          required
-        />
-        <input
-          type="text"
-          className="gf-oms-input"
-          value={reason}
-          onChange={(e) => setReason(e.target.value)}
-          aria-label="Mô tả tình trạng máy"
-          placeholder="Mô tả tình trạng cần hỗ trợ..."
-          required
-        />
-        <button type="submit" className="gf-oms-btn" style={{ minHeight: 40, fontSize: 12.5 }} disabled={submitting}>
+      <form className="gf-oms-rma-form" onSubmit={(e) => void handleWarrantySubmit(e)}>
+        <div className="gf-oms-rma-row">
+          <label className="gf-oms-rma-field">
+            <span className="gf-oms-rma-label">Loại yêu cầu</span>
+            <select
+              aria-label="Loại yêu cầu hậu mãi"
+              className="gf-oms-rma-control"
+              value={requestType}
+              onChange={(e) => setRequestType(e.target.value as 'WARRANTY' | 'EXCHANGE' | 'RETURN')}
+            >
+              <option value="WARRANTY">Bảo hành</option>
+              <option value="EXCHANGE">Đổi máy mới</option>
+              <option value="RETURN">Hoàn trả</option>
+            </select>
+          </label>
+          <label className="gf-oms-rma-field">
+            <span className="gf-oms-rma-label">Mã Serial định danh</span>
+            <input
+              type="text"
+              className="gf-oms-rma-control is-mono"
+              value={serialNumber}
+              onChange={(e) => setSerialNumber(e.target.value)}
+              placeholder="VD: SN-GF-E2E-542"
+              required
+            />
+          </label>
+        </div>
+        <label className="gf-oms-rma-field">
+          <span className="gf-oms-rma-label">Mô tả tình trạng máy</span>
+          <input
+            type="text"
+            className="gf-oms-rma-control"
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder="Mô tả ngắn gọn lỗi phần cứng hoặc nhu cầu hỗ trợ..."
+            required
+          />
+        </label>
+        <button type="submit" className="gf-oms-btn" disabled={submitting}>
           {submitting ? 'Đang gửi...' : 'Gửi yêu cầu'}
         </button>
       </form>

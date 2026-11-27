@@ -5,88 +5,68 @@ import './riot-home.css';
 
 interface EcosystemCard {
   id: string;
+  step: string;
   title: string;
-  sub?: string;
+  sub: string;
   img: string;
   action: () => void;
 }
 
 export function RiotEcosystemStrip() {
-  const { navigateToPage, openDrawer, setVideoModalSrc } = useGearForgeStore();
-  const railRef = useRef<HTMLDivElement>(null);
+  const { navigateToPage, setVideoModalSrc } = useGearForgeStore();
+  const downXRef = useRef(0);
   const hw = VIBE_PORTFOLIO_CARDS.hardware;
 
   const cards: EcosystemCard[] = [
-    {
-      id: 'ai',
-      title: 'AI BUILDER',
-      img: hw.riotEcoAiBuilder,
-      action: () => navigateToPage('ecosystem'),
-    },
-    {
-      id: 'setup',
-      title: 'ĐHQG SETUP',
-      img: hw.pcMiniItx,
-      action: () => navigateToPage('gallery'),
-    },
-    {
-      id: 'lab',
-      title: 'LAB STRESS',
-      img: hw.riotEcoStressLab,
-      action: () => setVideoModalSrc(VIBE_VIDEOS.labPc),
-    },
-    {
-      id: 'oms',
-      title: 'OMS SERIAL',
-      img: hw.riotNewsOmsSerial,
-      action: () => openDrawer('oms'),
-    },
-    {
-      id: 'sv-club',
-      title: 'CAMPUS ARENA',
-      img: hw.riotNewsBooth,
-      action: () => navigateToPage('gallery'),
-    },
+    { id: 'ai', step: '01', title: 'AI BUILDER', sub: 'Gợi ý cấu hình theo ngành ĐHQG', img: hw.ecoCardAi, action: () => navigateToPage('ecosystem') },
+    { id: 'setup', step: '02', title: 'ĐHQG SETUP', sub: 'Góc máy thực tế sinh viên đã giao', img: hw.ecoCardSetup, action: () => navigateToPage('gallery') },
+    { id: 'lab', step: '03', title: 'LAB STRESS', sub: 'Test tải nặng 30p trước xuất kho', img: hw.riotEcoStressLab, action: () => setVideoModalSrc(VIBE_VIDEOS.heroShowcase) },
+    { id: 'oms', step: '04', title: 'OMS SERIAL', sub: 'Tra cứu bảo hành & hóa đơn VAT', img: hw.ecoCardOms, action: () => navigateToPage('tracking') },
+    { id: 'sv-club', step: '05', title: 'CAMPUS ARENA', sub: 'Giao hỏa tốc KTX Khu A & B', img: VIBE_VIDEOS.posterHeroShowcase, action: () => navigateToPage('gallery') },
   ];
-
-  const scrollRail = (dir: number) => {
-    railRef.current?.scrollBy({ left: dir * 360, behavior: 'smooth' });
-  };
 
   return (
     <section
       id="he-sinh-thai-strip"
-      className="gf-riot-sec gf-riot-topo gf-riot-eco"
+      className="gf-riot-sec gf-riot-eco"
+      role="region"
+      aria-roledescription="carousel"
       aria-labelledby="riot-eco-h"
     >
       <div className="gf-riot-wrap">
         <div className="gf-riot-head">
-          <h2 id="riot-eco-h" className="gf-riot-h2">
-            Hệ Sinh Thái &amp; Giải Pháp
-          </h2>
-          <div className="gf-riot-nav-pair" aria-label="Điều hướng thẻ giải pháp">
-            <button type="button" className="gf-riot-nav-txt" aria-label="Trước" onClick={() => scrollRail(-1)}>
-              &larr;
-            </button>
-            <span className="gf-riot-nav-sep" aria-hidden="true" />
-            <button type="button" className="gf-riot-nav-txt" aria-label="Tiếp" onClick={() => scrollRail(1)}>
-              &rarr;
-            </button>
-          </div>
+          <h2 id="riot-eco-h" className="gf-riot-h2">Hệ Sinh Thái &amp; Giải Pháp</h2>
+          <button type="button" className="gf-riot-all-btn" onClick={() => navigateToPage('ecosystem')}>
+            KHÁM PHÁ HỆ SINH THÁI
+          </button>
         </div>
       </div>
 
-      <div ref={railRef} className="gf-riot-eco-rail">
-        {cards.map((card) => (
-          <button key={card.id} type="button" className="gf-riot-slant-card" onClick={card.action}>
-            <img src={card.img} alt={card.title} className="gf-riot-slant-bg" />
-            <div className="gf-riot-slant-overlay" aria-hidden="true" />
-            <div className="gf-riot-slant-center">
-              <strong className="gf-riot-slant-title">{card.title}</strong>
-              {card.sub && <span className="gf-riot-slant-sub">{card.sub}</span>}
-            </div>
-          </button>
-        ))}
+      <div className="gf-riot-eco-wide">
+        <div className="gf-riot-eco-grid">
+          {cards.slice(0, 4).map((card) => (
+            <button
+              key={card.id}
+              type="button"
+              className="gf-riot-slant-card"
+              onPointerDown={(e) => {
+                downXRef.current = e.clientX;
+              }}
+              onClick={(e) => {
+                if (e.detail !== 0 && Math.abs(e.clientX - downXRef.current) > 8) return;
+                card.action();
+              }}
+            >
+              <img src={card.img} alt={card.title} className="gf-riot-slant-bg" draggable={false} />
+              <div className="gf-riot-slant-overlay" aria-hidden="true" />
+              <div className="gf-riot-slant-center">
+                <span className="gf-riot-slant-step">{card.step}</span>
+                <strong className="gf-riot-slant-title">{card.title}</strong>
+                <span className="gf-riot-slant-sub">{card.sub}</span>
+              </div>
+            </button>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -99,9 +79,7 @@ export function RiotStudentSplit() {
     <section id="tra-gop-sv" className="gf-riot-split" aria-labelledby="riot-split-h">
       <div className="gf-riot-split-inner">
         <div className="gf-riot-split-copy">
-          <h2 id="riot-split-h" className="gf-riot-split-h2">
-            Trả Góp 0% Sinh Viên!
-          </h2>
+          <h2 id="riot-split-h" className="gf-riot-split-h2">Trả Góp 0% Sinh Viên!</h2>
           <p className="gf-riot-split-lead">
             Hãy đồng hành cùng GearForge để trang bị cấu hình chuẩn ĐHQG và giao KTX trong 2 giờ
           </p>
@@ -117,11 +95,7 @@ export function RiotStudentSplit() {
             </div>
           </div>
 
-          <button
-            type="button"
-            className="gf-riot-red-pill"
-            onClick={() => openDrawer('installment')}
-          >
+          <button type="button" className="gf-riot-red-pill" onClick={() => openDrawer('installment')}>
             Ước tính Trả góp 0%
           </button>
         </div>
@@ -129,7 +103,8 @@ export function RiotStudentSplit() {
         <div className="gf-riot-split-media" aria-hidden="true">
           <img
             src={VIBE_PORTFOLIO_CARDS.hardware.riotSplitStatue}
-            alt="Cyber Bear Guardian tại showroom công nghệ GearForge ĐHQG"
+            alt="Khối phần cứng Custom PC và Laptop RTX tại GearForge Studio ĐHQG"
+            draggable={false}
           />
         </div>
       </div>

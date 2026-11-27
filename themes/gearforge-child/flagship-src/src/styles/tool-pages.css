@@ -1,0 +1,447 @@
+/* ==========================================================================
+   /tra-gop/, /so-sanh-cau-hinh/, /gio-hang-sv/ — Full Riot Editorial Tool Pages
+   Replaces blocking slide-over drawers · Warm paper #F1F0EC · Hairline #D3D1CF
+   ========================================================================== */
+
+.tc.gf-tool-page {
+  background: #F1F0EC;
+  color: #0A0A0A;
+  padding: 0;
+  min-height: 80vh;
+}
+
+.tc.gf-tool-page > .tc-wrap {
+  padding-top: 28px;
+  padding-bottom: 52px;
+}
+
+.gf-tool-head {
+  padding: 18px 0 26px;
+  border-bottom: 1px solid #D3D1CF;
+}
+
+.gf-tool-crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin-bottom: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #656462;
+  cursor: pointer;
+}
+
+.gf-tool-crumb:hover {
+  color: #D13639;
+}
+
+.gf-tool-kicker {
+  display: block;
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #D13639;
+}
+
+.gf-tool-title {
+  margin: 0 0 10px;
+  font-family: var(--gf-font-display);
+  font-size: clamp(28px, 3.8vw, 42px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #0A0A0A;
+}
+
+.gf-tool-sub {
+  margin: 0;
+  max-width: 660px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: #656462;
+}
+
+/* Open 2-Col Editorial Grid (Installment + Cart) */
+.gf-tool-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 52px;
+  padding-top: 34px;
+  align-items: start;
+}
+
+.gf-tool-split.is-cart {
+  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.85fr);
+}
+
+.gf-tool-section-label {
+  display: block;
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #656462;
+}
+
+.gf-tool-select,
+.gf-tool-input {
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  border-bottom: 1.5px solid #D3D1CF;
+  border-radius: 0;
+  background: transparent;
+  padding: 8px 2px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #0A0A0A;
+}
+
+.gf-tool-select:focus,
+.gf-tool-input:focus {
+  outline: none;
+  border-bottom-color: #D13639;
+}
+
+.gf-tool-field-block {
+  padding: 18px 0;
+  border-bottom: 1px solid #D3D1CF;
+}
+
+.gf-tool-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+}
+
+.gf-tool-chip {
+  min-height: 34px;
+  padding: 4px 2px 8px;
+  border: 0;
+  border-bottom: 1.5px solid #D3D1CF;
+  border-radius: 0;
+  background: transparent;
+  color: #656462;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.gf-tool-chip:hover {
+  border-bottom-color: #0A0A0A;
+  color: #0A0A0A;
+}
+
+.gf-tool-chip.is-active {
+  background: transparent;
+  border-bottom: 2px solid #D13639;
+  color: #0A0A0A;
+  font-weight: 800;
+}
+
+.gf-tool-facts {
+  margin-top: 22px;
+  border-top: 1px solid #D3D1CF;
+}
+
+.gf-tool-fact {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 13px 12px;
+  border-bottom: 1px solid #D3D1CF;
+  font-size: 14px;
+}
+
+.gf-tool-fact:nth-child(odd) {
+  background: rgba(10, 10, 10, 0.035);
+}
+
+.gf-tool-fact span {
+  color: #656462;
+}
+
+.gf-tool-fact strong {
+  color: #0A0A0A;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.gf-tool-fact strong.is-accent {
+  color: #D13639;
+  font-size: 16px;
+}
+
+/* Flat Form Overrides Inside InstallmentPageView */
+.tc.gf-tool-page .gf-dark-input {
+  border: 0;
+  border-bottom: 1px solid #D3D1CF;
+  border-radius: 0;
+  background: transparent;
+  padding: 8px 2px;
+  min-height: 40px;
+  color: #0A0A0A;
+}
+
+.tc.gf-tool-page .gf-dark-input:focus {
+  outline: none;
+  border-bottom-color: #D13639;
+}
+
+.tc.gf-tool-page .gf-nd13-box,
+.tc.gf-tool-page .gf-alert-box {
+  background: transparent;
+  border: 0;
+  border-left: 2px solid #D13639;
+  border-radius: 0;
+  padding: 8px 0 8px 14px;
+  color: #0A0A0A;
+}
+
+.tc.gf-tool-page .gf-alert-box.is-ok {
+  border-left-color: #047857;
+  color: #047857;
+}
+
+.gf-tool-file-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #D3D1CF;
+}
+
+.gf-tool-file-native {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.gf-tool-file-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: #E5E3DF;
+  color: #0A0A0A;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.gf-tool-file-btn:hover {
+  background: #D8D5CF;
+}
+
+.gf-tool-file-name {
+  font-size: 13px;
+  color: #656462;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Compare Matrix (Borderless Riot Hairline Table) */
+.gf-cmp-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 0;
+  border-bottom: 1px solid #D3D1CF;
+}
+
+.gf-cmp-matrix {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.gf-cmp-matrix th,
+.gf-cmp-matrix td {
+  padding: 16px 14px;
+  border-bottom: 1px solid #D3D1CF;
+  text-align: left;
+  vertical-align: top;
+  color: #0A0A0A;
+}
+
+.gf-cmp-matrix thead th {
+  padding-top: 24px;
+  padding-bottom: 20px;
+}
+
+.gf-cmp-matrix tbody th {
+  width: 170px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #656462;
+}
+
+.gf-cmp-matrix tbody tr.is-diff {
+  background: #E7E5E0;
+}
+
+.gf-cmp-col-head {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 190px;
+}
+
+.gf-cmp-col-head img {
+  width: 100%;
+  height: 118px;
+  object-fit: contain;
+  background: #FFFFFF;
+  border-radius: 4px;
+  padding: 8px;
+}
+
+.gf-cmp-col-head a {
+  color: #0A0A0A;
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 1.35;
+  text-decoration: none;
+}
+
+.gf-cmp-col-head a:hover {
+  color: #D13639;
+}
+
+/* Cart Item Hairline Rows & Obsidian Summary */
+.gf-cart-list-item {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 18px 0;
+  border-bottom: 1px solid #D3D1CF;
+}
+
+.gf-cart-list-item img {
+  width: 76px;
+  height: 58px;
+  object-fit: contain;
+  background: #FFFFFF;
+  border-radius: 4px;
+  padding: 4px;
+}
+
+.gf-cart-qty-btn {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 999px;
+  background: #E5E3DF;
+  color: #0A0A0A;
+  font-size: 16px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.16s ease;
+}
+
+.gf-cart-qty-btn:hover {
+  background: #D8D5CF;
+}
+
+.gf-cart-dark-summary {
+  background: transparent;
+  color: #0A0A0A;
+  padding: 24px 0 0;
+  border-top: 2px solid #D13639;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.gf-cart-dark-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 12px 10px;
+  border-bottom: 1px solid #D3D1CF;
+  font-size: 14px;
+}
+
+.gf-cart-dark-row:nth-of-type(odd) { background: rgba(10, 10, 10, 0.035); }
+.gf-cart-dark-row span { color: #656462; }
+.gf-cart-dark-row strong { color: #0A0A0A; font-variant-numeric: tabular-nums; }
+.gf-cart-dark-row.is-total strong { color: #D13639; font-size: 20px; }
+
+.gf-tool-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 26px;
+  border: 0;
+  border-radius: 999px;
+  background: #D13639;
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.gf-tool-btn-primary:hover { background: #B22C2F; }
+
+.gf-tool-link-btn {
+  border: 0;
+  background: transparent;
+  padding: 0 0 2px;
+  border-bottom: 1px solid #0A0A0A;
+  color: #0A0A0A;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.gf-tool-link-btn:hover {
+  color: #D13639;
+  border-bottom-color: #D13639;
+}
+
+@media (max-width: 959px) {
+  .gf-tool-split,
+  .gf-tool-split.is-cart {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
+@media (max-width: 640px) {
+  .tc.gf-tool-page {
+    padding: 0 0 100px;
+  }
+
+  .gf-cart-list-item {
+    grid-template-columns: 60px minmax(0, 1fr);
+  }
+}

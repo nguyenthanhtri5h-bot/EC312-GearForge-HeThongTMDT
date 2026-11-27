@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { formatVnd, useGearForgeStore } from '../../hooks/useGearForgeStore';
 import { calcFallbackInstallment } from '../../hooks/fallbackBoot';
 
@@ -7,24 +7,29 @@ interface MajorPreset {
   label: string;
   minBudget: number;
   baseFps: number;
-  cat: string;
-  specHint: string;
+  gpuTarget: string;
+  query: string;
 }
 
 const MAJORS: MajorPreset[] = [
-  { id: 'ai', label: 'CNTT / AI-ML', minBudget: 20000000, baseFps: 135, cat: 'laptop-gaming', specHint: 'RTX 4060+ · 16–32GB RAM' },
-  { id: 'ktpm', label: 'Kỹ thuật Phần mềm', minBudget: 16000000, baseFps: 110, cat: 'laptop-ultrabook', specHint: 'Core Ultra / Ryzen AI · Pin 7h+' },
-  { id: 'attt', label: 'An toàn Thông tin', minBudget: 18000000, baseFps: 120, cat: 'pc-workstation', specHint: '32GB+ RAM VM · Đa nhân' },
-  { id: 'media', label: 'Đồ họa 3D / Creator', minBudget: 22000000, baseFps: 145, cat: 'laptop-ultrabook', specHint: 'OLED 100% DCI-P3 · RTX Studio' },
+  { id: 'ai', label: 'CNTT / AI-ML', minBudget: 22000000, baseFps: 95, gpuTarget: 'RTX 4060+ · 16–32GB RAM', query: 'RTX' },
+  { id: 'se', label: 'Kỹ thuật Phần mềm', minBudget: 17000000, baseFps: 75, gpuTarget: 'Core i5/Ryzen 5 · 16GB RAM', query: 'RAM 16GB' },
+  { id: 'sec', label: 'An toàn Thông tin', minBudget: 18000000, baseFps: 70, gpuTarget: 'Intel Ultra / Ryzen AI · Linux ready', query: 'Ultra' },
+  { id: 'creator', label: 'Đồ họa 3D / Creator', minBudget: 25000000, baseFps: 115, gpuTarget: 'RTX 4070+ · Màn 100% sRGB/OLED', query: 'RTX' },
 ];
+
+const DEFAULT_ESTIMATE = { budget: 28000000, downPct: 20, months: 3 } as const;
 
 export function StudentBuildEstimator() {
   const { calcInstallment, navigateToPage } = useGearForgeStore();
   const [majorId, setMajorId] = useState('ai');
-  const [budget, setBudget] = useState(28000000);
-  const [downPct, setDownPct] = useState(20);
-  const [months, setMonths] = useState(3);
-  const [monthlyPay, setMonthlyPay] = useState(() => calcFallbackInstallment(28000000, 20, 3).monthly_amount);
+  const [budget, setBudget] = useState<number>(DEFAULT_ESTIMATE.budget);
+  const [downPct, setDownPct] = useState<number>(DEFAULT_ESTIMATE.downPct);
+  const [months, setMonths] = useState<number>(DEFAULT_ESTIMATE.months);
+  const [monthlyPay, setMonthlyPay] = useState(() =>
+    calcFallbackInstallment(DEFAULT_ESTIMATE.budget, DEFAULT_ESTIMATE.downPct, DEFAULT_ESTIMATE.months).monthly_amount
+  );
+  const firstMountRef = useRef(true);
 
   const major = MAJORS.find((m) => m.id === majorId) || MAJORS[0];
   const tier = Math.max(0, Math.min(1, (budget - 15000000) / (70000000 - 15000000)));
@@ -33,105 +38,136 @@ export function StudentBuildEstimator() {
   const invalidBudget = budget < major.minBudget;
 
   useEffect(() => {
+    if (firstMountRef.current) {
+      firstMountRef.current = false;
+      return;
+    }
     let active = true;
     const t = window.setTimeout(() => {
-      void calcInstallment(budget, downPct, months).then((res) => {
-        if (active && typeof res?.monthly_amount === 'number') setMonthlyPay(res.monthly_amount);
-      });
-    }, 120);
+      void calcInstallment(budget, downPct, months)
+        .then((res) => {
+          if (active && Number.isFinite(res?.monthly_amount)) {
+            setMonthlyPay(res.monthly_amount);
+          }
+        })
+        .catch(() => {
+          /* keep fallback estimate */
+        });
+    }, 150);
     return () => { active = false; window.clearTimeout(t); };
   }, [budget, downPct, months, calcInstallment]);
 
   return (
-    <div className="gf-est-box" aria-labelledby="gf-est-title">
-      <div>
-        <span className="gf-live-badge"><i /> Công cụ ước tính cấu hình &amp; trả góp ĐHQG-HCM</span>
-        <h2 id="gf-est-title" style={{ margin: '12px 0 8px', fontFamily: "'Be Vietnam Pro', sans-serif", fontSize: 28, fontWeight: 800 }}>
-          4 Bước Chọn Máy Theo Ngành Học
-        </h2>
-        <p style={{ margin: '0 0 18px', fontSize: 14, color: '#475569' }}>
-          Tính ngay hiệu năng dự kiến và mức góp mỗi tháng theo chính sách ưu đãi sinh viên ĐHQG-HCM.
-        </p>
-
-        <div className="gf-eco-pills" role="tablist" aria-label="Chọn ngành học UIT">
-          {MAJORS.map((m) => (
-            <button
-              key={m.id}
-              type="button"
-              className={`gf-eco-pill ${m.id === majorId ? 'is-on' : ''}`}
-              onClick={() => setMajorId(m.id)}
-            >
-              {m.label}
-            </button>
-          ))}
+    <section className="gf-est-workbench" aria-labelledby="gf-est-title">
+      <div className="gf-est-workbench__left">
+        <div className="gf-est-head">
+          <span className="gf-est-kicker">CÔNG CỤ DỰ TOÁN · ĐHQG-HCM</span>
+          <h2 id="gf-est-title">4 Bước Chọn Máy &amp; Tính Trả Góp</h2>
         </div>
 
-        <div style={{ marginTop: 18, display: 'grid', gap: 14 }}>
-          <div>
-            <label htmlFor="gf-est-budget" className="gf-budget-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>1. Ngân sách tối đa</span>
-              <strong>{formatVnd(budget)}</strong>
-            </label>
-            <input id="gf-est-budget" type="range" className="gf-budget-range" style={{ width: '100%' }}
-              min={15000000} max={70000000} step={1000000} value={budget}
-              onChange={(e) => setBudget(Number(e.target.value))} />
+        <div className="gf-est-step">
+          <div className="gf-est-step-row">
+            <span className="gf-est-num">01</span>
+            <strong>Ngành học của bạn</strong>
           </div>
-
-          <div>
-            <label htmlFor="gf-est-down" className="gf-budget-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>2. Trả trước ({downPct}%)</span>
-              <strong>{formatVnd((budget * downPct) / 100)}</strong>
-            </label>
-            <input id="gf-est-down" type="range" className="gf-budget-range" style={{ width: '100%' }}
-              min={20} max={50} step={10} value={downPct}
-              onChange={(e) => setDownPct(Number(e.target.value))} />
+          <div className="gf-est-pills">
+            {MAJORS.map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                className={`gf-eco-pill ${majorId === m.id ? 'is-on' : ''}`}
+                onClick={() => setMajorId(m.id)}
+              >
+                {m.label}
+              </button>
+            ))}
           </div>
+        </div>
 
-          <div>
-            <span className="gf-budget-label" style={{ display: 'block', marginBottom: 8 }}>3. Kỳ hạn góp</span>
-            <div style={{ display: 'flex', gap: 8 }}>
-              {[3, 6, 12].map((m) => (
-                <button key={m} type="button" className={`gf-mini-pill ${months === m ? 'is-active' : ''}`} onClick={() => setMonths(m)}>
-                  {m} tháng {m === 3 ? '(0% SV)' : ''}
-                </button>
-              ))}
-            </div>
+        <div className="gf-est-step">
+          <div className="gf-est-step-row">
+            <span className="gf-est-num">02</span>
+            <label htmlFor="gf-budget-range">Ngân sách tối đa</label>
+            <strong className="gf-est-val">{formatVnd(budget)}</strong>
+          </div>
+          <input
+            id="gf-budget-range"
+            type="range"
+            min={15000000}
+            max={70000000}
+            step={1000000}
+            value={budget}
+            onChange={(e) => setBudget(Number(e.target.value))}
+            className="gf-est-range"
+          />
+          {invalidBudget && (
+            <p className="gf-est-warn">
+              Ngành {major.label} khuyến nghị từ {formatVnd(major.minBudget)} để chạy mượt đồ án.
+            </p>
+          )}
+        </div>
+
+        <div className="gf-est-step">
+          <div className="gf-est-step-row">
+            <span className="gf-est-num">03</span>
+            <strong>Tỷ lệ trả trước</strong>
+          </div>
+          <div className="gf-est-pills">
+            {[20, 30, 50].map((pct) => (
+              <button key={pct} type="button" className={`gf-eco-pill ${downPct === pct ? 'is-on' : ''}`} onClick={() => setDownPct(pct)}>
+                {pct}% ({formatVnd((budget * pct) / 100)})
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="gf-est-step">
+          <div className="gf-est-step-row">
+            <span className="gf-est-num">04</span>
+            <strong>Kỳ hạn góp (.edu.vn)</strong>
+          </div>
+          <div className="gf-est-pills">
+            {[3, 6, 12].map((m) => (
+              <button key={m} type="button" className={`gf-eco-pill ${months === m ? 'is-on' : ''}`} onClick={() => setMonths(m)}>
+                {m} tháng {m === 3 ? '(0% lãi)' : ''}
+              </button>
+            ))}
           </div>
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 16, padding: 20, borderRadius: 14, background: '#F1F0EC', border: '1px solid #DFDEDC' }}>
+      <div className="gf-est-workbench__right">
         <div>
-          <span style={{ fontSize: 12, fontWeight: 800, color: '#D13639', letterSpacing: '0.04em' }}>GỢI Ý CẤU HÌNH ({major.label})</span>
-          <div style={{ fontSize: 15, fontWeight: 700, color: '#0A0A0A', marginTop: 4 }}>{major.specHint}</div>
+          <span className="gf-hud-kicker">GỢI Ý CẤU HÌNH ({major.label.toUpperCase()})</span>
+          <h3 className="gf-hud-target">{major.gpuTarget}</h3>
+          <p className="gf-hud-note">
+            Trả trước {downPct}% qua hồ sơ sinh viên, duyệt trực tuyến trong giờ hành chính và giao tận phòng KTX.
+          </p>
         </div>
 
-        <div className="gf-inst-summary">
-          <div className="gf-inst-stat"><span>FPS Đồ họa/Game</span><strong>~{estFps} FPS</strong></div>
-          <div className="gf-inst-stat"><span>Pin học tập</span><strong>{estBattery} giờ</strong></div>
-          <div className="gf-inst-stat"><span>Góp {months} tháng</span><strong>{formatVnd(monthlyPay)}</strong></div>
+        <div className="gf-hud-stats">
+          <div className="gf-hud-stat">
+            <span>FPS Đồ họa/Game</span>
+            <strong>~{estFps} FPS</strong>
+          </div>
+          <div className="gf-hud-stat">
+            <span>Pin học tập</span>
+            <strong>{estBattery} giờ</strong>
+          </div>
+          <div className="gf-hud-stat">
+            <span>Góp {months} tháng</span>
+            <strong className="is-accent">{formatVnd(monthlyPay)}</strong>
+          </div>
         </div>
-
-        {invalidBudget ? (
-          <div className="gf-alert-box is-warn">
-            Ngân sách tối thiểu đề xuất cho ngành {major.label} là {formatVnd(major.minBudget)}.
-          </div>
-        ) : (
-          <div style={{ fontSize: 13, color: '#475569' }}>
-            Phù hợp với nhiều cấu hình sẵn kho (ước tính góp ~<strong style={{ color: '#0f172a' }}>{formatVnd(monthlyPay)}/th</strong>).
-          </div>
-        )}
 
         <button
           type="button"
-          className="tc-btn tc-btn-cam"
-          style={{ border: 0, cursor: 'pointer', width: '100%', justifyContent: 'center' }}
-          disabled={invalidBudget}
-          onClick={() => navigateToPage('shop', { category: major.cat, maxPrice: budget })}
+          className="gf-est-workbench__cta"
+          onClick={() => navigateToPage('shop', { maxPrice: budget, search: major.query, page: 1 })}
         >
-          Xem các máy phù hợp →
+          Xem máy phù hợp ngân sách {formatVnd(budget)} &rarr;
         </button>
       </div>
-    </div>
+    </section>
   );
 }

@@ -114,7 +114,7 @@ export function SystemVideoSection() {
                 <span style={{ fontSize: 12, fontWeight: 700, color: '#93c5fd', letterSpacing: '0.08em' }}>
                   GEARFORGE LAB · QUY TRÌNH KIỂM ĐỊNH TRƯỚC GIAO MÁY
                 </span>
-                <h3 style={{ margin: '10px 0 14px', fontFamily: "'Be Vietnam Pro', sans-serif", fontSize: 24, fontWeight: 800 }}>
+                <h3 style={{ margin: '10px 0 14px', fontFamily: 'var(--gf-font-display)', fontSize: 24, fontWeight: 800 }}>
                   Kiểm Tra Tải Nặng &amp; Kích Hoạt Bảo Hành Điện Tử
                 </h3>
                 <ul style={{ display: 'grid', gap: 8, fontSize: 15, color: '#e2e8f0', lineHeight: 1.55 }}>

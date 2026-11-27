@@ -68,7 +68,7 @@ class GF_Compare_Specs {
                     wp_send_json_error([
                         'message' => 'Khay so sánh tối đa 3 sản phẩm. Vui lòng xóa bớt 1 máy trước khi thêm.',
                         'ids'     => $ids,
-                    ], 400);
+                    ]);
                 }
                 if (!empty($ids)) {
                     $base_group = self::get_device_group($ids[0]);
@@ -77,7 +77,7 @@ class GF_Compare_Specs {
                         wp_send_json_error([
                             'message' => 'Chỉ có thể so sánh các thiết bị cùng nhóm (Laptop với Laptop, PC với PC).',
                             'ids'     => $ids,
-                        ], 400);
+                        ]);
                     }
                 }
                 $ids[] = $product_id;
@@ -95,11 +95,14 @@ class GF_Compare_Specs {
         foreach ($ids as $id) {
             $p = function_exists('wc_get_product') ? wc_get_product($id) : null;
             if ($p) {
+                $img_src = function_exists('gf_flagship_product_image')
+                    ? gf_flagship_product_image($p)
+                    : (wp_get_attachment_image_url($p->get_image_id(), 'thumbnail') ?: wc_placeholder_img_src());
                 $items[] = [
                     'id'    => $id,
                     'name'  => $p->get_name(),
                     'price' => number_format((float) $p->get_price(), 0, ',', '.') . 'đ',
-                    'image' => wp_get_attachment_image_url($p->get_image_id(), 'thumbnail') ?: wc_placeholder_img_src(),
+                    'image' => $img_src,
                 ];
             }
         }
@@ -125,7 +128,9 @@ class GF_Compare_Specs {
                 'name'         => $product->get_name(),
                 'sku'          => $product->get_sku(),
                 'url'          => get_permalink($pid),
-                'image'        => wp_get_attachment_image_url($product->get_image_id(), 'medium') ?: wc_placeholder_img_src(),
+                'image'        => function_exists('gf_flagship_product_image')
+                    ? gf_flagship_product_image($product)
+                    : (wp_get_attachment_image_url($product->get_image_id(), 'medium') ?: wc_placeholder_img_src()),
                 'price_raw'    => $price,
                 'price_fmt'    => number_format($price, 0, ',', '.') . 'đ',
                 'monthly_3m'   => number_format($m3_amt, 0, ',', '.') . 'đ/tháng (0%)',

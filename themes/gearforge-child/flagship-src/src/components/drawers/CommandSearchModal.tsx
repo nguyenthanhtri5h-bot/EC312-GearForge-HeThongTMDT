@@ -1,6 +1,70 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { formatVnd, useGearForgeStore } from '../../hooks/useGearForgeStore';
 
+const IMG_BASE = '/wp-content/themes/gearforge-child/assets/flagship/vibe/hardware';
+
+function resolveSearchFallback(slug?: string): string {
+  const s = (slug || '').toLowerCase();
+  if (s.includes('gaming') && !s.includes('pc')) return `${IMG_BASE}/laptop-gaming.jpg`;
+  if (s.includes('pc') || s.includes('workstation')) return `${IMG_BASE}/pc-workstation.jpg`;
+  if (s.includes('gear') || s.includes('chuot') || s.includes('ban-phim')) return `${IMG_BASE}/gear-peripherals.jpg`;
+  return `${IMG_BASE}/laptop-ultrabook.jpg`;
+}
+
+function sanitizeSpecSummary(specs: { cpu?: string; ram?: string; gpu?: string }): string {
+  const clean = [specs.cpu, specs.ram, specs.gpu]
+    .filter(Boolean)
+    .map((s) => String(s).replace(/\s*\([^)]*\)/g, '').replace(/\s*\([^)]*$/g, '').trim())
+    .filter(Boolean)
+    .join(' · ');
+  return clean.length > 68 ? `${clean.slice(0, 65)}...` : clean;
+}
+
+function SearchThumb({ src, alt, categorySlug }: { src: string; alt: string; categorySlug?: string }) {
+  const [imgSrc, setImgSrc] = useState(src || resolveSearchFallback(categorySlug));
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    setImgSrc(src || resolveSearchFallback(categorySlug));
+    setLoaded(false);
+  }, [src, categorySlug]);
+
+  const onErr = () => {
+    const fb = resolveSearchFallback(categorySlug);
+    if (imgSrc !== fb) {
+      setImgSrc(fb);
+    } else {
+      setLoaded(true);
+    }
+  };
+
+  return (
+    <img
+      src={imgSrc}
+      alt={alt}
+      referrerPolicy="no-referrer"
+      loading="eager"
+      onLoad={(e) => {
+        if (e.currentTarget.naturalWidth <= 10) {
+          onErr();
+        } else {
+          setLoaded(true);
+        }
+      }}
+      onError={onErr}
+      style={{
+        width: 56,
+        height: 38,
+        objectFit: 'contain',
+        background: loaded ? '#FFFFFF' : '#F5F4F0',
+        border: '1px solid #DFDEDC',
+        borderRadius: 6,
+        flexShrink: 0,
+      }}
+    />
+  );
+}
+
 const TRENDING_TAGS = [
   { label: 'RTX 4060', q: 'RTX 4060' },
   { label: 'MSI Katana', q: 'Katana' },
@@ -51,11 +115,11 @@ export function CommandSearchModal() {
         if (e.target === e.currentTarget) setSearchOpen(false);
       }}
     >
-      <div className="gf-drawer-panel" style={{ width: 'min(640px, 100%)', borderRadius: 22, margin: '8vh auto auto', height: 'auto', maxHeight: '80vh' }}>
+      <div className="gf-drawer-panel" style={{ width: 'min(640px, calc(100vw - 24px))', borderRadius: 12, margin: '8vh auto auto', height: 'auto', maxHeight: '80vh' }}>
         <div className="gf-drawer-head">
           <div>
             <h3>Tìm nhanh cấu hình</h3>
-            <span style={{ fontSize: 12.5, color: '#475569' }}>Gõ tên máy, CPU, RTX hoặc nhấn Esc để đóng</span>
+            <span style={{ fontSize: 12.5, color: '#52525B' }}>Gõ tên máy, CPU, RTX hoặc nhấn Esc để đóng</span>
           </div>
           <button type="button" className="gf-drawer-close" aria-label="Đóng tìm kiếm" onClick={() => setSearchOpen(false)}>
             &times;
@@ -67,8 +131,8 @@ export function CommandSearchModal() {
             <input
               type="search"
               autoFocus
-              className="gf-cat-input"
-              style={{ flex: 1, minWidth: 0 }}
+              className="gf-dark-input"
+              style={{ flex: 1, minWidth: 0, minHeight: 44 }}
               placeholder="Tìm ROG, ThinkPad, RTX 4060, Bàn phím..."
               value={term}
               onChange={(e) => setTerm(e.target.value)}
@@ -123,18 +187,18 @@ export function CommandSearchModal() {
                   minWidth: 0,
                   boxSizing: 'border-box',
                   padding: '8px 10px',
-                  borderRadius: 10,
-                  background: '#f8fafc',
-                  border: '1px solid #e2e8f0',
-                  color: '#0f172a',
+                  borderRadius: 8,
+                  background: '#FFFFFF',
+                  border: '1px solid #DFDEDC',
+                  color: '#0A0A0A',
                   textAlign: 'left',
                   cursor: 'pointer',
                 }}
               >
-                <img src={m.image} alt="" style={{ width: 52, height: 36, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }} />
+                <SearchThumb src={m.image} alt={m.name} categorySlug={m.categorySlug} />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13.5, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.name}</div>
-                  <div style={{ fontSize: 12, color: '#475569', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{[m.specs.cpu, m.specs.ram, m.specs.gpu].filter(Boolean).join(' · ')}</div>
+                  <div style={{ fontSize: 13.5, fontWeight: 700, color: '#0A0A0A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.name}</div>
+                  <div style={{ fontSize: 12, color: '#52525B', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{sanitizeSpecSummary(m.specs)}</div>
                 </div>
                 <strong style={{ color: '#D13639', fontSize: 13.5, flexShrink: 0, whiteSpace: 'nowrap' }}>{formatVnd(m.price)}</strong>
               </button>

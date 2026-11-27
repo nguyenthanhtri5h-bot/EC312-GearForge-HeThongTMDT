@@ -1,0 +1,260 @@
+/* ==========================================================================
+   Contact & OMS Section — Open Riot Editorial Layout (#F1F0EC)
+   Eliminates black header slab overlap + nested white/grey box cages
+   ========================================================================== */
+
+.contact-box-footer {
+  background: #F1F0EC;
+  color: #0A0A0A;
+  padding: 68px 0 80px;
+  border-top: 1px solid #D3D1CF;
+}
+
+.contact-box-wrap {
+  position: relative;
+  z-index: 2;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+}
+
+.contact-box-ctn {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.18fr);
+  gap: 56px;
+  align-items: start;
+}
+
+.contact-kicker {
+  margin: 0 0 12px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #D13639;
+}
+
+.contact-title {
+  margin: 0 0 14px;
+  font-family: var(--gf-font-display);
+  font-size: clamp(26px, 3vw, 36px);
+  font-weight: 800;
+  line-height: 1.14;
+  letter-spacing: -0.02em;
+  color: #0A0A0A;
+}
+
+.contact-sub {
+  margin: 0 0 28px;
+  max-width: 48ch;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #656462;
+}
+
+.contact-facts {
+  margin: 0 0 24px;
+  border-top: 1px solid #D3D1CF;
+}
+
+.contact-fact-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 13px 0;
+  border-bottom: 1px solid #D3D1CF;
+  font-size: 13.5px;
+}
+
+.contact-fact-row span {
+  color: #656462;
+}
+
+.contact-fact-row strong {
+  color: #0A0A0A;
+  font-weight: 700;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.contact-link-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.contact-link-btn {
+  border: 0;
+  background: transparent;
+  padding: 0 0 3px;
+  border-bottom: 1px solid #0A0A0A;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0A0A0A;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.16s ease, border-color 0.16s ease;
+}
+
+.contact-link-btn:hover {
+  color: #D13639;
+  border-bottom-color: #D13639;
+}
+
+/* Right Column: Open Riot Tabs + Flat Surface */
+.contact-box-form .wrap {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+}
+
+.form-tab {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  border-bottom: 1px solid #D3D1CF;
+  margin-bottom: 24px;
+}
+
+.tab-btn {
+  position: relative;
+  border: 0;
+  background: transparent;
+  padding: 0 0 13px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #656462;
+  cursor: pointer;
+  transition: color 0.16s ease;
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: #0A0A0A;
+}
+
+.tab-btn.active {
+  color: #0A0A0A;
+}
+
+.tab-btn.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: #D13639;
+}
+
+/* Clean Hairline Form Inputs */
+.gf-flat-form {
+  display: grid;
+  gap: 18px;
+}
+
+.gf-flat-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.gf-flat-field {
+  display: grid;
+  gap: 6px;
+}
+
+.gf-flat-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #656462;
+}
+
+.gf-flat-input {
+  width: 100%;
+  min-height: 42px;
+  border: 0;
+  border-bottom: 1px solid #D3D1CF;
+  border-radius: 0;
+  background: transparent;
+  padding: 8px 2px;
+  font-family: inherit;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: #0A0A0A;
+  transition: border-color 0.16s ease;
+}
+
+.gf-flat-input:focus {
+  outline: none;
+  border-bottom-color: #D13639;
+}
+
+.gf-flat-textarea {
+  min-height: 78px;
+  resize: vertical;
+}
+
+.gf-flat-submit {
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  border-radius: 999px;
+  background: #D13639;
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.gf-flat-submit:hover {
+  background: #B22C2F;
+}
+
+.gf-flat-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.gf-flat-msg {
+  padding: 10px 0;
+  border-bottom: 1px solid #D3D1CF;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.gf-flat-msg.is-ok { color: #047857; }
+.gf-flat-msg.is-err { color: #B91C1C; }
+
+@media (max-width: 959px) {
+  .contact-box-footer {
+    padding: 48px 0 64px;
+  }
+
+  .contact-box-ctn {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+}
+
+@media (max-width: 560px) {
+  .gf-flat-grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .form-tab {
+    gap: 16px;
+  }
+}

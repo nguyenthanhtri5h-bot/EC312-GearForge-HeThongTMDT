@@ -1,112 +1,139 @@
-import { useState } from 'react';
-import { VIBE_PORTFOLIO_CARDS, VIBE_VIDEOS } from '../data/vibeAssets';
+import { useEffect, useState } from 'react';
+import { ECO_HOVER_STEPS, QUICK_MAJORS } from '../data/ecosystemData';
+import { VIBE_VIDEOS } from '../data/vibeMedia';
 import { useGearForgeStore } from '../hooks/useGearForgeStore';
 import { ContactSection } from './ContactSection';
 import { OmsPipelineSimulator } from './ecosystem/OmsPipelineSimulator';
 import { StudentBuildEstimator } from './ecosystem/StudentBuildEstimator';
 import './ecosystem/ecosystem.css';
+import { SubpageHoverBand } from './subpages/SubpageHoverBand';
+import { SubpageMediaBand } from './subpages/SubpageMediaBand';
 
-const hw = VIBE_PORTFOLIO_CARDS.hardware;
-
-const INFRA_MODULES = [
-  { id: 'catalog', title: 'Lọc Máy Theo Ngành Học', tag: 'CPU · RAM · GPU · SSD', img: hw.riotEcoAiBuilder, desc: 'Chọn nhanh cấu hình phù hợp từng chuyên ngành CNTT, AI, Đồ họa hay Văn phòng trong vài giây.' },
-  { id: 'installment', title: 'Trả Góp 0% .edu.vn', tag: 'Kỳ hạn 3–6–12 tháng', img: hw.riotNewsInstallment, desc: 'Chỉ cần email sinh viên ĐHQG-HCM & thẻ SV, không phí hồ sơ kỳ hạn 3 tháng, không giữ giấy tờ gốc.' },
-  { id: 'security', title: 'Bảo Mật Thông Tin Cá Nhân', tag: 'An toàn tuyệt đối', img: hw.riotNewsOmsSerial, desc: 'Hình ảnh CCCD & Thẻ sinh viên được mã hóa bảo mật riêng tư, chỉ dùng để duyệt hồ sơ trả góp.' },
-  { id: 'serial', title: 'Bảo Hành Theo Số Serial', tag: 'Tra cứu trực tuyến', img: hw.riotEcoStressLab, desc: 'Mỗi thiết bị đều có mã định danh Serial chính hãng, hỗ trợ gửi bảo hành hoặc đổi trả nhanh chóng.' },
-  { id: 'delivery', title: 'Hóa Đơn VAT & Giao KTX 2h', tag: 'Khu A / Khu B', img: hw.riotNewsLead, desc: 'Xuất hóa đơn điện tử hợp lệ & kỹ thuật viên cài đặt sẵn phần mềm môn học tận phòng ký túc xá.' },
-];
+const AUTO_ADVANCE_MS = 7000;
 
 export function EcosystemPageView() {
-  const { navigateToPage, openDrawer } = useGearForgeStore();
-  const [activeMod, setActiveMod] = useState(0);
-  const current = INFRA_MODULES[activeMod];
+  const { navigateToPage } = useGearForgeStore();
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [autoAdvance, setAutoAdvance] = useState(true);
+
+  const activeMajor = QUICK_MAJORS[activeIdx] || QUICK_MAJORS[0];
+
+  useEffect(() => {
+    if (!autoAdvance) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const timer = window.setTimeout(() => {
+      setActiveIdx((prev) => (prev + 1) % QUICK_MAJORS.length);
+    }, AUTO_ADVANCE_MS);
+    return () => window.clearTimeout(timer);
+  }, [activeIdx, autoAdvance]);
+
+  const handleSelectTab = (idx: number) => {
+    setActiveIdx(idx);
+    setAutoAdvance(false);
+  };
 
   return (
-    <main className="tc" id="tc-ecosystem" style={{ paddingTop: 78, background: '#F1F0EC', color: '#0A0A0A' }}>
-      <section className="gf-eco-hero" style={{ position: 'relative', overflow: 'hidden' }}>
-        <video
-          src={VIBE_VIDEOS.ecosystemFlow}
-          poster={VIBE_VIDEOS.posterEcosystemFlow}
-          autoPlay
-          muted
-          loop
-          playsInline
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            opacity: 0.16,
-            pointerEvents: 'none',
-          }}
+    <main className="tc" id="tc-ecosystem" style={{ background: '#F1F0EC' }}>
+      <section className="gf-eco-hero is-who-hero" aria-label="Hệ sinh thái chọn máy theo ngành học">
+        <img
+          key={activeMajor.id}
+          src={activeMajor.heroImg}
+          alt={`Cấu hình chuẩn ngành ${activeMajor.label}`}
+          className="gf-eco-hero-media is-switching"
         />
-        <div className="tc-wrap gf-eco-grid" style={{ position: 'relative', zIndex: 2 }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#A1A1AA', marginBottom: 12 }}>
-              <button type="button" onClick={() => navigateToPage('showcase')} style={{ background: 'none', border: 0, color: '#ffffff', fontWeight: 700, cursor: 'pointer', padding: 0 }}>
-                &larr; Trang chủ
-              </button>
-              <span>/</span>
-              <span>Hệ Sinh Thái &amp; Công Cụ Chọn Máy</span>
-            </div>
-            <h1 className="tc-h1" style={{ color: '#fff', fontSize: 'clamp(28px, 3.6vw, 44px)' }}>
-              Chọn Máy Theo <span style={{ borderBottom: '2px solid #D13639' }}>Ngành Học</span> &amp; Dự Toán Trả Góp 0%
-            </h1>
-            <p style={{ marginTop: 14, fontSize: 15.5, color: '#D4D4D8', maxWidth: 560, lineHeight: 1.65 }}>
-              Công cụ giúp sinh viên ĐHQG-HCM chọn đúng cấu hình học tập, ước tính khoản góp hàng tháng và theo dõi quy trình giao hàng hỏa tốc trong 2 giờ.
-            </p>
-            <div className="gf-eco-pills">
-              {INFRA_MODULES.map((m, idx) => (
-                <button key={m.id} type="button" className={`gf-eco-pill ${idx === activeMod ? 'is-on' : ''}`} onClick={() => setActiveMod(idx)}>
-                  {m.title}
-                </button>
-              ))}
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 22 }}>
-              <button type="button" className="tc-btn tc-btn-cam" style={{ border: 0, cursor: 'pointer' }} onClick={() => navigateToPage('shop')}>
-                Khám phá Cửa hàng &rarr;
-              </button>
-              <button
-                type="button"
-                className="tc-btn"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  color: '#FFFFFF',
-                  border: '1px solid rgba(255, 255, 255, 0.34)',
-                  cursor: 'pointer',
-                }}
-                onClick={() => openDrawer('installment')}
-              >
-                Đăng ký Trả góp 0%
-              </button>
+        <div className="gf-eco-hero-scrim" aria-hidden="true" />
+
+        <div className="tc-wrap gf-eco-hero-center">
+          <span className="gf-eco-hero-kicker">
+            TIÊU CHUẨN ĐHQG-HCM · <span style={{ whiteSpace: 'nowrap' }}>{activeMajor.label.toUpperCase()}</span>
+          </span>
+          <h1>{activeMajor.heroHeadline}</h1>
+          <p className="gf-eco-hero-lead">{activeMajor.heroLead}</p>
+          <button
+            type="button"
+            className="gf-eco-center-pill"
+            onClick={() => navigateToPage('shop', { search: activeMajor.query, page: 1 })}
+          >
+            / Xem máy ngành {activeMajor.label}
+          </button>
+        </div>
+
+        <nav className="gf-who-tabs" aria-label="Nhóm ngành học ĐHQG">
+          <div className="tc-wrap">
+            <div className="gf-who-tabs-grid" role="tablist">
+              {QUICK_MAJORS.map((m, idx) => {
+                const active = idx === activeIdx;
+                return (
+                  <button
+                    key={m.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={active}
+                    className={`gf-who-tab ${active ? 'is-active' : ''}`}
+                    onClick={() => handleSelectTab(idx)}
+                  >
+                    <span className="gf-who-tab-label">
+                      <span className="gf-who-tab-num">{m.num}.</span>
+                      <span>{m.label}</span>
+                    </span>
+                    <span className="gf-who-tab-track" aria-hidden="true">
+                      {active && (
+                        <span
+                          key={`${m.id}-${autoAdvance ? 'auto' : 'locked'}`}
+                          className={`gf-who-tab-fill ${autoAdvance ? 'is-running' : 'is-locked'}`}
+                          style={{ animationDuration: `${AUTO_ADVANCE_MS}ms` }}
+                        />
+                      )}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
+        </nav>
+      </section>
 
-          <div className="gf-live-card">
-            <div>
-              <span className="gf-live-badge"><i /> {current.tag}</span>
-              <h2 style={{ margin: '12px 0 8px', fontFamily: "var(--gf-font-display, 'Be Vietnam Pro', sans-serif)", fontSize: 22, fontWeight: 700, color: '#fff' }}>
-                {current.title}
-              </h2>
-              <p style={{ margin: 0, fontSize: 14, color: '#D4D4D8', lineHeight: 1.55 }}>{current.desc}</p>
-            </div>
-            <img
-              src={current.img}
-              alt={current.title}
-              style={{ width: 170, height: 128, objectFit: 'cover', borderRadius: 10 }}
-            />
+      <section className="gf-eco-pillars-dark" aria-live="polite">
+        <div className="tc-wrap">
+          <div className="gf-eco-pillars-grid">
+            {activeMajor.pillars.map((p) => (
+              <article key={p.title} className="gf-eco-pillar-col">
+                <h2>{p.title}</h2>
+                <p>{p.body}</p>
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="tc-sec" style={{ paddingBlock: 48, background: '#F1F0EC' }}>
-        <div className="tc-wrap" style={{ display: 'grid', gap: 28 }}>
-          <StudentBuildEstimator />
-          <OmsPipelineSimulator />
-        </div>
-      </section>
+      <div className="tc-wrap">
+        <StudentBuildEstimator />
+      </div>
+
+      <SubpageHoverBand
+        kicker="QUY TRÌNH LAB-TO-DORM 4 CHẶNG"
+        heading="Lộ Trình Chuẩn Bị Máy"
+        items={ECO_HOVER_STEPS}
+      />
+
+      <div className="tc-wrap">
+        <OmsPipelineSimulator />
+      </div>
+
+      <SubpageMediaBand
+        kicker="KIỂM ĐỊNH PHÒNG LAB ĐHQG"
+        heading="Stress-Test GPU & Nhiệt Độ Trước Xuất Kho"
+        desc="Mọi máy AI/Đồ họa đều chạy benchmark liên tục 30 phút bằng FurMark & Cinebench trong phòng Lab trước khi kỹ thuật viên đi giao tận KTX."
+        videoSrc={VIBE_VIDEOS.labPc}
+        posterSrc={VIBE_VIDEOS.posterLab}
+        facts={[
+          { label: 'Thời gian test tải nặng', value: '30 phút GPU + CPU đồng thời' },
+          { label: 'Ngưỡng nhiệt độ xuất kho', value: 'Dưới 82°C buồng hơi ổn định' },
+          { label: 'Cam kết lỗi đầu tiên', value: 'Đổi máy mới trong 15 ngày' },
+        ]}
+        ctaLabel="Lọc máy cấu hình cao tại Kho"
+        onCta={() => navigateToPage('shop')}
+      />
 
       <ContactSection />
     </main>

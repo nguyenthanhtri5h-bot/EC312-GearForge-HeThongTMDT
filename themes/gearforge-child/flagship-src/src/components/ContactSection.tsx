@@ -1,179 +1,189 @@
-import { useState, type FormEvent } from 'react';
-import { CONTACT_SERVICES } from '../data/footerData';
+import { useState } from 'react';
 import { useGearForgeStore } from '../hooks/useGearForgeStore';
 import { OmsLookupPanel } from './OmsLookupPanel';
+import '../styles/contact-section.css';
 
-type ContactTab = 'oms' | 'installment' | 'build';
+type TabKey = 'support' | 'installment' | 'build';
 
 export function ContactSection() {
-  const { setChatOpen, openDrawer, applyCoupon, showToast } = useGearForgeStore();
-  const [activeTab, setActiveTab] = useState<ContactTab>('oms');
+  const { boot, setChatOpen, openDrawer, navigateToPage } = useGearForgeStore();
+  const [tab, setTab] = useState<TabKey>('support');
   const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [service, setService] = useState('');
-  const [message, setMessage] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+  const [contact, setContact] = useState('');
+  const [details, setDetails] = useState('');
+  const [statusMsg, setStatusMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [sending, setSending] = useState(false);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !phone.trim()) return;
-    setSubmitted(true);
-    showToast(`Đã ghi nhận yêu cầu tư vấn cho ${name}!`);
-    window.setTimeout(() => setSubmitted(false), 5000);
+    setStatusMsg(null);
+    if (!name.trim() || !contact.trim()) {
+      setStatusMsg({ ok: false, text: 'Vui lòng điền họ tên và email / SĐT.' });
+      return;
+    }
+    setSending(true);
+    try {
+      const url = tab === 'installment'
+        ? `${boot.restUrl}/installment/apply`
+        : `${boot.restUrl}/support-request`;
+      const payload = tab === 'installment'
+        ? { product_id: boot.products[0]?.id || 0, full_name: name, contact_info: contact, notes: details }
+        : { request_type: tab, full_name: name, contact_info: contact, message: details };
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(boot.restNonce ? { 'X-WP-Nonce': boot.restNonce } : {}),
+        },
+        body: JSON.stringify(payload),
+      });
+      const json = await res.json();
+      if (res.ok && json) {
+        setStatusMsg({ ok: true, text: json.message || 'Đã tiếp nhận yêu cầu! Bộ phận ĐHQG-HCM sẽ liên hệ lại sớm.' });
+        setDetails('');
+      } else {
+        setStatusMsg({ ok: false, text: json?.message || 'Gửi thất bại, vui lòng thử lại hoặc gọi 1900 6868 07.' });
+      }
+    } catch {
+      setStatusMsg({ ok: false, text: 'Không kết nối được máy chủ. Vui lòng thử lại.' });
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
-    <section id="gf-oms-contact" className="contact-box-footer" aria-labelledby="gf-contact-title">
-      <div className="contact-box-map">
-        <div
-          style={{
-            height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center',
-            justifyContent: 'center', padding: '24px 20px 140px', textAlign: 'center', color: '#ffffff',
-            background: 'radial-gradient(circle at 50% 40%, #1F1F1F 0%, #0A0A0A 75%)',
-          }}
-        >
-          <span
-            style={{
-              padding: '4px 12px', borderRadius: 6, background: '#1F1F1F',
-              border: '1px solid rgba(255, 255, 255, 0.18)', color: '#FCA5A5', fontSize: 12, fontWeight: 700,
-            }}
-          >
-            CAMPUS HUB · ĐHQG-HCM THỦ ĐỨC
-          </span>
-          <strong style={{ marginTop: 10, fontSize: 22, fontWeight: 800 }}>
-            Khu phố 6, P. Linh Trung — Giao hỏa tốc 2h tới KTX Khu A &amp; Khu B
-          </strong>
-          <span style={{ marginTop: 6, fontSize: 14, color: '#cbd5e1' }}>
-            UIT · Bách Khoa · KHTN · Hỗ trợ test máy trực tiếp &amp; nhận bảo hành S/N tại chỗ
-          </span>
-        </div>
-      </div>
-
-      <div className="container">
+    <section id="gf-oms-contact" className="contact-box-footer" aria-labelledby="gf-contact-heading">
+      <div className="tc-wrap">
         <div className="contact-box-wrap">
           <div className="contact-box-ctn">
             <div className="contact-box-content">
-              <div>
-                <div className="contact-box-header">
-                  <h2 id="gf-contact-title" className="title" style={{ margin: 0 }}>
-                    Tra Cứu Đơn Hàng, Trả Góp 0% &amp; Kích Hoạt Bảo Hành
-                  </h2>
-                  <div className="desc">
-                    Kiểm tra tiến độ giao hàng theo mã đơn, tải hóa đơn điện tử VAT, mở hồ sơ trả góp{' '}
-                    <strong>.edu.vn</strong> hoặc gửi yêu cầu bảo hành theo Serial máy.
-                  </div>
-                </div>
+              <p className="contact-kicker">TRUNG TÂM HỖ TRỢ SINH VIÊN ĐHQG-HCM</p>
+              <h2 id="gf-contact-heading" className="contact-title">
+                Tra Cứu Đơn Hàng, Trả Góp 0% &amp; Kích Hoạt Bảo Hành
+              </h2>
+              <p className="contact-sub">
+                Kiểm tra tiến độ giao hàng theo mã đơn, tải hóa đơn điện tử VAT, mở hồ sơ trả góp .edu.vn hoặc gửi yêu cầu bảo hành theo số Serial máy.
+              </p>
 
-                <div className="contact-box-react">
-                  <button type="button" className="item" style={{ border: 0, cursor: 'pointer', textAlign: 'left' }} onClick={() => setActiveTab('oms')}>
-                    <div className="label">Kiểm tra tiến độ</div>
-                    <div className="name">Tra cứu đơn hàng</div>
-                  </button>
-                  <button type="button" className="item" style={{ border: 0, cursor: 'pointer', textAlign: 'left' }} onClick={() => openDrawer('installment')}>
-                    <div className="label">Duyệt qua .edu.vn</div>
-                    <div className="name">Mở Trả góp 0%</div>
-                  </button>
-                  <button type="button" className="item" style={{ border: 0, cursor: 'pointer', textAlign: 'left' }} onClick={() => setChatOpen(true)}>
-                    <div className="label">Tư vấn cấu hình</div>
-                    <div className="name">Chat Trợ lý AI</div>
-                  </button>
+              <div className="contact-facts">
+                <div className="contact-fact-row">
+                  <span>Giờ trực KTX Khu A &amp; B</span>
+                  <strong>08:00 – 22:00 (T2 – CN)</strong>
                 </div>
+                <div className="contact-fact-row">
+                  <span>Thời gian giao nội khu</span>
+                  <strong>Trong 2 giờ · Miễn phí cài app</strong>
+                </div>
+                <div className="contact-fact-row">
+                  <span>Hotline &amp; Email kỹ thuật</span>
+                  <strong>1900 6868 07 · support@gearforge.vn</strong>
+                </div>
+              </div>
 
-                <div className="contact-box-address">
-                  <a className="item" href="/tra-cuu-don-hang/">
-                    <span>Mở trang tra cứu đơn hàng đầy đủ →</span>
-                  </a>
-                  <a className="item" href="mailto:support@gearforge.vn">
-                    <span>Email kỹ thuật: support@gearforge.vn · Hotline: 1900 6868 07</span>
-                  </a>
-                </div>
+              <div className="contact-link-stack">
+                <a
+                  href="/tra-cuu-don-hang/"
+                  className="contact-link-btn"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigateToPage('tracking');
+                  }}
+                >
+                  Mở trang tra cứu đơn hàng đầy đủ &rarr;
+                </a>
+                <button type="button" className="contact-link-btn" onClick={() => setChatOpen(true)}>
+                  Mở Trợ lý AI GearForge tư vấn cấu hình &rarr;
+                </button>
               </div>
             </div>
 
-            <div id="id-form-contact" className="contact-box-form">
+            <div className="contact-box-form" id="id-form-contact">
               <div className="wrap">
-                <div className="form-tab" role="tablist" aria-label="Chức năng hỗ trợ GearForge">
-                  {([
-                    ['oms', 'Tra cứu & Bảo hành'],
-                    ['installment', 'Trả góp 0%'],
-                    ['build', 'Build PC & Ưu đãi'],
-                  ] as const).map(([key, label]) => (
-                    <button
-                      key={key}
-                      type="button"
-                      role="tab"
-                      aria-selected={activeTab === key}
-                      className={`form-tab-item ${activeTab === key ? 'active' : ''}`}
-                      onClick={() => setActiveTab(key)}
-                    >
-                      {label}
-                    </button>
-                  ))}
+                <div className="form-tab" role="tablist" aria-label="Chức năng hỗ trợ">
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={tab === 'support'}
+                    className={`tab-btn ${tab === 'support' ? 'active' : ''}`}
+                    onClick={() => setTab('support')}
+                  >
+                    Tra cứu &amp; Bảo hành
+                  </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={tab === 'installment'}
+                    className={`tab-btn ${tab === 'installment' ? 'active' : ''}`}
+                    onClick={() => setTab('installment')}
+                  >
+                    Trả góp 0%
+                  </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={tab === 'build'}
+                    className={`tab-btn ${tab === 'build' ? 'active' : ''}`}
+                    onClick={() => setTab('build')}
+                  >
+                    Build PC &amp; Ưu đãi
+                  </button>
                 </div>
 
-                {activeTab === 'oms' && <OmsLookupPanel initialOrderId={542} />}
-
-                {activeTab === 'installment' && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                    <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: '#141018' }}>
-                      Hồ sơ Trả góp 0% Sinh viên ĐHQG-HCM
-                    </h3>
-                    <p style={{ margin: 0, fontSize: 14, lineHeight: 1.55, color: '#47405c' }}>
-                      Hỗ trợ kỳ hạn 3 tháng lãi suất 0% (trả trước từ 20%). Thông tin CCCD &amp; Thẻ sinh viên của bạn được bảo mật tuyệt đối theo quy định hiện hành.
-                    </p>
-                    <button type="button" className="cf-submit" onClick={() => openDrawer('installment')}>
-                      Mở biểu mẫu Trả góp 0%
-                    </button>
-                    <button
-                      type="button"
-                      className="gf-act-btn"
-                      style={{ background: '#F1F0EC', color: '#0A0A0A', borderColor: '#DFDEDC' }}
-                      onClick={() => openDrawer('compare')}
-                    >
-                      Xem khay So sánh 3 thiết bị
-                    </button>
-                  </div>
-                )}
-
-                {activeTab === 'build' && (
-                  <form onSubmit={handleSubmit}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '10px 12px', marginBottom: 12, borderRadius: 12, background: '#FEF2F2', border: '1px solid #FECACA' }}>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: '#B91C1C' }}>
-                        Mã SV ĐHQG: <code>BACKTOSCHOOL</code> (-5%)
+                {tab === 'support' ? (
+                  <OmsLookupPanel initialOrderId={542} compact />
+                ) : (
+                  <form className="gf-flat-form" onSubmit={(e) => void handleSubmit(e)}>
+                    <div className="gf-flat-grid-2">
+                      <label className="gf-flat-field">
+                        <span className="gf-flat-label">Họ và tên sinh viên</span>
+                        <input
+                          type="text"
+                          className="gf-flat-input"
+                          placeholder="Ví dụ: Nguyễn Minh Khoa"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          required
+                        />
+                      </label>
+                      <label className="gf-flat-field">
+                        <span className="gf-flat-label">Email .edu.vn hoặc SĐT</span>
+                        <input
+                          type="text"
+                          className="gf-flat-input"
+                          placeholder="mssv@gm.uit.edu.vn / 09xx"
+                          value={contact}
+                          onChange={(e) => setContact(e.target.value)}
+                          required
+                        />
+                      </label>
+                    </div>
+                    <label className="gf-flat-field">
+                      <span className="gf-flat-label">
+                        {tab === 'installment' ? 'Mẫu máy muốn trả góp 0% (3 tháng)' : 'Ngân sách & nhu cầu Build PC / Nâng cấp'}
                       </span>
-                      <button type="button" className="gf-hd-pill is-primary" onClick={() => void applyCoupon('BACKTOSCHOOL')}>
-                        Áp dụng mã
-                      </button>
-                    </div>
-                    <div className="cf-field">
-                      <input type="text" className="cf-input" placeholder="Họ và tên sinh viên *" value={name} onChange={(e) => setName(e.target.value)} required />
-                    </div>
-                    <div className="cf-field">
-                      <input type="tel" className="cf-input" placeholder="Số điện thoại / Zalo *" value={phone} onChange={(e) => setPhone(e.target.value)} required />
-                    </div>
-                    <div className="cf-field">
-                      <select className="cf-select" value={service} onChange={(e) => setService(e.target.value)}>
-                        <option value="">Chọn nhu cầu tư vấn cấu hình *</option>
-                        {CONTACT_SERVICES.map((sv) => <option key={sv} value={sv}>{sv}</option>)}
-                      </select>
-                    </div>
-                    <div className="cf-field">
                       <textarea
-                        className="cf-textarea"
-                        placeholder="Ngân sách, phần mềm sử dụng (PyTorch, SolidWorks, Premiere...)"
-                        maxLength={200}
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
+                        className="gf-flat-input gf-flat-textarea"
+                        placeholder={tab === 'installment' ? 'Ghi rõ tên máy, trả trước (20%–50%) và tòa KTX...' : 'Ví dụ: PC AI RTX 4060 ngân sách 25tr...'}
+                        value={details}
+                        onChange={(e) => setDetails(e.target.value)}
                       />
-                      <p className="cf-word">{message.length}/200</p>
-                    </div>
-                    <button type="submit" className="cf-submit">
-                      Gửi yêu cầu Build PC &amp; Nhận báo giá
-                    </button>
-                    {submitted && (
-                      <div className="cf-success">
-                        Đã ghi nhận yêu cầu của {name}! Kỹ sư GearForge sẽ phản hồi qua Zalo trong 10 phút.
+                    </label>
+                    {statusMsg && (
+                      <div className={`gf-flat-msg ${statusMsg.ok ? 'is-ok' : 'is-err'}`}>
+                        {statusMsg.text}
                       </div>
+                    )}
+                    <button type="submit" className="gf-flat-submit" disabled={sending}>
+                      {sending ? 'Đang gửi...' : tab === 'installment' ? 'Gửi yêu cầu mở hồ sơ trả góp 0%' : 'Nhận cấu hình & ưu đãi SV'}
+                    </button>
+                    {tab === 'installment' && (
+                      <button
+                        type="button"
+                        className="contact-link-btn"
+                        onClick={() => openDrawer('installment', boot.products[0]?.id)}
+                      >
+                        Hoặc mở trình ước tính Trả góp 0% chi tiết &rarr;
+                      </button>
                     )}
                   </form>
                 )}

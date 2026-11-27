@@ -1,19 +1,10 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { apiCalcInstallment, apiFetchCatalog, apiLookupOms, apiPostCart, apiPostCompare } from './apiClient';
 import { filterLocalProducts, getInitialBoot, normalizeCompareItems, recalcLocalCart } from './fallbackBoot';
+import { detectModeFromLocation, resolveDrawerPageMode, resolvePageUrl } from './pageRoutes';
 import type { CartState, CompareItem, DrawerKind, FilterParams, FlagshipPageMode, GearForgeBoot, GearForgeContextValue, GearForgeProduct } from '../types/gearforge';
 
-function detectModeFromLocation(fallback?: FlagshipPageMode): FlagshipPageMode {
-  if (typeof window === 'undefined') return fallback || 'showcase';
-  const p = window.location.pathname.replace(/\/+$/, '');
-  const q = new URLSearchParams(window.location.search);
-  if (p.startsWith('/shop') || p.startsWith('/product-category') || q.get('view') === 'shop') return 'shop';
-  if (p.startsWith('/he-sinh-thai')) return 'ecosystem';
-  if (p.startsWith('/cau-hinh-mau')) return 'gallery';
-  return p === '' || p === '/index.php' ? 'showcase' : fallback || 'showcase';
-}
-
-const DEFAULT_FILTERS: FilterParams = { search: '', category: '', cpu: '', ram: '', gpu: '', storage: '', maxPrice: 80000000, sort: 'menu_order', page: 1, perPage: 12 };
+const DEFAULT_FILTERS: FilterParams = { search: '', category: '', cpu: '', ram: '', gpu: '', storage: '', maxPrice: 80000000, sort: 'menu_order', page: 1, perPage: 24 };
 
 const GearForgeContext = createContext<GearForgeContextValue | null>(null);
 
@@ -24,9 +15,11 @@ export function formatVnd(amount: number): string {
 export function GearForgeProvider({ children }: { children: React.ReactNode }) {
   const [boot] = useState<GearForgeBoot>(() => getInitialBoot());
   const [pageMode, setPageMode] = useState<FlagshipPageMode>(() => detectModeFromLocation(boot.pageMode));
-  const [products, setProducts] = useState<GearForgeProduct[]>(() => boot.products || []);
+  const [products, setProducts] = useState<GearForgeProduct[]>(() => (boot.products || []).slice(0, DEFAULT_FILTERS.perPage));
   const [totalProducts, setTotalProducts] = useState<number>(() => boot.totalProducts ?? boot.products?.length ?? 0);
-  const [totalPages, setTotalPages] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(() =>
+    Math.max(1, Math.ceil((boot.totalProducts ?? boot.products?.length ?? 0) / DEFAULT_FILTERS.perPage))
+  );
   const [catalogLoading, setCatalogLoading] = useState(false);
   const [filters, setFilters] = useState<FilterParams>(DEFAULT_FILTERS);
   const [cart, setCart] = useState<CartState>(() => boot.cart);
@@ -54,7 +47,14 @@ export function GearForgeProvider({ children }: { children: React.ReactNode }) {
 
   const openDrawer = useCallback((kind: Exclude<DrawerKind, null>, productId?: number) => {
     if (kind === 'installment' && productId) setInstallmentProductId(productId);
-    setActiveDrawer(kind);
+    const mode = resolveDrawerPageMode(kind);
+    const url = resolvePageUrl(mode);
+    setActiveDrawer(null);
+    setPageMode(mode);
+    if (typeof window !== 'undefined' && window.location.pathname + window.location.search !== url) {
+      window.history.pushState({ pageMode: mode }, '', url);
+    }
+    window.setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 30);
   }, []);
 
   const closeDrawer = useCallback(() => setActiveDrawer(null), []);
@@ -66,9 +66,10 @@ export function GearForgeProvider({ children }: { children: React.ReactNode }) {
     setFilters(next);
     if (!boot.ajaxUrl) {
       const filtered = filterLocalProducts(boot.products || [], next);
-      setProducts(filtered);
+      const start = (next.page - 1) * next.perPage;
+      setProducts(filtered.slice(start, start + next.perPage));
       setTotalProducts(filtered.length);
-      setTotalPages(1);
+      setTotalPages(Math.max(1, Math.ceil(filtered.length / next.perPage)));
       return;
     }
     catalogAbortRef.current?.abort();
@@ -187,13 +188,7 @@ export function GearForgeProvider({ children }: { children: React.ReactNode }) {
 
   const navigateToPage = useCallback((mode: FlagshipPageMode, filterPatch?: Partial<FilterParams>, hash?: string) => {
     setPageMode(mode);
-    const url = mode === 'shop'
-      ? `/shop/${filterPatch?.category ? `?category=${encodeURIComponent(filterPatch.category)}` : ''}`
-      : mode === 'ecosystem'
-        ? '/he-sinh-thai/'
-        : mode === 'gallery'
-          ? '/cau-hinh-mau/'
-          : `/${hash ? (hash.startsWith('#') ? hash : `#${hash}`) : ''}`;
+    const url = resolvePageUrl(mode, filterPatch, hash);
     if (typeof window !== 'undefined' && window.location.pathname + window.location.search + window.location.hash !== url) {
       window.history.pushState({ pageMode: mode }, '', url);
     }

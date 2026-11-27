@@ -115,8 +115,7 @@ function gf_is_focused_flow_page(): bool {
     return (function_exists('is_product') && is_product())
         || (function_exists('is_cart') && is_cart())
         || (function_exists('is_checkout') && is_checkout())
-        || (function_exists('is_account_page') && is_account_page())
-        || is_page(['so-sanh-cau-hinh', 'tra-cuu-don-hang']);
+        || (function_exists('is_account_page') && is_account_page());
 }
 
 /**
@@ -148,6 +147,18 @@ function gf_get_flagship_page_mode(): ?string {
     }
     if ($trimmed === 'cau-hinh-mau') {
         return 'gallery';
+    }
+    if ($trimmed === 'tra-cuu-don-hang') {
+        return 'tracking';
+    }
+    if ($trimmed === 'tra-gop') {
+        return 'installment';
+    }
+    if ($trimmed === 'so-sanh-cau-hinh') {
+        return 'compare';
+    }
+    if ($trimmed === 'gio-hang-sv') {
+        return 'cart';
     }
     return null;
 }
@@ -194,17 +205,25 @@ add_action('template_redirect', static function (): void {
 add_filter('document_title_parts', static function (array $parts): array {
     $mode = gf_get_flagship_page_mode();
     if ($mode === 'ecosystem') {
-        $parts['title'] = 'Hệ sinh thái & Công cụ chọn máy – GearForge';
+        $parts['title'] = 'Hệ sinh thái & Công cụ chọn máy';
     } elseif ($mode === 'gallery') {
-        $parts['title'] = 'Góc máy thực tế ĐHQG-HCM – GearForge';
+        $parts['title'] = 'Góc máy thực tế ĐHQG-HCM';
+    } elseif ($mode === 'tracking') {
+        $parts['title'] = 'Tra cứu đơn hàng & Bảo hành S/N';
+    } elseif ($mode === 'installment') {
+        $parts['title'] = 'Trả góp 0% Sinh viên ĐHQG-HCM';
+    } elseif ($mode === 'compare') {
+        $parts['title'] = 'So sánh cấu hình';
+    } elseif ($mode === 'cart') {
+        $parts['title'] = 'Giỏ hàng GearForge';
     } elseif ($mode === 'shop') {
-        $parts['title'] = 'Cửa hàng Laptop, PC & Gaming Gear – GearForge';
+        $parts['title'] = 'Cửa hàng Laptop, PC & Gaming Gear';
     } elseif (function_exists('is_cart') && is_cart()) {
-        $parts['title'] = 'Giỏ hàng – GearForge';
+        $parts['title'] = 'Giỏ hàng';
     } elseif (function_exists('is_checkout') && is_checkout()) {
-        $parts['title'] = 'Thanh toán – GearForge';
+        $parts['title'] = 'Thanh toán';
     } elseif (function_exists('is_account_page') && is_account_page()) {
-        $parts['title'] = 'Tài khoản Sinh viên – GearForge';
+        $parts['title'] = 'Tài khoản Sinh viên';
     }
     return $parts;
 }, 99);
@@ -259,7 +278,7 @@ add_action('wp_enqueue_scripts', static function (): void {
     if (gf_is_flagship_front_request()) {
         wp_enqueue_style(
             'gearforge-flagship-fonts',
-            'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap',
+            'https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700&family=Barlow:wght@600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap',
             [],
             null
         );
@@ -281,7 +300,7 @@ add_action('wp_enqueue_scripts', static function (): void {
 
     wp_enqueue_style(
         'gearforge-fonts',
-        'https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap',
+        'https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700&family=Barlow:wght@600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap',
         [],
         null
     );
@@ -418,12 +437,48 @@ function gf_render_canonical_logo_svg(int $size = 28): string {
         . '</svg>';
 }
 
+add_filter('xmlrpc_enabled', '__return_false');
+
+add_action('send_headers', static function (): void {
+    if (is_admin() || headers_sent()) {
+        return;
+    }
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: SAMEORIGIN');
+    header('Referrer-Policy: strict-origin-when-cross-origin');
+    header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
+});
+
 add_action('wp_head', static function (): void {
     if (is_admin()) {
         return;
     }
     $svg_icon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cpolygon points='60,6 108,24 100,79 60,114 20,79 12,24' fill='%23D13639'/%3E%3Cpolygon points='60,15 99,30 92,75 60,104 28,75 21,30' fill='%230B0B0E'/%3E%3Cpath d='M60 24L86 36L82 49H54V59H79L73 82L60 94L37 74L34 37L60 24Z' fill='%23FFFFFF'/%3E%3Cpolygon points='56,64 72,64 67,79 58,86' fill='%23EB0029'/%3E%3C/svg%3E";
     echo '<link rel="icon" type="image/svg+xml" href="' . esc_attr($svg_icon) . '" />' . "\n";
+
+    $req_path = trim((string) wp_parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH), '/');
+    $private_prefixes = ['tra-cuu-don-hang', 'gio-hang-sv', 'so-sanh-cau-hinh', 'cart', 'checkout', 'my-account'];
+    $is_private = (function_exists('is_cart') && is_cart())
+        || (function_exists('is_checkout') && is_checkout())
+        || (function_exists('is_account_page') && is_account_page());
+    foreach ($private_prefixes as $prefix) {
+        if ($req_path === $prefix || str_starts_with($req_path, $prefix . '/')) {
+            $is_private = true;
+            break;
+        }
+    }
+    if ($is_private) {
+        echo '<meta name="robots" content="noindex, nofollow" />' . "\n";
+    } elseif (gf_is_flagship_front_request()) {
+        $og_url = home_url($req_path !== '' ? '/' . $req_path . '/' : '/');
+        $og_img = get_stylesheet_directory_uri() . '/assets/flagship/vibe/videos/gf-hero-riot-poster.jpg';
+        echo '<meta property="og:type" content="website" />' . "\n";
+        echo '<meta property="og:site_name" content="GearForge ĐHQG-HCM" />' . "\n";
+        echo '<meta property="og:title" content="GearForge — Laptop RTX, PC AI & Gaming Gear Sinh Viên ĐHQG-HCM" />' . "\n";
+        echo '<meta property="og:description" content="Hệ thống Laptop RTX, PC Workstation AI & Gaming Gear chính hãng ĐHQG-HCM. Trả góp 0% .edu.vn, giao hỏa tốc KTX 2h, bảo hành S/N." />' . "\n";
+        echo '<meta property="og:url" content="' . esc_url($og_url) . '" />' . "\n";
+        echo '<meta property="og:image" content="' . esc_url($og_img) . '" />' . "\n";
+    }
 }, 5);
 
 add_action('wp_body_open', static function (): void {
@@ -449,26 +504,33 @@ add_action('wp_body_open', static function (): void {
         <div class="gf-sec-hd-inner">
             <a class="gf-sec-brand" href="<?php echo esc_url(home_url('/')); ?>" aria-label="GearForge Trang chủ" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;">
                 <?php echo gf_render_canonical_logo_svg(28); ?>
-                <span style="font-family:'Be Vietnam Pro',sans-serif;font-size:16px;font-weight:800;letter-spacing:0.08em;color:#FFFFFF;line-height:1;">GEARFORGE</span>
+                <span style="font-family:'Barlow','Inter',sans-serif;font-size:17px;font-weight:800;letter-spacing:0.08em;color:#FFFFFF;line-height:1;">GEARFORGE</span>
             </a>
 
             <nav class="gf-sec-nav" aria-label="Điều hướng chính">
-                <a class="gf-sec-nav-link" href="<?php echo esc_url(home_url('/')); ?>">Trang chủ</a>
-                <a class="gf-sec-nav-link" href="<?php echo esc_url(home_url('/shop/')); ?>">Sản phẩm</a>
-                <a class="gf-sec-nav-link" href="<?php echo esc_url(home_url('/he-sinh-thai/')); ?>">Hệ sinh thái</a>
-                <a class="gf-sec-nav-link" href="<?php echo esc_url(home_url('/cau-hinh-mau/')); ?>">Góc máy SV</a>
-                <a class="gf-sec-nav-link <?php echo $cur_path === 'so-sanh-cau-hinh' ? 'is-active' : ''; ?>" href="<?php echo esc_url($compare_url); ?>">So sánh</a>
-                <a class="gf-sec-nav-link <?php echo $cur_path === 'tra-cuu-don-hang' ? 'is-active' : ''; ?>" href="<?php echo esc_url($oms_url); ?>">Tra cứu đơn</a>
+                <a class="gf-sec-nav-link <?php echo $cur_path === 'shop' ? 'is-active' : ''; ?>" href="<?php echo esc_url(home_url('/shop/')); ?>">SẢN PHẨM</a>
+                <a class="gf-sec-nav-link <?php echo $cur_path === 'he-sinh-thai' ? 'is-active' : ''; ?>" href="<?php echo esc_url(home_url('/he-sinh-thai/')); ?>">HỆ SINH THÁI</a>
+                <a class="gf-sec-nav-link <?php echo $cur_path === 'cau-hinh-mau' ? 'is-active' : ''; ?>" href="<?php echo esc_url(home_url('/cau-hinh-mau/')); ?>">GÓC MÁY SV</a>
+                <a class="gf-sec-nav-link <?php echo $cur_path === 'tra-cuu-don-hang' ? 'is-active' : ''; ?>" href="<?php echo esc_url($oms_url); ?>">TRA CỨU ĐƠN</a>
+                <a class="gf-sec-nav-link <?php echo $cur_path === 'so-sanh-cau-hinh' ? 'is-active' : ''; ?>" href="<?php echo esc_url($compare_url); ?>">SO SÁNH (<?php echo esc_html((string) $cmp_count); ?>)</a>
             </nav>
 
             <div class="gf-sec-actions">
-                <a class="gf-sec-action-btn" href="<?php echo esc_url($compare_url); ?>" aria-label="Khay so sánh cấu hình">
-                    <span class="gf-sec-action-label">So sánh</span>
-                    <span class="gf-sec-count"><?php echo esc_html((string) $cmp_count); ?></span>
+                <a class="gf-sec-icon-circle" href="<?php echo esc_url(home_url('/shop/')); ?>" aria-label="Tìm sản phẩm">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true">
+                        <circle cx="11" cy="11" r="7"></circle>
+                        <path d="M20 20l-3.5-3.5"></path>
+                    </svg>
                 </a>
-                <a class="gf-sec-action-btn is-primary" href="<?php echo esc_url($cart_url); ?>" aria-label="Giỏ hàng GearForge">
-                    <span class="gf-sec-action-label">Giỏ hàng</span>
-                    <span class="gf-sec-count"><?php echo esc_html((string) $cart_count); ?></span>
+                <a class="gf-sec-icon-circle" href="<?php echo esc_url($cart_url); ?>" aria-label="Giỏ hàng GearForge">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true">
+                        <circle cx="9" cy="20" r="1.5"></circle>
+                        <circle cx="17" cy="20" r="1.5"></circle>
+                        <path d="M3 4h2l2.4 11.2a1.5 1.5 0 0 0 1.5 1.2h9.2a1.5 1.5 0 0 0 1.4-1.1L21 8H7"></path>
+                    </svg>
+                    <?php if ($cart_count > 0) : ?>
+                        <span class="gf-sec-circle-badge"><?php echo esc_html((string) $cart_count); ?></span>
+                    <?php endif; ?>
                 </a>
                 <a class="gf-sec-action-btn gf-sec-account-btn" href="<?php echo esc_url($account_url); ?>" aria-label="Tài khoản Sinh viên">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true">
@@ -477,6 +539,7 @@ add_action('wp_body_open', static function (): void {
                     </svg>
                     <span class="gf-sec-action-label"><?php echo is_user_logged_in() ? 'Tài khoản' : 'Đăng nhập'; ?></span>
                 </a>
+                <a class="gf-sec-pill-cta" href="<?php echo esc_url(home_url('/tra-gop/')); ?>">TRẢ GÓP 0%</a>
                 <button type="button" id="gf-sec-burger-btn" class="gf-sec-burger" aria-expanded="false" aria-controls="gf-sec-mobile-drawer" aria-label="Mở menu điều hướng">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
                         <path d="M4 6h16M4 12h16M4 18h16"></path>
@@ -488,9 +551,10 @@ add_action('wp_body_open', static function (): void {
 
     <nav id="gf-sec-mobile-drawer" class="gf-sec-mobile-drawer" aria-label="Menu di động" hidden>
         <a href="<?php echo esc_url(home_url('/')); ?>"><span>Trang chủ GearForge</span><span>→</span></a>
-        <a href="<?php echo esc_url(home_url('/shop/')); ?>"><span>Tất cả sản phẩm</span><span>→</span></a>
-        <a href="<?php echo esc_url(home_url('/he-sinh-thai/')); ?>"><span>Hệ sinh thái &amp; Công cụ</span><span>→</span></a>
+        <a href="<?php echo esc_url(home_url('/shop/')); ?>"><span>Sản phẩm chính hãng</span><span>→</span></a>
+        <a href="<?php echo esc_url(home_url('/he-sinh-thai/')); ?>"><span>Hệ sinh thái ĐHQG</span><span>→</span></a>
         <a href="<?php echo esc_url(home_url('/cau-hinh-mau/')); ?>"><span>Góc máy Sinh viên ĐHQG</span><span>→</span></a>
+        <a href="<?php echo esc_url(home_url('/tra-gop/')); ?>"><span>Trả góp 0% (.edu.vn)</span><span>→</span></a>
         <a href="<?php echo esc_url($compare_url); ?>"><span>So sánh cấu hình (3 máy)</span><span><?php echo esc_html((string) $cmp_count); ?></span></a>
         <a href="<?php echo esc_url($oms_url); ?>"><span>Tra cứu đơn &amp; Bảo hành</span><span>→</span></a>
         <a href="<?php echo esc_url($cart_url); ?>"><span>Giỏ hàng &amp; Thanh toán</span><span><?php echo esc_html((string) $cart_count); ?></span></a>
@@ -505,39 +569,26 @@ add_action('wp_footer', static function (): void {
     }
     ?>
     <footer class="gf-sec-ft" role="contentinfo">
-        <div class="gf-sec-ft-inner">
-            <div class="gf-sec-ft-brand">
-                <a class="gf-sec-brand" href="<?php echo esc_url(home_url('/')); ?>" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;">
-                    <?php echo gf_render_canonical_logo_svg(28); ?>
-                    <span style="font-family:'Be Vietnam Pro',sans-serif;font-size:16px;font-weight:800;letter-spacing:0.08em;color:#FFFFFF;line-height:1;">GEARFORGE</span>
-                </a>
-                <p>Hệ thống Laptop, PC Workstation &amp; Gaming Gear dành cho Sinh viên ĐHQG TP.HCM — Trả góp 0% kỳ hạn 3 tháng qua email .edu.vn, giao KTX trong 2 giờ &amp; bảo hành điện tử theo Serial.</p>
-            </div>
+        <div class="gf-sec-ft-bar">
+            <a class="gf-sec-brand" href="<?php echo esc_url(home_url('/')); ?>" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;">
+                <?php echo gf_render_canonical_logo_svg(26); ?>
+                <span style="font-family:'Barlow','Inter',sans-serif;font-size:16px;font-weight:800;letter-spacing:0.08em;color:#FFFFFF;line-height:1;">GEARFORGE</span>
+            </a>
 
-            <div>
-                <h4>Chính sách &amp; Hỗ trợ</h4>
-                <ul>
-                    <li><a href="<?php echo esc_url(home_url('/tra-cuu-don-hang/')); ?>">Chính sách bảo hành &amp; Đổi trả</a></li>
-                    <li><a href="<?php echo esc_url(home_url('/checkout/')); ?>">Chính sách bảo vệ dữ liệu cá nhân</a></li>
-                    <li><a href="<?php echo esc_url(home_url('/he-sinh-thai/')); ?>">Quy chế Trả góp 0% Sinh viên</a></li>
-                    <li><a href="<?php echo esc_url(home_url('/tra-cuu-don-hang/')); ?>">Thanh toán bảo mật &amp; Hóa đơn VAT</a></li>
-                </ul>
-            </div>
+            <nav class="gf-sec-ft-links" aria-label="Điều hướng chân trang">
+                <a href="<?php echo esc_url(home_url('/')); ?>">TRANG CHỦ</a>
+                <a href="<?php echo esc_url(home_url('/shop/')); ?>">SẢN PHẨM</a>
+                <a href="<?php echo esc_url(home_url('/he-sinh-thai/')); ?>">HỆ SINH THÁI</a>
+                <a href="<?php echo esc_url(home_url('/tra-gop/')); ?>">TRẢ GÓP 0%</a>
+                <a href="<?php echo esc_url(home_url('/tra-cuu-don-hang/')); ?>">TRA CỨU ĐƠN</a>
+            </nav>
 
-            <div>
-                <h4>Khám phá nhanh</h4>
-                <ul>
-                    <li><a href="<?php echo esc_url(home_url('/shop/')); ?>">Tất cả sản phẩm chính hãng</a></li>
-                    <li><a href="<?php echo esc_url(home_url('/so-sanh-cau-hinh/')); ?>">So sánh cấu hình (3 thiết bị)</a></li>
-                    <li><a href="<?php echo esc_url(home_url('/tra-cuu-don-hang/')); ?>">Tra cứu đơn hàng &amp; Bảo hành</a></li>
-                    <li><a href="<?php echo esc_url(home_url('/my-account/')); ?>">Tài khoản &amp; Đơn hàng của tôi</a></li>
-                </ul>
-            </div>
+            <a class="gf-sec-ft-top" href="#top" aria-label="Lên đầu trang">LÊN ĐẦU TRANG ↑</a>
         </div>
 
         <div class="gf-sec-ft-bottom">
-            <span>© 2026 GearForge Vietnam — Trung tâm Laptop, PC &amp; Gear Sinh viên ĐHQG-HCM.</span>
-            <span>KTX Khu B ĐHQG-HCM • Giao nhanh 2h nội khu • Zalo OA Hỗ trợ SV</span>
+            <span>© 2026 GEARFORGE VIETNAM — HỆ THỐNG LAPTOP, PC &amp; GEAR SINH VIÊN ĐHQG TP.HCM</span>
+            <span>KTX KHU B ĐHQG-HCM • GIAO NHANH 2H • BẢO HÀNH ĐIỆN TỬ S/N</span>
         </div>
     </footer>
 
@@ -689,18 +740,19 @@ add_filter('posts_clauses', static function (array $clauses, WP_Query $query): a
 
 // Route category-aware studio hardware assets across Blocksy media & WooCommerce hooks.
 add_filter('woocommerce_placeholder_img_src', static function (): string {
-    return gf_resolve_studio_image_url();
+    $product = ($GLOBALS['product'] ?? null) instanceof WC_Product ? $GLOBALS['product'] : wc_get_product(get_the_ID());
+    return $product instanceof WC_Product ? gf_flagship_product_image($product) : gf_resolve_studio_image_url();
 }, 20);
 
 add_filter('woocommerce_placeholder_img', static function (string $html): string {
-    if ($html !== '' && !str_contains($html, 'woocommerce-placeholder')) {
+    $product = ($GLOBALS['product'] ?? null) instanceof WC_Product ? $GLOBALS['product'] : wc_get_product(get_the_ID());
+    if (!$product instanceof WC_Product && $html !== '' && !str_contains($html, 'woocommerce-placeholder')) {
         return $html;
     }
-    $product = ($GLOBALS['product'] ?? null) instanceof WC_Product ? $GLOBALS['product'] : null;
-    $alt     = $product ? $product->get_name() : 'GearForge Studio Hardware';
-    $src     = gf_resolve_studio_image_url($product);
+    $alt = $product instanceof WC_Product ? $product->get_name() : 'GearForge Studio Hardware';
+    $src = $product instanceof WC_Product ? gf_flagship_product_image($product) : gf_resolve_studio_image_url();
     return sprintf(
-        '<img src="%1$s" alt="%2$s" class="wp-post-image gf-studio-img" style="aspect-ratio: 16/10;" loading="lazy" decoding="async" />',
+        '<img src="%1$s" alt="%2$s" class="wp-post-image gf-studio-img" style="aspect-ratio: 16/10;" referrerpolicy="no-referrer" loading="lazy" decoding="async" />',
         esc_url($src),
         esc_attr($alt)
     );
@@ -713,9 +765,9 @@ add_filter('woocommerce_product_get_image', static function (string $image, WC_P
     if (!str_contains($image, 'woocommerce-placeholder') && $image !== '') {
         return $image;
     }
-    $src = gf_resolve_studio_image_url($product);
+    $src = gf_flagship_product_image($product);
     $img_tag = sprintf(
-        '<img src="%1$s" alt="%2$s" class="wp-post-image gf-studio-img" style="aspect-ratio: 16/10;" loading="lazy" decoding="async" />',
+        '<img src="%1$s" alt="%2$s" class="wp-post-image gf-studio-img" style="aspect-ratio: 16/10;" referrerpolicy="no-referrer" loading="lazy" decoding="async" />',
         esc_url($src),
         esc_attr($product->get_name())
     );
@@ -724,19 +776,24 @@ add_filter('woocommerce_product_get_image', static function (string $image, WC_P
 }, 20, 2);
 
 add_filter('woocommerce_single_product_image_thumbnail_html', static function (string $html): string {
-    if (!str_contains($html, 'woocommerce-placeholder')) {
+    $product = ($GLOBALS['product'] ?? null) instanceof WC_Product ? $GLOBALS['product'] : wc_get_product(get_the_ID());
+    $has_missing_attachment = $product instanceof WC_Product && (int) $product->get_image_id() <= 0;
+    if (!$has_missing_attachment && $html !== '' && !preg_match('/<img\b[^>]*woocommerce-placeholder/i', $html)) {
         return $html;
     }
-    $product = ($GLOBALS['product'] ?? null) instanceof WC_Product ? $GLOBALS['product'] : null;
-    $src     = gf_resolve_studio_image_url($product);
-    $alt     = $product ? $product->get_name() : 'GearForge Studio Hardware';
+    $src     = $product instanceof WC_Product ? gf_flagship_product_image($product) : gf_resolve_studio_image_url();
+    $alt     = $product instanceof WC_Product ? $product->get_name() : '';
     $img_tag = sprintf(
-        '<img src="%1$s" alt="%2$s" class="wp-post-image gf-studio-img gf-single-studio-img" style="aspect-ratio: 16/10;" fetchpriority="high" decoding="async" />',
+        '<img src="%1$s" alt="%2$s" class="wp-post-image gf-studio-img gf-single-studio-img" style="aspect-ratio: 16/10;" referrerpolicy="no-referrer" fetchpriority="high" decoding="async" />',
         esc_url($src),
         esc_attr($alt)
     );
     $replaced = preg_replace('/<img\b[^>]*woocommerce-placeholder[^>]*>/i', $img_tag, $html);
-    return is_string($replaced) && $replaced !== '' ? $replaced : $html;
+    if (is_string($replaced) && $replaced !== '' && $replaced !== $html) {
+        return $replaced;
+    }
+    $esc_src = esc_url($src);
+    return '<div data-thumb="' . $esc_src . '" class="woocommerce-product-gallery__image"><a href="' . $esc_src . '">' . $img_tag . '</a></div>';
 }, 20);
 
 add_filter('woocommerce_cart_item_thumbnail', static function (string $thumbnail, array $cart_item): string {
@@ -747,9 +804,9 @@ add_filter('woocommerce_cart_item_thumbnail', static function (string $thumbnail
     if ($cart_product->get_image_id() && !str_contains($thumbnail, 'woocommerce-placeholder')) {
         return $thumbnail;
     }
-    $src     = gf_resolve_studio_image_url($cart_product);
+    $src     = gf_flagship_product_image($cart_product);
     $img_tag = sprintf(
-        '<img src="%1$s" alt="%2$s" class="wp-post-image gf-studio-img" style="aspect-ratio: 16/10;" loading="lazy" decoding="async" />',
+        '<img src="%1$s" alt="%2$s" class="wp-post-image gf-studio-img" style="aspect-ratio: 16/10;" referrerpolicy="no-referrer" loading="lazy" decoding="async" />',
         esc_url($src),
         esc_attr($cart_product->get_name())
     );
@@ -771,14 +828,14 @@ add_filter('woocommerce_get_availability_text', static function (string $availab
 }, 20, 2);
 
 // Show real savings badge only on genuinely discounted items.
-add_filter('woocommerce_sale_flash', static function (string $html, WP_Post $post, WC_Product $product): string {
+add_filter('woocommerce_sale_flash', static function (string $html, $post, WC_Product $product): string {
     $reg  = (float) $product->get_regular_price();
     $sale = (float) $product->get_sale_price();
     if ($reg > 0 && $sale > 0 && $sale < $reg) {
-        $pct = (int) round((($reg - $sale) / $reg) * 100);
+        $pct = max(1, (int) round((($reg - $sale) / $reg) * 100));
         return '<span class="onsale" data-shape="type-2">-' . esc_html((string) $pct) . '%</span>';
     }
-    return '';
+    return $product->is_type('simple') ? '' : $html;
 }, 20, 3);
 
 // Fallback loop spec chips + installment hint + Compare CTA only when GF_Core plugin is inactive.
@@ -859,6 +916,11 @@ function gf_translate_ui_text(string $translated, string $text, string $domain):
         return $translated;
     }
     return match ($text) {
+        'Home'                          => 'Trang chủ',
+        'Description'                   => 'Mô tả chi tiết',
+        'Additional information'        => 'Thông số kỹ thuật',
+        'Reviews (%d)'                  => 'Đánh giá (%d)',
+        'Reviews'                       => 'Đánh giá',
         'Filter'                        => 'Lọc giá',
         'Price:'                        => 'Khoảng giá:',
         'Showing the single result'     => 'Hiển thị 1 sản phẩm',
@@ -1044,7 +1106,11 @@ function gf_flagship_extract_specs(WC_Product $product): array {
                 $val = $meta;
             }
         }
-        return trim((string) explode(',', (string) $val)[0]);
+        $first = trim((string) explode(',', (string) $val)[0]);
+        if (substr_count($first, '(') > substr_count($first, ')')) {
+            $first = trim((string) preg_replace('/\s*\([^)]*$/', '', $first));
+        }
+        return $first;
     };
 
     $cpu     = $read_attr('pa_cpu', 'CPU', '_gf_cpu');
@@ -1060,19 +1126,20 @@ function gf_flagship_extract_specs(WC_Product $product): array {
     if ($ram === '' && preg_match('/\b(8GB|16GB|24GB|32GB|64GB|128GB)\b/i', $title, $m)) {
         $ram = strtoupper($m[1]);
     }
-    if ($gpu === '' && preg_match('/\b(RTX\s*(?:2050|3050|3060|3070|3080|4050|4060|4070|4080|4090|5060|5070|5080|5090)(?:\s*(?:Ti|SUPER))?|GTX\s*1650|RX\s*\d{4}[A-Z]*|Radeon\s*[0-9A-Z]+|Intel\s*Arc)\b/iu', $title, $m)) {
+    if ($gpu === '' && preg_match('/\b(RTX\s*\d{4}(?:\s*(?:Ti|SUPER|Ada))?|GTX\s*1650|RX\s*\d{4}[A-Z]*|Radeon\s*[0-9A-Z]+|Iris\s*Xe|Intel\s*Arc(?:\s*\d+)?)\b/iu', $title, $m)) {
         $gpu = trim($m[1]);
     }
     if ($storage === '' && preg_match('/\b(256GB|512GB|1TB|2TB|4TB)\s*(?:NVMe|SSD)?\b/i', $title, $m)) {
         $storage = strtoupper($m[1]) . ' NVMe';
     }
 
+    $is_part_or_gear = has_term(['vga', 'ram', 'cpu', 'linh-kien', 'gear', 'chuot', 'ban-phim', 'lot-chuot'], 'product_cat', $pid);
     return [
-        'cpu'     => $cpu !== '' ? $cpu : 'Đang cập nhật',
-        'ram'     => $ram !== '' ? $ram : '16GB DDR5',
-        'gpu'     => $gpu !== '' ? $gpu : 'Card tích hợp',
-        'storage' => $storage !== '' ? $storage : '512GB NVMe',
-        'screen'  => $screen !== '' ? $screen : '15.6" FHD/OLED',
+        'cpu'     => $cpu !== '' ? $cpu : ($is_part_or_gear ? 'Chính hãng GearForge' : 'Đang cập nhật'),
+        'ram'     => $ram !== '' ? $ram : ($is_part_or_gear ? 'Bảo hành 36T' : '16GB DDR5'),
+        'gpu'     => $gpu !== '' ? $gpu : ($is_part_or_gear ? 'Tem Serial S/N' : 'Card tích hợp'),
+        'storage' => $storage !== '' ? $storage : ($is_part_or_gear ? 'Fullbox VAT' : '512GB NVMe'),
+        'screen'  => $screen !== '' ? $screen : ($is_part_or_gear ? 'Chính hãng' : '15.6" FHD/OLED'),
         'weight'  => $weight !== '' ? $weight : '1.7 kg',
     ];
 }
@@ -1116,21 +1183,49 @@ function gf_flagship_serialize_product(WC_Product $product): array {
     $raw_status   = $product->get_stock_status();
     $stock_status = in_array($raw_status, ['instock', 'outofstock', 'onbackorder'], true) ? $raw_status : 'instock';
 
+    $primary_img    = gf_flagship_product_image($product);
+    $gallery_images = [];
+    foreach ((array) $product->get_gallery_image_ids() as $gid) {
+        $g_url = wp_get_attachment_image_url((int) $gid, 'medium_large') ?: wp_get_attachment_image_url((int) $gid, 'full');
+        if (is_string($g_url) && $g_url !== '' && !str_contains($g_url, 'woocommerce-placeholder') && $g_url !== $primary_img) {
+            $gallery_images[] = $g_url;
+        }
+    }
+    $ext_gal = get_post_meta($pid, '_gf_external_gallery_urls', true);
+    if (is_string($ext_gal) && $ext_gal !== '') {
+        $decoded = json_decode($ext_gal, true);
+        $candidates = is_array($decoded) ? $decoded : preg_split('/[\s,|]+/', $ext_gal);
+        foreach ((array) $candidates as $cand) {
+            $cand = trim((string) $cand);
+            if ($cand !== '' && filter_var($cand, FILTER_VALIDATE_URL) && $cand !== $primary_img && !in_array($cand, $gallery_images, true)) {
+                $gallery_images[] = esc_url_raw($cand);
+            }
+        }
+    } elseif (is_array($ext_gal)) {
+        foreach ($ext_gal as $cand) {
+            $cand = trim((string) $cand);
+            if ($cand !== '' && filter_var($cand, FILTER_VALIDATE_URL) && $cand !== $primary_img && !in_array($cand, $gallery_images, true)) {
+                $gallery_images[] = esc_url_raw($cand);
+            }
+        }
+    }
+
     return [
-        'id'           => $pid,
-        'name'         => html_entity_decode(wp_strip_all_tags($product->get_name()), ENT_QUOTES, 'UTF-8'),
-        'slug'         => $product->get_slug(),
-        'permalink'    => get_permalink($pid) ?: home_url('/shop/'),
-        'price'        => $price,
-        'regularPrice' => $reg_price > 0 ? $reg_price : $price,
-        'salePrice'    => ($sale > 0 && $reg_price > 0 && $sale < $reg_price) ? $sale : null,
-        'image'        => gf_flagship_product_image($product),
-        'category'     => $cat_name,
-        'categorySlug' => $cat_slug,
-        'specs'        => gf_flagship_extract_specs($product),
-        'stockStatus'  => $stock_status,
-        'stockQty'     => $product->managing_stock() ? $product->get_stock_quantity() : null,
-        'monthly3m'    => $monthly_3m,
+        'id'            => $pid,
+        'name'          => html_entity_decode(wp_strip_all_tags($product->get_name()), ENT_QUOTES, 'UTF-8'),
+        'slug'          => $product->get_slug(),
+        'permalink'     => get_permalink($pid) ?: home_url('/shop/'),
+        'price'         => $price,
+        'regularPrice'  => $reg_price > 0 ? $reg_price : $price,
+        'salePrice'     => ($sale > 0 && $reg_price > 0 && $sale < $reg_price) ? $sale : null,
+        'image'         => $primary_img,
+        'galleryImages' => array_slice($gallery_images, 0, 4),
+        'category'      => $cat_name,
+        'categorySlug'  => $cat_slug,
+        'specs'         => gf_flagship_extract_specs($product),
+        'stockStatus'   => $stock_status,
+        'stockQty'      => $product->managing_stock() ? $product->get_stock_quantity() : null,
+        'monthly3m'     => $monthly_3m,
     ];
 }
 
@@ -1254,9 +1349,9 @@ function gf_flagship_serialize_oms_order(int $order_id, bool $allow_demo_guest =
 
     if (!$is_owner_or_staff && !($allow_demo_guest && $is_demo)) {
         return new WP_Error(
-            'gf_oms_forbidden',
-            sprintf('Vui lòng đăng nhập tài khoản chủ đơn hàng để tra cứu đơn #%d.', $order_id),
-            ['status' => 403]
+            'gf_oms_not_found',
+            'Không tìm thấy đơn hàng hoặc vui lòng đăng nhập tài khoản chủ đơn để tra cứu.',
+            ['status' => 404]
         );
     }
 
@@ -1669,11 +1764,11 @@ function gf_ajax_flagship_oms_lookup(): void {
     }
     $res = gf_flagship_serialize_oms_order($order_id, true);
     if (is_wp_error($res)) {
-        $status = (int) ($res->get_error_data()['status'] ?? 403);
+        $status = (int) ($res->get_error_data()['status'] ?? 404);
         wp_send_json_error(['message' => $res->get_error_message()], $status);
     }
     if (!is_array($res)) {
-        wp_send_json_error(['message' => sprintf('Không tìm thấy đơn hàng #%d trong hệ thống.', $order_id)], 404);
+        wp_send_json_error(['message' => 'Không tìm thấy đơn hàng hoặc vui lòng đăng nhập tài khoản chủ đơn để tra cứu.'], 404);
     }
     wp_send_json_success($res);
 }

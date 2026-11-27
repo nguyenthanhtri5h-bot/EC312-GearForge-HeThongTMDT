@@ -2,7 +2,7 @@
 .dv { background: #f8fafc; color: #0f172a; }
 .dv .tc-pin-in { background: linear-gradient(180deg, #f8fafc 0 63%, #f1f5f9 63% 100%); }
 .dv-h {
-  font-family: 'Be Vietnam Pro', 'Inter', system-ui, sans-serif;
+  font-family: var(--gf-font-sans);
   position: absolute;
   z-index: 4;
   left: max(20px, calc((100% - var(--wrap)) / 2));
@@ -163,23 +163,23 @@
 .ht.co-vid .ht-tren, .ht.co-vid .ht-duoi { height: 0; padding: 0; overflow: hidden; transition: height 0.5s var(--ease); }
 
 /* ── 06 Trả góp 0% Sinh Viên (KHA layout — Crisp Light) ── */
-.kha { --pk: #2563eb; --pk2: #0f172a; --vi: #475569; --than: #f8fafc; overflow: clip; color: #0f172a; }
+.kha { --pk: #D13639; --pk2: #0f172a; --vi: #475569; --than: #f8fafc; overflow: clip; color: #0f172a; }
 .kha .tc-pin-in { display: grid; grid-template-rows: minmax(0, 1fr) auto; background: var(--than); }
-.kha-sang { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 46% 60% at 72% 46%, rgba(37, 99, 235, 0.05), transparent 70%); }
+.kha-sang { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 46% 60% at 72% 46%, rgba(209, 54, 57, 0.06), transparent 70%); }
 .kha-sang::after { content: ''; position: absolute; inset: 0; opacity: 0.22; background-image: radial-gradient(rgba(15, 23, 42, 0.06) 1px, transparent 1px); background-size: calc(8 * var(--u)) calc(8 * var(--u)); }
 .kha-grid { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: calc(50 * var(--u)); align-items: center; min-height: 0; }
 .kha-badge { display: inline-flex; align-items: center; gap: calc(10 * var(--u)); margin: 0 0 calc(22 * var(--u)); padding: calc(6 * var(--u)) calc(14 * var(--u)) calc(6 * var(--u)) calc(8 * var(--u)); border-radius: 8px; background: #ffffff; border: 1px solid #cbd5e1; font-size: calc(14 * var(--u)); font-weight: 700; color: #0f172a; }
 .tc .kha-badge img { width: auto; height: calc(30 * var(--u)); border-radius: 99px; }
 .kha-h { margin: 0; font-size: calc(44 * var(--u)); line-height: 1.2; font-weight: 800; letter-spacing: -0.025em; color: #0f172a; max-width: 19ch; text-wrap: balance; }
-.kha-grad { color: #0f172a; border-bottom: 2px solid #2563eb; padding-bottom: 0.06em; }
+.kha-grad { color: #0f172a; border-bottom: 2px solid #D13639; padding-bottom: 0.06em; }
 .kha-mo { margin: calc(18 * var(--u)) 0 0; max-width: 44ch; font-size: calc(16 * var(--u)); line-height: 1.6; color: #475569; }
 .kha-buoc { list-style: none; margin: calc(28 * var(--u)) 0 calc(30 * var(--u)); padding: 0 0 0 calc(24 * var(--u)); border-left: 2px solid #cbd5e1; display: flex; flex-direction: column; gap: calc(14 * var(--u)); }
 .kha-buoc li { position: relative; font-size: calc(17 * var(--u)); font-weight: 700; color: #64748b; transition: color 0.3s, font-size 0.3s var(--ease); }
 .kha-buoc li::before { content: ''; position: absolute; left: calc(-31 * var(--u)); top: 0.5em; width: calc(12 * var(--u)); height: calc(12 * var(--u)); border-radius: 50%; background: #cbd5e1; transition: all 0.3s; }
 .kha-buoc li.on { font-size: calc(21 * var(--u)); color: #0f172a; }
-.kha-buoc li.on::before { background: #2563eb; box-shadow: 0 0 0 calc(4 * var(--u)) rgba(37, 99, 235, 0.16); }
-.kha-nut { display: inline-flex; align-items: center; gap: calc(10 * var(--u)); min-height: max(48px, calc(54 * var(--u))); padding: 0 calc(26 * var(--u)); border-radius: 10px; border: 0; cursor: pointer; background: #2563eb; color: #ffffff !important; font-size: calc(16 * var(--u)); font-weight: 700; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.22); transition: transform 0.2s var(--ease), background 0.18s ease; }
-.kha-nut:hover { background: #1d4ed8; }
+.kha-buoc li.on::before { background: #D13639; box-shadow: 0 0 0 calc(4 * var(--u)) rgba(209, 54, 57, 0.16); }
+.kha-nut { display: inline-flex; align-items: center; gap: calc(10 * var(--u)); min-height: max(48px, calc(54 * var(--u))); padding: 0 calc(26 * var(--u)); border-radius: 10px; border: 0; cursor: pointer; background: #D13639; color: #ffffff !important; font-size: calc(16 * var(--u)); font-weight: 700; box-shadow: 0 4px 12px rgba(209, 54, 57, 0.22); transition: transform 0.2s var(--ease), background 0.18s ease; }
+.kha-nut:hover { background: #B91C1C; }
 .kha-san { position: relative; height: min(calc(100svh - 170 * var(--u)), calc(700 * var(--u))); min-height: 0; }
 .tc .kha-hung { position: absolute; left: calc(-20 * var(--u)); bottom: 0; width: calc(500 * var(--u)); max-width: none; height: auto; opacity: 0.96; }
 .kha-dt { position: absolute; right: calc(30 * var(--u)); top: 53%; width: min(calc(300 * var(--u)), calc((100svh - 250 * var(--u)) * 0.42)); aspect-ratio: 390 / 844; margin-top: calc(min(calc(300 * var(--u)), calc((100svh - 250 * var(--u)) * 0.42)) * -1.08); padding: calc(9 * var(--u)); border-radius: calc(46 * var(--u)); background: #09090b; rotate: 3deg; box-shadow: 0 calc(30 * var(--u)) calc(60 * var(--u)) calc(-20 * var(--u)) rgba(0, 0, 0, 0.35); }

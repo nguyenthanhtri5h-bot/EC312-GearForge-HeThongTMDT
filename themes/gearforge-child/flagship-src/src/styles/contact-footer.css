@@ -1,11 +1,12 @@
 .gf-riot-ft {
-  background: #111111;
+  background: #252423;
   color: #E4E4E7;
-  padding: 40px 0 32px;
+  padding: 20px 0 24px;
+  font-family: var(--gf-font-sans);
 }
 
 .gf-riot-ft-wrap {
-  width: min(1320px, 100% - 64px);
+  width: min(1400px, 100% - 48px);
   margin-inline: auto;
 }
 
@@ -13,8 +14,8 @@
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 28px 36px;
-  padding-bottom: 28px;
+  gap: 20px 28px;
+  padding: 18px 0 26px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.14);
 }
 
@@ -37,7 +38,7 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 10px 24px;
+  gap: 8px 20px;
 }
 
 .gf-riot-ft-link {
@@ -45,9 +46,12 @@
   background: transparent;
   padding: 4px 0;
   color: #F4F4F5;
+  font-family: var(--gf-font-sans);
   font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  line-height: 1.4;
+  white-space: nowrap;
   cursor: pointer;
   transition: color 0.18s ease;
 }
@@ -82,7 +86,7 @@
   flex-wrap: wrap;
   gap: 14px;
   padding-top: 22px;
-  padding-right: 76px;
+  padding-right: 68px;
 }
 
 .gf-riot-ft-copy {
@@ -95,9 +99,10 @@
   border: 0;
   background: transparent;
   color: #F4F4F5;
+  font-family: var(--gf-font-sans);
   font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   cursor: pointer;
   padding: 6px 8px;
 }

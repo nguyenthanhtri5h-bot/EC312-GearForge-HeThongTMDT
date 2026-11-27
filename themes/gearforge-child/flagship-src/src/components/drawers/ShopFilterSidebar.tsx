@@ -121,7 +121,7 @@ export function ShopFilterSidebar({ filters, onUpdate, onResetAll }: Props) {
                   type="button"
                   role="radio"
                   aria-checked={active}
-                  className={`gf-facet-chip ${active ? 'is-active' : ''}`}
+                  className={`gf-facet-chip ${active ? (opt.id === 'all' ? 'is-neutral-on' : 'is-active') : ''}`}
                   onClick={() => {
                     setPriceId(opt.id);
                     onUpdate({ maxPrice: opt.maxPrice, page: 1 });
@@ -148,7 +148,7 @@ export function ShopFilterSidebar({ filters, onUpdate, onResetAll }: Props) {
                       type="button"
                       role="radio"
                       aria-checked={active}
-                      className={`gf-facet-chip ${active ? 'is-active' : ''}`}
+                      className={`gf-facet-chip ${active ? (opt.value === '' ? 'is-neutral-on' : 'is-active') : ''}`}
                       onClick={() => {
                         const nextVal = active && opt.value !== '' ? '' : opt.value;
                         onUpdate({ [group.key]: nextVal, page: 1 });

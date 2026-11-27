@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 }
 
 if (!defined('GF_CORE_VERSION')) {
-    define('GF_CORE_VERSION', '1.0.0');
+    define('GF_CORE_VERSION', '1.0.2');
 }
 if (!defined('GF_CORE_PATH')) {
     define('GF_CORE_PATH', plugin_dir_path(__FILE__));
@@ -303,7 +303,13 @@ if (!class_exists('GF_Core')) {
             $product_id = (int) ($_POST['product_id'] ?? 0);
             $months     = (int) ($_POST['months'] ?? 6);
             $down_pct   = (float) ($_POST['downpayment_pct'] ?? 20);
-            $phone      = preg_replace('/\D+/', '', (string) ($_POST['phone'] ?? ''));
+            $phone      = preg_replace('/[\s.\-()]+/', '', trim((string) ($_POST['phone'] ?? '')));
+            if ($phone !== '' && strpos($phone, '+84') === 0) {
+                $phone = '0' . substr($phone, 3);
+            } elseif ($phone !== '' && strpos($phone, '84') === 0 && strlen($phone) >= 11) {
+                $phone = '0' . substr($phone, 2);
+            }
+            $client_ip  = class_exists('GF_Fraud_Guard') ? GF_Fraud_Guard::get_client_ip() : sanitize_text_field((string) ($_SERVER['REMOTE_ADDR'] ?? ''));
             $cccd_raw   = preg_replace('/\D+/', '', (string) ($_POST['cccd_number'] ?? ''));
 
             if (class_exists('GF_Fraud_Guard')) {
@@ -312,7 +318,7 @@ if (!class_exists('GF_Core')) {
                     wp_send_json_error(['message' => $rl->get_error_message()], 429);
                 }
                 $bl = GF_Fraud_Guard::check_blacklist([
-                    'IP'        => GF_Fraud_Guard::get_client_ip(),
+                    'IP'        => $client_ip,
                     'USER'      => (string) $user_id,
                     'PHONE'     => $phone,
                     'CCCD_HASH' => class_exists('GF_Installment_Review') ? GF_Installment_Review::hash_cccd($cccd_raw) : hash('sha256', $cccd_raw),
@@ -356,6 +362,8 @@ if (!class_exists('GF_Core')) {
                 'student_code'          => (string) ($_POST['student_code'] ?? ''),
                 'student_edu_email'     => (string) ($_POST['student_edu_email'] ?? ''),
                 'cccd_number'           => $cccd_raw,
+                'phone'                 => $phone,
+                'client_ip'             => $client_ip,
                 'downpayment_amount'    => (float) $calc['downpayment_amount'],
                 'monthly_amount'        => (float) $calc['monthly_amount'],
                 'consent_nd13_accepted' => !empty($_POST['consent_nd13_accepted']) ? 1 : 0,
@@ -363,7 +371,8 @@ if (!class_exists('GF_Core')) {
 
             if (is_wp_error($app_id)) {
                 $order->delete(true);
-                wp_send_json_error(['message' => $app_id->get_error_message(), 'code' => $app_id->get_error_code()], 400);
+                $err_status = $app_id->get_error_code() === 'gf_blacklisted' ? 403 : 400;
+                wp_send_json_error(['message' => $app_id->get_error_message(), 'code' => $app_id->get_error_code()], $err_status);
             }
 
             wp_send_json_success([

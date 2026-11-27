@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 class GF_RMA_Manager {
 
     private const ALLOWED_TYPES = ['RETURN', 'EXCHANGE', 'WARRANTY'];
-    private const ELIGIBLE_ORDER_STATUSES = ['gf-shipping', 'shipping', 'completed'];
+    private const ELIGIBLE_ORDER_STATUSES = ['gf-shipping', 'shipping', 'gf-delivered', 'completed'];
     private const RETURN_WINDOW_DAYS = 15;
 
     private static bool $table_checked = false;

@@ -1,106 +1,108 @@
-import { useState } from 'react';
-import { PRODUCT_MENU_TABS, type ProductMenuTab } from '../data/productMenuData';
+import { useEffect, useState } from 'react';
+import { MEGA_PREVIEW_ITEMS } from '../data/megaMenuData';
 import { useGearForgeStore } from '../hooks/useGearForgeStore';
+import type { FilterParams } from '../types/gearforge';
 
-const TAB_TO_CATEGORY: Record<string, string> = {
-  laptop: 'laptop-gaming',
-  pc: 'pc-workstation',
-  gear: 'gear',
-};
+interface SlimLink {
+  id: keyof typeof MEGA_PREVIEW_ITEMS;
+  label: string;
+  action: () => void;
+}
 
-export function ProductMegaMenu() {
-  const { openDrawer, navigateToPage } = useGearForgeStore();
-  const [activeTab, setActiveTab] = useState<ProductMenuTab['id']>('laptop');
-  const current = PRODUCT_MENU_TABS.find((t) => t.id === activeTab) || PRODUCT_MENU_TABS[0];
+const PREVIEW_LIST = Object.values(MEGA_PREVIEW_ITEMS);
+
+export function ProductMegaMenu({ onSelect }: { onSelect?: () => void }) {
+  const { navigateToPage, openDrawer } = useGearForgeStore();
+  const [activeId, setActiveId] = useState<string>('all');
+
+  useEffect(() => {
+    PREVIEW_LIST.forEach((item) => {
+      const pre = new Image();
+      pre.src = item.img;
+    });
+  }, []);
+
+  const goShop = (patch?: Partial<FilterParams>) => {
+    onSelect?.();
+    navigateToPage('shop', patch);
+  };
+
+  const hardwareLinks: SlimLink[] = [
+    { id: 'all', label: 'Tất cả Kho Máy ĐHQG', action: () => goShop() },
+    { id: 'gaming', label: 'Laptop Gaming RTX 40/50', action: () => goShop({ category: 'laptop-gaming' }) },
+    { id: 'ultrabook', label: 'Ultrabook & Đồ họa OLED', action: () => goShop({ category: 'laptop-ultrabook' }) },
+    { id: 'pc', label: 'PC Custom & Workstation AI', action: () => goShop({ category: 'pc-workstation' }) },
+    { id: 'linhKien', label: 'Linh kiện & Card đồ họa', action: () => goShop({ category: 'linh-kien' }) },
+    { id: 'gear', label: 'Gaming Gear & Màn hình 240Hz', action: () => goShop({ category: 'gear' }) },
+  ];
+
+  const svLinks: SlimLink[] = [
+    { id: 'ecosystem', label: 'Gợi ý máy theo ngành học', action: () => { onSelect?.(); navigateToPage('ecosystem'); } },
+    { id: 'installment', label: 'Trả góp 0% qua .edu.vn', action: () => { onSelect?.(); openDrawer('installment'); } },
+    { id: 'compare', label: 'So sánh tối đa 3 cấu hình', action: () => { onSelect?.(); openDrawer('compare'); } },
+    { id: 'tracking', label: 'Tra cứu đơn & Bảo hành S/N', action: () => { onSelect?.(); navigateToPage('tracking'); } },
+  ];
+
+  const activePreview = MEGA_PREVIEW_ITEMS[activeId] || MEGA_PREVIEW_ITEMS.all;
 
   return (
-    <div className="mega-menu-wrap">
-      <div className="mm3-panel-box">
-        <div className="mm3-nav">
-          {PRODUCT_MENU_TABS.map((tab) => (
+    <div
+      className="mega-menu-wrap"
+      role="menu"
+      aria-label="Danh mục sản phẩm"
+      onMouseLeave={() => setActiveId('all')}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) setActiveId('all');
+      }}
+    >
+      <div className="gf-mega-split">
+        <div className="gf-slim-col">
+          <span className="gf-slim-title">Danh mục phần cứng</span>
+          {hardwareLinks.map((item) => (
             <button
-              key={tab.id}
+              key={item.label}
               type="button"
-              className={`mm3-tab ${tab.id === activeTab ? 'on' : ''}`}
-              onMouseEnter={() => setActiveTab(tab.id)}
-              onClick={() => setActiveTab(tab.id)}
+              className={`gf-slim-link${activeId === item.id ? ' is-active' : ''}`}
+              role="menuitem"
+              onMouseEnter={() => setActiveId(item.id)}
+              onFocus={() => setActiveId(item.id)}
+              onClick={item.action}
             >
-              <span className="t">{tab.title}</span>
-              <span className="d">{tab.desc}</span>
+              {item.label}
             </button>
           ))}
-          <a href="tel:1900686807" className="mm3-hot">
-            <span className="ic">☎</span>
-            <span>
-              <b>1900 6868 07</b>
-              <small>Tư vấn SV ĐHQG 8h–22h</small>
-            </span>
-          </a>
         </div>
 
-        <div className="mm3-stage">
-          <div className="mm3-hd">
-            <span className="t">{current.title}</span>
-            <a
-              href="/shop/"
-              className="all"
-              onClick={(e) => {
-                e.preventDefault();
-                navigateToPage('shop', { category: TAB_TO_CATEGORY[activeTab] || '' });
-              }}
+        <div className="gf-slim-col">
+          <span className="gf-slim-title">Hỗ trợ Sinh viên</span>
+          {svLinks.map((item) => (
+            <button
+              key={item.label}
+              type="button"
+              className={`gf-slim-link${activeId === item.id ? ' is-active' : ''}`}
+              role="menuitem"
+              onMouseEnter={() => setActiveId(item.id)}
+              onFocus={() => setActiveId(item.id)}
+              onClick={item.action}
             >
-              {current.allLabel} →
-            </a>
-          </div>
-          <div className="mm3-rows">
-            {current.items.map((item) => (
-              <a
-                key={item.name}
-                href="/shop/"
-                className="mm3-row"
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigateToPage('shop', { category: TAB_TO_CATEGORY[activeTab] || '' });
-                }}
-              >
-                <span className={`im ${current.isBearRound ? 'round' : ''}`}>
-                  <img src={item.img} alt={item.name} loading="lazy" />
-                </span>
-                <span>
-                  <span className="n">
-                    {item.name}
-                    {item.domain && (
-                      <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 500, color: '#A1A1AA' }}>
-                        {item.domain}
-                      </span>
-                    )}
-                  </span>
-                  <span className="x">{item.desc}</span>
-                </span>
-              </a>
-            ))}
-          </div>
+              {item.label}
+            </button>
+          ))}
         </div>
 
-        <button
-          type="button"
-          className="mm3-bn"
-          style={{ border: 0, textAlign: 'left', cursor: 'pointer' }}
-          onClick={() => openDrawer('installment')}
-        >
-          <div>
-            <div className="live">
-              <i /> ĐẶC QUYỀN ĐHQG-HCM
-            </div>
-            <h3 className="ttl">
-              Trả góp 0% <em>duyệt qua .edu.vn</em>
-            </h3>
-            <p className="lead">
-              Chỉ cần email sinh viên <b>.edu.vn</b> &amp; thẻ SV. Kỳ hạn 3 tháng lãi suất 0%, không giữ giấy tờ.
-            </p>
-          </div>
-          <span className="cta-bn">Tính lịch góp ngay →</span>
-        </button>
+        <div className="gf-mega-stage">
+          {PREVIEW_LIST.map((item) => (
+            <img
+              key={item.id}
+              src={item.img}
+              alt=""
+              className={`gf-mega-stage-img${activePreview.id === item.id ? ' is-active' : ''}`}
+            />
+          ))}
+          <span className="gf-mega-stage-tag">{activePreview.tag}</span>
+          <h4 className="gf-mega-stage-title">{activePreview.title}</h4>
+          <p className="gf-mega-stage-desc">{activePreview.desc}</p>
+        </div>
       </div>
     </div>
   );

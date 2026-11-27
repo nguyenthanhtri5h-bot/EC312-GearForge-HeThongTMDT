@@ -56,7 +56,7 @@ export function CartCheckoutDrawer() {
         <div className="gf-drawer-head">
           <div>
             <h3 id="gf-cart-drawer-title">Giỏ hàng ({cart.count})</h3>
-            <span style={{ fontSize: 12.5, color: '#475569' }}>
+            <span style={{ fontSize: 12.5, color: '#52525B' }}>
               Giao hỏa tốc KTX ĐHQG trong 2h · Hỗ trợ trả góp 0%
             </span>
           </div>
@@ -84,10 +84,10 @@ export function CartCheckoutDrawer() {
                 <div key={it.key} className="gf-cart-row">
                   <img src={it.image} alt={it.name} />
                   <div style={{ minWidth: 0 }}>
-                    <a href={it.permalink} style={{ color: '#0f172a', fontWeight: 800, fontSize: 14, display: 'block' }}>
+                    <a href={it.permalink} style={{ color: '#0A0A0A', fontWeight: 800, fontSize: 14, display: 'block' }}>
                       {it.name}
                     </a>
-                    <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 13, color: '#475569' }}>
+                    <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 13, color: '#52525B' }}>
                       {formatVnd(it.price)} &times; {it.qty} = {formatVnd(it.lineTotal)}
                     </span>
                   </div>

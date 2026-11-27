@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import type { CSSProperties } from 'react';
 import { useGearForgeStore } from '../hooks/useGearForgeStore';
 import { CatalogFilterBar } from './drawers/CatalogFilterBar';
 import { ShopFilterSidebar } from './drawers/ShopFilterSidebar';
@@ -122,8 +123,19 @@ export function CatalogSection({ hideCategoryTabs = false }: { hideCategoryTabs?
             ) : (
               <div className="gf-cat-grid">
                 {products.map((p, idx) => (
-                  <StorefrontProductCard key={p.id} product={p} eagerImage={idx < 8} />
+                  <StorefrontProductCard key={p.id} product={p} eagerImage={idx < 24} />
                 ))}
+                {!catalogLoading && products.length > 0 && products.length % 4 !== 0 && (
+                  <a
+                    href="/he-sinh-thai/"
+                    className="gf-grid-helper-card"
+                    style={{ '--gf-span': 4 - (products.length % 4) } as CSSProperties}
+                  >
+                    <span className="gf-grid-helper-badge">TƯ VẤN SINH VIÊN ĐHQG</span>
+                    <strong>Chưa chắc cấu hình phù hợp ngành học?</strong>
+                    <span>Mở Dự Toán Trả Góp 0% &amp; Gợi Ý Theo Ngành (CNTT, AI, Đồ họa) →</span>
+                  </a>
+                )}
               </div>
             )}
 

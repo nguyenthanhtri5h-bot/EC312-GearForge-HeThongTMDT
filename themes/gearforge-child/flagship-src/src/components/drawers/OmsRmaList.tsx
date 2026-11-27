@@ -22,12 +22,11 @@ export function OmsRmaList({ entries }: { entries: RmaEntry[] }) {
             display: 'flex',
             flexWrap: 'wrap',
             justifyContent: 'space-between',
-            gap: 6,
-            padding: '6px 10px',
-            borderRadius: 6,
-            background: '#F5F4F0',
-            border: '1px solid #DFDEDC',
-            fontSize: 12,
+            gap: 8,
+            padding: '10px 0',
+            background: 'transparent',
+            borderBottom: '1px solid #D3D1CF',
+            fontSize: 12.5,
           }}
         >
           <span>

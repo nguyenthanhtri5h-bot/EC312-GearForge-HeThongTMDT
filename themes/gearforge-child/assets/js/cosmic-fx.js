@@ -7,8 +7,8 @@
   bar.id = 'gf-scroll-progress';
   bar.setAttribute('aria-hidden', 'true');
   bar.style.cssText =
-    'position:fixed;top:64px;left:0;height:2px;width:0%;z-index:960;pointer-events:none;' +
-    'background:linear-gradient(90deg,#1d4ed8,#3b82f6);transition:width 80ms linear;';
+    'position:fixed;top:calc(80px + var(--wp-admin--admin-bar--height, 0px));left:0;height:2px;width:0%;z-index:960;pointer-events:none;' +
+    'background:linear-gradient(90deg,#D13639,#EB0029);transition:width 80ms linear;';
   document.addEventListener('DOMContentLoaded', function () {
     document.body.appendChild(bar);
     function updateScrollBar() {
