@@ -17,6 +17,14 @@ if (file_exists($gf_bridge_file)) {
     require_once $gf_bridge_file;
 }
 
+$gf_ai_chatbot_file = get_stylesheet_directory() . '/inc/class-gf-ai-chatbot.php';
+if (file_exists($gf_ai_chatbot_file)) {
+    require_once $gf_ai_chatbot_file;
+    if (class_exists('GF_AI_Chatbot')) {
+        GF_AI_Chatbot::init();
+    }
+}
+
 /**
  * Resolve category- and keyword-aware studio hardware image URL across 8 visuals.
  */

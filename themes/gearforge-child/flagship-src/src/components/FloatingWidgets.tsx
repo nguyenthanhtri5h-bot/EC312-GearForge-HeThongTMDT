@@ -1,16 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import {
+  apiSendAiChat,
+  CHAT_INITIAL_MESSAGE,
+  type ChatMessage,
+  type ChatSuggestedAction,
+} from '../hooks/chatApi';
 import { useGearForgeStore } from '../hooks/useGearForgeStore';
 import { CrestIcon } from './BrandLogo';
-
-const QUICK_PROMPTS = [
-  { label: 'Gợi ý Laptop AI/Dev', action: 'shop-ai' as const },
-  { label: 'Tính trả góp 0%', action: 'installment' as const },
-  { label: 'Tra cứu đơn OMS', action: 'oms' as const },
-];
+import { ChatMessageList } from './chat/ChatMessageList';
 
 export function FloatingWidgets() {
-  const { chatOpen, setChatOpen, openDrawer, navigateToPage, pageMode } = useGearForgeStore();
+  const { boot, chatOpen, setChatOpen, openDrawer, navigateToPage, pageMode, addToCart, setQuickViewProduct } = useGearForgeStore();
   const [showBubble, setShowBubble] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>([CHAT_INITIAL_MESSAGE]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [interactionId, setInteractionId] = useState<string | null>(null);
+  const [aiMode, setAiMode] = useState<'ready' | 'gemini' | 'fallback'>('ready');
+  const scrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const checkScroll = () => {
@@ -30,13 +37,6 @@ export function FloatingWidgets() {
       window.removeEventListener('resize', checkScroll);
     };
   }, [pageMode]);
-  const [messages, setMessages] = useState<{ from: 'bot' | 'user'; text: string }[]>([
-    {
-      from: 'bot',
-      text: 'Chào bạn! Mình là GearForge AI Advisor. Bạn cần tìm Laptop Gaming/Dev, Build PC hay tính lịch trả góp 0% ĐHQG-HCM?',
-    },
-  ]);
-  const [input, setInput] = useState('');
 
   useEffect(() => {
     if (!chatOpen) return;
@@ -47,91 +47,147 @@ export function FloatingWidgets() {
     return () => window.removeEventListener('keydown', onKey);
   }, [chatOpen, setChatOpen]);
 
-  const handleQuickPrompt = (label: string, action: 'shop-ai' | 'installment' | 'oms') => {
-    setMessages((prev) => [...prev, { from: 'user', text: label }]);
-    if (action === 'shop-ai') {
-      setMessages((prev) => [...prev, { from: 'bot', text: 'Mình mở ngay danh sách máy RTX 4060 / AI Dev phù hợp nhất cho bạn nhé!' }]);
-      setChatOpen(false);
-      navigateToPage('shop', { category: 'laptop-gaming', gpu: 'RTX 4060', page: 1 });
-    } else if (action === 'installment') {
-      setChatOpen(false);
-      openDrawer('installment');
-    } else {
-      setChatOpen(false);
-      navigateToPage('tracking');
+  useEffect(() => {
+    if (chatOpen && scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [chatOpen, messages, loading]);
+
+  const handleRunAction = (action: ChatSuggestedAction) => {
+    setChatOpen(false);
+    if (action === 'installment') openDrawer('installment');
+    else if (action === 'oms') navigateToPage('tracking');
+    else if (action === 'compare') navigateToPage('compare');
+    else if (action === 'ecosystem') navigateToPage('ecosystem');
+    else navigateToPage('shop', { page: 1 });
+  };
+
+  const handleReset = () => {
+    if (loading) return;
+    setMessages([CHAT_INITIAL_MESSAGE]);
+    setInteractionId(null);
+    setAiMode('ready');
+    setInput('');
+  };
+
+  const sendMessage = async (rawText: string) => {
+    const clean = rawText.trim();
+    if (!clean || loading) return;
+
+    const userMsg: ChatMessage = { id: `u-${Date.now()}`, from: 'user', text: clean };
+    const history = messages
+      .filter((m) => m.id !== CHAT_INITIAL_MESSAGE.id)
+      .slice(-6)
+      .map((m) => ({ role: (m.from === 'bot' ? 'assistant' : 'user') as 'assistant' | 'user', text: m.text }));
+
+    setMessages((prev) => [...prev, userMsg]);
+    setInput('');
+    setLoading(true);
+
+    try {
+      const res = await apiSendAiChat(boot, { message: clean, history, interactionId });
+      if (res.interactionId) setInteractionId(res.interactionId);
+      setAiMode(res.mode === 'gemini' ? 'gemini' : 'fallback');
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `b-${Date.now()}`,
+          from: 'bot',
+          text: res.reply,
+          products: res.products,
+          suggestedAction: res.suggestedAction,
+          followUps: res.followUps,
+          mode: res.mode,
+        },
+      ]);
+    } catch (err) {
+      const errText = err instanceof Error ? err.message : 'Không thể kết nối GearForge AI.';
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `e-${Date.now()}`,
+          from: 'bot',
+          text: `${errText} Bạn có thể thử lại hoặc mở thẳng kho sản phẩm bên dưới.`,
+          suggestedAction: 'shop',
+          followUps: ['Thử tìm Laptop RTX 4060', 'Tính trả góp 0% .edu.vn'],
+        },
+      ]);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const sendText = (val: string) => {
-    const clean = val.trim();
-    if (!clean) return;
-    setMessages((prev) => [
-      ...prev,
-      { from: 'user', text: clean },
-      {
-        from: 'bot',
-        text: 'Mình đã ghi nhận câu hỏi! Bạn có thể tìm trực tiếp cấu hình theo từ khóa đó trong Cửa hàng ngay nhé.',
-      },
-    ]);
-    setInput('');
-    const kwMatch = clean.match(/\b(RTX\s*\d{4}|ASUS|ROG|Lenovo|Legion|MSI|Katana|Acer|HP|MacBook|ThinkPad|RAM|SSD|VGA|CPU|PC)\b/i);
-    if (kwMatch) {
-      window.setTimeout(() => {
-        setChatOpen(false);
-        navigateToPage('shop', { search: kwMatch[0], page: 1 });
-      }, 650);
-    }
-  };
+  const statusLabel = aiMode === 'fallback' ? 'Trợ lý kho 590+ máy' : 'Trực tuyến · Tư vấn 24/7';
 
   return (
     <>
       {chatOpen && (
-        <div className="mc-panel" role="dialog" aria-label="Trợ lý tư vấn GearForge">
+        <div className="mc-panel" role="dialog" aria-label="Trợ lý tư vấn GearForge AI">
           <div className="mc-panel-head">
-            <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 38, height: 38, borderRadius: '50%', background: '#18181B', border: '1px solid rgba(209,54,57,0.45)', flexShrink: 0 }}>
-              <CrestIcon size={24} />
+            <span className="mc-avatar">
+              <CrestIcon size={22} />
             </span>
-            <div>
+            <div className="mc-head-copy">
               <div className="title">GearForge AI · Trợ lý chọn máy</div>
-              <div className="status">Tư vấn cấu hình &amp; Trả góp 0%</div>
+              <div className="status">
+                <span className={`mc-status-dot ${aiMode === 'fallback' ? 'is-fallback' : ''}`} aria-hidden="true" />
+                {statusLabel}
+              </div>
             </div>
-            <button type="button" className="close-btn" onClick={() => setChatOpen(false)} aria-label="Đóng chat">✕</button>
+            <div className="mc-head-actions">
+              <button
+                type="button"
+                className="mc-head-btn"
+                onClick={handleReset}
+                disabled={loading}
+                aria-label="Xóa đoạn chat"
+                title="Bắt đầu hội thoại mới"
+              >
+                ↺
+              </button>
+              <button type="button" className="close-btn" onClick={() => setChatOpen(false)} aria-label="Đóng chat">
+                ✕
+              </button>
+            </div>
           </div>
-          <div style={{ padding: '6px 12px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0', fontSize: 11.5, color: '#475569', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span>Hỗ trợ sinh viên ĐHQG-HCM 8h–22h</span>
-            <button type="button" onClick={() => { setChatOpen(false); navigateToPage('ecosystem'); }} style={{ background: 'none', border: 0, color: '#D13639', fontWeight: 700, cursor: 'pointer', fontSize: 11.5, textDecoration: 'underline', whiteSpace: 'nowrap', flexShrink: 0 }}>
+
+          <div className="mc-subheader">
+            <span>Hỗ trợ sinh viên ĐHQG-HCM · Trả góp 0%</span>
+            <button type="button" onClick={() => { setChatOpen(false); navigateToPage('ecosystem'); }}>
               Chọn theo ngành →
             </button>
           </div>
-          <div className="mc-messages">
-            {messages.map((m, i) => (
-              <div key={i} className={`mc-msg ${m.from}`}>
-                {m.text}
-              </div>
-            ))}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
-              {QUICK_PROMPTS.map((qp) => (
-                <button
-                  key={qp.label}
-                  type="button"
-                  onClick={() => handleQuickPrompt(qp.label, qp.action)}
-                  style={{ fontSize: 11.5, fontWeight: 700, padding: '5px 10px', borderRadius: 99, border: '1px solid #fecaca', background: '#fef2f2', color: '#b91c1c', cursor: 'pointer' }}
-                >
-                  {qp.label}
-                </button>
-              ))}
-            </div>
+
+          <div className="mc-messages" ref={scrollRef}>
+            <ChatMessageList
+              messages={messages}
+              loading={loading}
+              onQuickView={(p) => { setChatOpen(false); setQuickViewProduct(p); }}
+              onAddToCart={(pid) => { void addToCart(pid, 1); }}
+              onInstallment={(pid) => { setChatOpen(false); openDrawer('installment', pid); }}
+              onRunAction={handleRunAction}
+              onFollowUp={(fq) => { void sendMessage(fq); }}
+            />
           </div>
+
           <div className="mc-composer">
             <input
               type="text"
-              aria-label="Nhập câu hỏi hoặc từ khóa tìm máy"
-              placeholder="Gõ tên máy, RTX 4060, ngân sách..."
+              aria-label="Nhập câu hỏi hoặc nhu cầu cấu hình"
+              placeholder="Hỏi cấu hình, ngân sách 25tr, trả góp..."
               value={input}
+              disabled={loading}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') sendText(input); }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  void sendMessage(input);
+                }
+              }}
             />
-            <button type="button" onClick={() => sendText(input)}>Tìm</button>
+            <button type="button" disabled={loading || !input.trim()} onClick={() => void sendMessage(input)}>
+              {loading ? '...' : 'Gửi'}
+            </button>
           </div>
         </div>
       )}
@@ -141,7 +197,7 @@ export function FloatingWidgets() {
           type="button"
           className="mc-bubble"
           aria-expanded={chatOpen}
-          aria-label={chatOpen ? 'Đóng trợ lý tư vấn' : 'Mở trợ lý tư vấn'}
+          aria-label={chatOpen ? 'Đóng trợ lý tư vấn' : 'Mở trợ lý tư vấn GearForge AI'}
           onClick={() => setChatOpen(!chatOpen)}
         >
           <CrestIcon size={26} />
