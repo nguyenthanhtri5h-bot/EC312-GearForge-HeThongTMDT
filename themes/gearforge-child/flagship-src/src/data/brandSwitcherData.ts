@@ -26,7 +26,7 @@ export const SWITCHER_ARTWORK: Record<string, SwitcherArtworkItem> = {
     kicker: 'RTX 4050/4060 · MÀN 165HZ+',
     title: 'Laptop Gaming RTX 40/50 Series',
     desc: 'ROG Strix, Lenovo Legion, MSI Katana test stress 30 phút đạt chuẩn FPS & CUDA trước khi xuất kho.',
-    img: hw.laptopRogRgb,
+    img: hw.realGamingLaptop,
   },
   ultrabook: {
     id: 'ultrabook',
@@ -34,7 +34,7 @@ export const SWITCHER_ARTWORK: Record<string, SwitcherArtworkItem> = {
     kicker: 'MỎNG NHẸ · PIN 11 GIỜ',
     title: 'Ultrabook Mỏng Nhẹ & OLED Studio',
     desc: 'MacBook, ThinkPad, Zenbook OLED độ lệch màu Delta E < 2 cho sinh viên KTPM, Media Club & thiết kế.',
-    img: hw.laptopUltrabook,
+    img: hw.realUltrabookStudio,
   },
   pc: {
     id: 'pc',
@@ -42,7 +42,7 @@ export const SWITCHER_ARTWORK: Record<string, SwitcherArtworkItem> = {
     kicker: 'CUSTOM RTX BUILD · TẢN NƯỚC AIO',
     title: 'Workstation AI & Render CAD',
     desc: 'Cấu hình PC tối ưu PyTorch, SolidWorks, Blender với nguồn 80+ Gold và bảo hành từng linh kiện theo Serial.',
-    img: hw.pcWatercool,
+    img: hw.realPcWorkstation,
   },
   gear: {
     id: 'gear',
@@ -50,7 +50,7 @@ export const SWITCHER_ARTWORK: Record<string, SwitcherArtworkItem> = {
     kicker: 'PHÍM CƠ · CHUỘT ESPORTS · MÀN 240HZ',
     title: 'Linh Kiện & Combo Gaming Gear',
     desc: 'Phím cơ gasket êm phòng KTX, chuột không dây siêu nhẹ, tai nghe 2.4GHz và RAM/SSD NVMe nâng cấp lấy liền.',
-    img: hw.gearPeripherals,
+    img: hw.realMechGear,
   },
   ecosystem: {
     id: 'ecosystem',
@@ -98,7 +98,7 @@ export const SWITCHER_ARTWORK: Record<string, SwitcherArtworkItem> = {
     kicker: 'BÀN GIAO THỰC TẾ KTX KHU A/B',
     title: 'Không Gian Học & Gaming Thực Tế',
     desc: 'Khám phá góc máy sinh viên UIT, Bách Khoa, KHTN đã bàn giao trọn bộ kèm setup tối giản gọn dây.',
-    img: hw.campusUitAi,
+    img: hw.realAiDev,
   },
   galleryLab: {
     id: 'galleryLab',
@@ -106,7 +106,7 @@ export const SWITCHER_ARTWORK: Record<string, SwitcherArtworkItem> = {
     kicker: 'WORKSTATION · MÀN OLED CHUẨN MÀU',
     title: 'Góc Studio Dựng Phim & AI Research',
     desc: 'Dual-monitor OLED 240Hz + PC RTX build tản nhiệt êm cho CLB Media, Lab AI và nhóm đồ án tốt nghiệp.',
-    img: hw.galleryEsportsDesk,
+    img: hw.realEsportsDual,
   },
   serialRma: {
     id: 'serialRma',

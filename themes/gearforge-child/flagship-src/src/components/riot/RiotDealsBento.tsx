@@ -65,7 +65,7 @@ export function RiotDealsBento() {
 
   const deal2Cat = (deal2?.category || 'PC RTX').toUpperCase();
   const deal3Cat = (deal3?.category || 'GAMING GEAR').toUpperCase();
-  const deal3Thumb = deal3 && isGearProduct(deal3) ? hw.gearPeripherals : hw.bentoLaptop;
+  const deal3Thumb = deal3 && isGearProduct(deal3) ? hw.realMechGear : hw.realUltrabookStudio;
 
   const sideItems: NewsRowItem[] = [
     {
@@ -73,7 +73,7 @@ export function RiotDealsBento() {
       tag: `FLASH DEAL · ${deal2Cat}`,
       title: deal2 ? cleanShortName(deal2.name) : 'Custom PC Nova RTX 4070 Super',
       priceText: deal2 ? formatVnd(deal2.salePrice && deal2.salePrice > 0 ? deal2.salePrice : deal2.price) : undefined,
-      thumb: hw.bentoPc,
+      thumb: hw.realEsportsDual,
       action: () => (deal2 ? setQuickViewProduct(deal2) : navigateToPage('shop', { category: 'pc-workstation' })),
     },
     {
@@ -88,14 +88,14 @@ export function RiotDealsBento() {
       id: 'sv-0',
       tag: 'TÀI CHÍNH · 0% .EDU.VN',
       title: 'Duyệt Trả Góp 0% Qua Email .edu.vn Trong 2 Giờ',
-      thumb: hw.riotNewsInstallment,
+      thumb: hw.realStudentEduDesk,
       action: () => openDrawer('installment'),
     },
     {
       id: 'oms-check',
       tag: 'OMS · BẢO HÀNH S/N',
       title: 'Tra Cứu Serial Chính Hãng & Hóa Đơn VAT ĐHQG',
-      thumb: hw.riotNewsOmsSerial,
+      thumb: hw.realSerialHardware,
       action: () => navigateToPage('tracking'),
     },
   ];
@@ -117,7 +117,7 @@ export function RiotDealsBento() {
             onClick={() => (heroDeal ? setQuickViewProduct(heroDeal) : navigateToPage('shop'))}
           >
             <div className="gf-riot-bento-lead-media">
-              <img src={hw.bentoLead} alt={heroDeal?.name || 'Deal Tựu Trường ĐHQG GearForge'} />
+              <img src={hw.realGamingLaptop} alt={heroDeal?.name || 'Deal Tựu Trường ĐHQG GearForge'} />
               {heroPct > 0 && <span className="gf-riot-lead-badge">-{heroPct}%</span>}
             </div>
             <h3 className="gf-riot-lead-title">{`Mùa Tựu Trường ĐHQG 2026 — ${shortName}`}</h3>

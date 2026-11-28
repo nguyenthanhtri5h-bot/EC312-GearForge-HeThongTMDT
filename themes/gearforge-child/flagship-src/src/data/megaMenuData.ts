@@ -23,21 +23,21 @@ export const MEGA_PREVIEW_ITEMS: Record<string, MegaPreviewItem> = {
     tag: 'RTX 4050 / 4060 / 5070',
     title: 'Laptop Gaming & AI Di Động',
     desc: 'Tản nhiệt buồng hơi, stress-test 30 phút đạt chuẩn FPS & CUDA trước khi giao.',
-    img: hw.laptopRogRgb,
+    img: hw.realGamingLaptop,
   },
   ultrabook: {
     id: 'ultrabook',
     tag: 'PIN 11H · CHUẨN MÀU OLED',
     title: 'Ultrabook & Đồ Họa Sáng Tạo',
     desc: 'Mỏng nhẹ dưới 1.4kg mang lên giảng đường UIT, Bách Khoa, KHTN cả ngày.',
-    img: hw.laptopUltrabook,
+    img: hw.realUltrabookStudio,
   },
   pc: {
     id: 'pc',
     tag: 'WORKSTATION CUSTOM',
     title: 'PC AI & Render 3D Theo Đơn',
     desc: 'Linh kiện chính hãng nguyên seal, cân đối nguồn Airflow và xuất hóa đơn VAT.',
-    img: hw.pcWatercool,
+    img: hw.realPcWorkstation,
   },
   linhKien: {
     id: 'linhKien',
@@ -51,7 +51,7 @@ export const MEGA_PREVIEW_ITEMS: Record<string, MegaPreviewItem> = {
     tag: 'OLED 240HZ · GASKET RGB',
     title: 'Gaming Gear & Màn Hình Studio',
     desc: 'Phím cơ silent cho phòng KTX, chuột không dây ultralight và màn OLED 2K/4K.',
-    img: hw.gearPeripherals,
+    img: hw.realMechGear,
   },
   ecosystem: {
     id: 'ecosystem',
