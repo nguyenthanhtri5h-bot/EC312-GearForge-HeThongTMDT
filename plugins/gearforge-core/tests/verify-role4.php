@@ -27,10 +27,10 @@ function gf_assert(bool $cond, string $label): void {
     }
 }
 
-$student = get_user_by('login', 'user');
-$admin   = get_user_by('login', 'admin');
+$student = get_user_by('login', 'user') ?: get_user_by('login', 'student_test');
+$admin   = get_user_by('login', 'admin') ?: get_user_by('login', 'gf_admin');
 if (!$student || !$admin) {
-    fwrite(STDERR, "Missing demo users 'user' or 'admin'.\n");
+    fwrite(STDERR, "Missing demo users 'user'/'student_test' or 'admin'/'gf_admin'.\n");
     exit(1);
 }
 
@@ -470,6 +470,15 @@ try {
         && strpos($pdf_vat_empty, 'VAT \\(10%\\)') !== false
         && $vn_clean === 'Don hang Dieu khien GearForge',
         'Invoice PDF uses MST 0318202607, configurable 8% VAT, safe 10% fallback on empty option, and clean Vietnamese transliteration'
+    );
+
+    // FIX-17: Raw JSON-safe PDF download URL must not contain HTML-escaped &amp;
+    $pdf_dl_url = GF_Invoice_PDF::get_download_url($order_id);
+    gf_assert(
+        strpos($pdf_dl_url, '&amp;') === false
+        && strpos($pdf_dl_url, 'action=gf_download_invoice_pdf') !== false
+        && strpos($pdf_dl_url, '&_wpnonce=') !== false,
+        'FIX-17: GF_Invoice_PDF::get_download_url() emits raw & query params safe for JSON/SPA links'
     );
 } finally {
     global $wpdb;

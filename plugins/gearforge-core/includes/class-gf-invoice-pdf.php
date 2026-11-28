@@ -27,9 +27,13 @@ class GF_Invoice_PDF {
      * Build a nonce-protected invoice download URL for an authorized order owner or operator.
      */
     public static function get_download_url(int $order_id): string {
-        return wp_nonce_url(
-            admin_url("admin-post.php?action=gf_download_invoice_pdf&order_id={$order_id}"),
-            "gf_pdf_{$order_id}"
+        return add_query_arg(
+            [
+                'action'   => 'gf_download_invoice_pdf',
+                'order_id' => $order_id,
+                '_wpnonce' => wp_create_nonce("gf_pdf_{$order_id}"),
+            ],
+            admin_url('admin-post.php')
         );
     }
 
