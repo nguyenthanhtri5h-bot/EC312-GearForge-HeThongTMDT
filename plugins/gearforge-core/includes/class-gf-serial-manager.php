@@ -194,7 +194,10 @@ class GF_Serial_Manager {
 
         $order_id = $order->get_id();
         $serials  = self::get_order_serials($order_id);
-        $pdf_url  = wp_nonce_url(admin_url("admin-post.php?action=gf_download_invoice_pdf&order_id={$order_id}"), "gf_pdf_{$order_id}");
+        $pdf_url  = class_exists('GF_Invoice_PDF')
+            ? GF_Invoice_PDF::get_download_url($order_id)
+            : wp_nonce_url(admin_url("admin-post.php?action=gf_download_invoice_pdf&order_id={$order_id}"), "gf_pdf_{$order_id}");
+        $nonce    = wp_create_nonce('gf_assign_serial_' . $order_id);
 
         echo '<p><strong>Danh sách Serial Number đã gắn:</strong></p>';
         if (empty($serials)) {
@@ -207,23 +210,74 @@ class GF_Serial_Manager {
             echo '</ul>';
         }
 
-        echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '" style="display:flex;gap:8px;align-items:center;margin-top:8px;">';
-        echo '<input type="hidden" name="action" value="gf_assign_serial" />';
-        echo '<input type="hidden" name="order_id" value="' . $order_id . '" />';
-        wp_nonce_field('gf_assign_serial_' . $order_id);
-        echo '<select name="order_item_id">';
+        // Avoid nested <form> inside WooCommerce Classic/HPOS <form id="order"> which breaks Update & nonce submission.
+        echo '<div id="gf-serial-assign-box" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px;">';
+        echo '<select id="gf_serial_item_id">';
         foreach ($order->get_items() as $item_id => $item) {
             echo '<option value="' . (int) $item_id . '">' . esc_html($item->get_name()) . '</option>';
         }
         echo '</select>';
-        echo '<input type="text" name="serial_number" placeholder="Nhập S/N (VD: SN-GF-2026-001)" required />';
-        echo '<button type="submit" class="button button-primary">Gắn S/N</button>';
+        echo '<input type="text" id="gf_serial_input" placeholder="Nhập S/N (VD: SN-GF-2026-001)" />';
+        echo '<button type="button" id="gf_assign_serial_btn" class="button button-primary">Gắn S/N</button>';
         echo '<a class="button" href="' . esc_url($pdf_url) . '" target="_blank">Xuất Hóa đơn PDF (T-VAN)</a>';
-        echo '</form>';
+        echo '</div>';
+        echo '<p id="gf_serial_inline_err" style="color:#d63638;display:none;margin:6px 0 0;"></p>';
+        ?>
+        <script>
+        (function() {
+            var btn = document.getElementById('gf_assign_serial_btn');
+            var input = document.getElementById('gf_serial_input');
+            var itemSelect = document.getElementById('gf_serial_item_id');
+            var errEl = document.getElementById('gf_serial_inline_err');
+            if (!btn || !input || !itemSelect) return;
+
+            function submitSerial() {
+                var sn = (input.value || '').trim();
+                if (!sn) {
+                    if (errEl) {
+                        errEl.textContent = 'Vui lòng nhập mã Serial Number trước khi bấm Gắn S/N.';
+                        errEl.style.display = 'block';
+                    }
+                    input.focus();
+                    return;
+                }
+                if (errEl) errEl.style.display = 'none';
+                var f = document.createElement('form');
+                f.method = 'POST';
+                f.action = <?php echo wp_json_encode(admin_url('admin-post.php')); ?>;
+                f.style.display = 'none';
+                var fields = {
+                    action: 'gf_assign_serial',
+                    order_id: <?php echo wp_json_encode((string) $order_id); ?>,
+                    _wpnonce: <?php echo wp_json_encode($nonce); ?>,
+                    order_item_id: itemSelect.value,
+                    serial_number: sn
+                };
+                Object.keys(fields).forEach(function(k) {
+                    var el = document.createElement('input');
+                    el.type = 'hidden';
+                    el.name = k;
+                    el.value = fields[k];
+                    f.appendChild(el);
+                });
+                document.body.appendChild(f);
+                f.submit();
+            }
+
+            btn.addEventListener('click', submitSerial);
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    submitSerial();
+                }
+            });
+        })();
+        </script>
+        <?php
     }
 
     public static function handle_assign_serial_form(): void {
-        if (!current_user_can('manage_woocommerce')) {
+        if (!current_user_can('manage_woocommerce') && !current_user_can('gf_assign_serial')) {
             wp_die('403 Forbidden', '403 Forbidden', ['response' => 403]);
         }
 

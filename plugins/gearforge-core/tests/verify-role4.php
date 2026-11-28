@@ -480,6 +480,18 @@ try {
         && strpos($pdf_dl_url, '&_wpnonce=') !== false,
         'FIX-17: GF_Invoice_PDF::get_download_url() emits raw & query params safe for JSON/SPA links'
     );
+
+    // FIX-18: Serial Meta Box must not emit nested <form> or required attribute inside WooCommerce HPOS <form id="order">
+    ob_start();
+    GF_Serial_Manager::render_serial_metabox(wc_get_order($order_id));
+    $metabox_html = (string) ob_get_clean();
+    gf_assert(
+        stripos($metabox_html, '<form') === false
+        && strpos($metabox_html, 'id="gf_assign_serial_btn"') !== false
+        && strpos($metabox_html, 'id="gf_serial_input"') !== false
+        && !preg_match('/<input[^>]*id="gf_serial_input"[^>]*\brequired\b/i', $metabox_html),
+        'FIX-18: GF_Serial_Manager::render_serial_metabox() avoids nested <form> and required input inside HPOS order form'
+    );
 } finally {
     global $wpdb;
     if (!empty($test_phone)) {
