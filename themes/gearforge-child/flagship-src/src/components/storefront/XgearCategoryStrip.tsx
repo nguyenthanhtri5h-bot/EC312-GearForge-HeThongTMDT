@@ -1,4 +1,5 @@
 import { VIBE_BEAR_GUIDE, VIBE_PORTFOLIO_CARDS } from '../../data/vibeAssets';
+import { vibeUrl } from '../../data/vibeMedia';
 import { useGearForgeStore } from '../../hooks/useGearForgeStore';
 import './xgear-shelves.css';
 
@@ -12,7 +13,7 @@ const QUICK_TILES = [
   { label: 'Gaming Gear', img: hw.galleryEsportsDesk, action: { page: 'shop' as const, category: 'gear' } },
   { label: 'Laptop RTX 4060', img: hw.laptopRogRgb, action: { page: 'shop' as const, gpu: 'RTX 4060' } },
   { label: 'MacBook M3 / M4', img: hw.laptopUltrabook, action: { page: 'shop' as const, search: 'MacBook' } },
-  { label: 'Nâng cấp RAM/SSD', img: hw.gearAudioHub, action: { page: 'shop' as const, storage: '1TB' } },
+  { label: 'Nâng cấp RAM/SSD', img: vibeUrl('mega-components.jpg'), action: { page: 'shop' as const, storage: '1TB' } },
   { label: 'Tự chọn theo ngành', img: VIBE_BEAR_GUIDE.ecosystemHub, action: { page: 'ecosystem' as const } },
 ];
 
@@ -28,14 +29,14 @@ const PROMO_CARDS = [
     badge: 'VOUCHER BACKTOSCHOOL',
     title: 'Laptop Gaming RTX 4060',
     desc: 'Giảm thẳng 500.000đ + hỗ trợ trả góp 0% kỳ hạn 3 tháng.',
-    img: hw.laptopRogRgb,
+    img: hw.laptopKatana,
     onClickType: 'laptop-gaming',
   },
   {
     badge: 'GIAO KTX 2 GIỜ',
     title: 'Combo Phím Cơ & Gear KTX',
     desc: 'Switch êm chuẩn phòng học tập, chuột không dây & tai nghe RGB.',
-    img: hw.galleryEsportsDesk,
+    img: hw.gearPeripherals,
     onClickType: 'gear',
   },
 ];

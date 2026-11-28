@@ -22,7 +22,7 @@ export function RiotEcosystemStrip() {
     { id: 'setup', step: '02', title: 'ĐHQG SETUP', sub: 'Góc máy thực tế sinh viên đã giao', img: hw.ecoCardSetup, action: () => navigateToPage('gallery') },
     { id: 'lab', step: '03', title: 'LAB STRESS', sub: 'Test tải nặng 30p trước xuất kho', img: hw.riotEcoStressLab, action: () => setVideoModalSrc(VIBE_VIDEOS.heroShowcase) },
     { id: 'oms', step: '04', title: 'OMS SERIAL', sub: 'Tra cứu bảo hành & hóa đơn VAT', img: hw.ecoCardOms, action: () => navigateToPage('tracking') },
-    { id: 'sv-club', step: '05', title: 'CAMPUS ARENA', sub: 'Giao hỏa tốc KTX Khu A & B', img: VIBE_VIDEOS.posterHeroShowcase, action: () => navigateToPage('gallery') },
+    { id: 'sv-club', step: '05', title: 'GIAO KTX 2 GIỜ', sub: 'Giao hỏa tốc KTX Khu A & B', img: hw.swKtxDelivery, action: () => navigateToPage('tracking') },
   ];
 
   return (

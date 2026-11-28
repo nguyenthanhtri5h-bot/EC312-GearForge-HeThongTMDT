@@ -11,7 +11,6 @@ interface NewsRowItem {
   title: string;
   priceText?: string;
   thumb: string;
-  isProductPhoto?: boolean;
   action: () => void;
 }
 
@@ -26,27 +25,28 @@ function cleanShortName(raw?: string, fallback = 'Laptop Gaming RTX'): string {
   return base.length > 44 ? `${base.slice(0, 41).trim()}...` : base;
 }
 
+const isGamingLaptop = (p: GearForgeProduct) =>
+  p.categorySlug === 'laptop-gaming' || (p.categorySlug.includes('gaming') && !p.categorySlug.startsWith('pc'));
+const isPcProduct = (p: GearForgeProduct) => p.categorySlug === 'pc' || p.categorySlug.startsWith('pc-');
+const isGearProduct = (p: GearForgeProduct) =>
+  ['ban-phim', 'chuot', 'lot-chuot', 'gear'].some((k) => p.categorySlug.includes(k));
+
 function pickDistinctDeals(products: GearForgeProduct[]): GearForgeProduct[] {
   const onSale = products.filter((p) => (p.regularPrice ?? p.price) > p.price);
   const pool = onSale.length >= 3 ? onSale : products;
-  if (pool.length <= 3) return pool.slice(0, 3);
+  if (pool.length === 0) return [];
 
-  const picked: GearForgeProduct[] = [pool[0]];
-  const usedCats = new Set<string>([pool[0].categorySlug]);
-  for (const item of pool.slice(1)) {
-    if (!usedCats.has(item.categorySlug)) {
-      picked.push(item);
-      usedCats.add(item.categorySlug);
-      if (picked.length === 3) return picked;
-    }
-  }
-  for (const item of pool.slice(1)) {
-    if (!picked.some((p) => p.id === item.id)) {
-      picked.push(item);
-      if (picked.length === 3) break;
-    }
-  }
-  return picked;
+  const hero = pool.find(isGamingLaptop) || products.find(isGamingLaptop) || pool[0];
+  const deal2 =
+    pool.find((p) => p.id !== hero.id && isPcProduct(p)) ||
+    products.find((p) => p.id !== hero.id && isPcProduct(p)) ||
+    pool.find((p) => p.id !== hero.id);
+  const deal3 =
+    pool.find((p) => p.id !== hero.id && p.id !== deal2?.id && isGearProduct(p)) ||
+    pool.find((p) => p.id !== hero.id && p.id !== deal2?.id && p.categorySlug.includes('laptop')) ||
+    pool.find((p) => p.id !== hero.id && p.id !== deal2?.id);
+
+  return [hero, deal2, deal3].filter((p): p is GearForgeProduct => Boolean(p));
 }
 
 export function RiotDealsBento() {
@@ -64,7 +64,8 @@ export function RiotDealsBento() {
   const heroPct = heroReg > heroPrice && heroReg > 0 ? Math.max(1, Math.min(45, Math.round(((heroReg - heroPrice) / heroReg) * 100))) : 0;
 
   const deal2Cat = (deal2?.category || 'PC RTX').toUpperCase();
-  const deal3Cat = (deal3?.category || 'LAPTOP').toUpperCase();
+  const deal3Cat = (deal3?.category || 'GAMING GEAR').toUpperCase();
+  const deal3Thumb = deal3 && isGearProduct(deal3) ? hw.gearPeripherals : hw.bentoLaptop;
 
   const sideItems: NewsRowItem[] = [
     {
@@ -72,18 +73,16 @@ export function RiotDealsBento() {
       tag: `FLASH DEAL · ${deal2Cat}`,
       title: deal2 ? cleanShortName(deal2.name) : 'Custom PC Nova RTX 4070 Super',
       priceText: deal2 ? formatVnd(deal2.salePrice && deal2.salePrice > 0 ? deal2.salePrice : deal2.price) : undefined,
-      thumb: deal2?.image || hw.bentoPc,
-      isProductPhoto: Boolean(deal2?.image),
+      thumb: hw.bentoPc,
       action: () => (deal2 ? setQuickViewProduct(deal2) : navigateToPage('shop', { category: 'pc-workstation' })),
     },
     {
       id: 'deal-3',
       tag: `FLASH DEAL · ${deal3Cat}`,
-      title: deal3 ? cleanShortName(deal3.name) : 'Ultrabook Dev Pin 14h ĐHQG',
+      title: deal3 ? cleanShortName(deal3.name) : 'Combo Phím Cơ & Chuột Esports ĐHQG',
       priceText: deal3 ? formatVnd(deal3.salePrice && deal3.salePrice > 0 ? deal3.salePrice : deal3.price) : undefined,
-      thumb: deal3?.image || hw.laptopUltrabook,
-      isProductPhoto: Boolean(deal3?.image),
-      action: () => (deal3 ? setQuickViewProduct(deal3) : navigateToPage('shop', { category: 'laptop-ultrabook' })),
+      thumb: deal3Thumb,
+      action: () => (deal3 ? setQuickViewProduct(deal3) : navigateToPage('shop', { category: 'gear' })),
     },
     {
       id: 'sv-0',
@@ -145,8 +144,8 @@ export function RiotDealsBento() {
                     <span>{item.tag}</span>
                   </span>
                 </div>
-                <div className={`gf-riot-stack-thumb ${item.isProductPhoto ? 'is-product-photo' : ''}`}>
-                  <img src={item.thumb} alt={item.title} referrerPolicy="no-referrer" />
+                <div className="gf-riot-stack-thumb">
+                  <img src={item.thumb} alt={item.title} />
                 </div>
               </button>
             ))}

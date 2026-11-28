@@ -797,10 +797,3 @@
   color: #FCA5A5;
   font-variant-numeric: tabular-nums;
 }
-.gf-riot-stack-thumb.is-product-photo {
-  background: #FFFFFF;
-  padding: 6px;
-}
-.gf-riot-stack-thumb.is-product-photo img {
-  object-fit: contain;
-}

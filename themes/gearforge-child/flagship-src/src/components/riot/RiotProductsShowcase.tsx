@@ -15,7 +15,7 @@ interface ShowcaseLine {
 const hw = VIBE_PORTFOLIO_CARDS.hardware;
 
 const SHOWCASE_LINES: ShowcaseLine[] = [
-  { id: 'titan-workstation', categorySlug: 'pc-workstation', label: 'Titan AI Workstation', img: hw.riotP4Titan, platforms: ['win', 'gpu', 'ktx'] },
+  { id: 'titan-workstation', categorySlug: 'pc-workstation', label: 'Titan AI Workstation', img: hw.riotPcTitan, platforms: ['win', 'gpu', 'ktx'] },
   { id: 'valkyrie-laptop', categorySlug: 'laptop-gaming', label: 'Valkyrie Gaming RTX', img: hw.riotP2Valkyrie, platforms: ['win', 'gpu'] },
   { id: 'apex-rtx-pc', categorySlug: 'pc-workstation', label: 'Apex RTX Custom Series', img: hw.riotP1ApexPc, platforms: ['win', 'gpu', 'ktx'] },
   { id: 'cipher-ultrabook', categorySlug: 'laptop-ultrabook', label: 'Cipher Evo Ultrabook', img: hw.riotP3Cipher, platforms: ['win', 'mac', 'ktx'] },
