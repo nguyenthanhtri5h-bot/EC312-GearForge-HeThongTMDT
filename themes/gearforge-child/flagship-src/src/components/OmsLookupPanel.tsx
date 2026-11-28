@@ -1,19 +1,10 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { formatVnd, useGearForgeStore } from '../hooks/useGearForgeStore';
-import type { OmsOrder, OmsStep } from '../types/gearforge';
+import type { OmsOrder } from '../types/gearforge';
 import { OmsSandboxBox } from './drawers/OmsSandboxBox';
 import { OmsWarrantyCard } from './drawers/OmsWarrantyCard';
+import { OMS_STEPS, OmsProgressStepper, resolveOmsStepIndex } from './oms/OmsProgressStepper';
 import './drawers/drawers-extra.css';
-
-const OMS_STEPS: OmsStep[] = [
-  { key: 'CREATED', label: '1. Tiếp nhận' },
-  { key: 'PENDING_INSTALLMENT_APPROVAL', label: '2. Xác nhận' },
-  { key: 'PROCESSING', label: '3. Kiểm máy' },
-  { key: 'SERIAL_ASSIGNED', label: '4. Gắn Serial' },
-  { key: 'SHIPPING', label: '5. Đang giao' },
-  { key: 'DELIVERED', label: '6. Đã giao' },
-  { key: 'COMPLETED', label: '7. Hoàn tất' },
-];
 
 const STATUS_VI: Record<string, string> = {
   CREATED: 'Đã tạo đơn',
@@ -88,12 +79,7 @@ export function OmsLookupPanel({
     void runLookup(parsed);
   };
 
-  const activeIdx = (() => {
-    if (!order) return -1;
-    if (order.status === 'PENDING_PAYMENT') return 1;
-    return OMS_STEPS.findIndex((s) => s.key === order.status);
-  })();
-  const progressPct = activeIdx >= 0 ? Math.round(((activeIdx + 1) / OMS_STEPS.length) * 100) : 14;
+  const activeIdx = order ? resolveOmsStepIndex(order.status) : -1;
 
   return (
     <div className="gf-oms-panel" id="gf-oms-lookup">
@@ -113,7 +99,7 @@ export function OmsLookupPanel({
         </button>
       </form>
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px 14px', margin: '10px 0 12px', fontSize: 12.5, color: '#656462' }}>
+      <div className="gf-oms-demo-row">
         <span>Đơn mẫu ĐHQG:</span>
         {[542, 543].map((demoId) => (
           <button
@@ -131,32 +117,28 @@ export function OmsLookupPanel({
       </div>
 
       {paidRedirect && (
-        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 10, padding: '12px 14px', marginBottom: 12, background: '#ECFDF5', borderLeft: '3px solid #047857', borderRadius: 6, color: '#065F46', fontSize: 13.5, fontWeight: 600 }}>
-          <span>Đã tiếp nhận giao dịch từ cổng Sandbox 3DS. Hệ thống đang hiển thị trạng thái thực tế từ máy chủ cho đơn #{order?.orderId || initialOrderId}.</span>
+        <div className="gf-oms-paid-banner">
+          <span>Đã tiếp nhận giao dịch từ cổng thanh toán. Hệ thống đang hiển thị trạng thái thực tế từ máy chủ cho đơn #{order?.orderId || initialOrderId}.</span>
           <button type="button" className="gf-oms-chip-btn" onClick={() => void runLookup(order?.orderId || initialOrderId)} disabled={loading}>
             {loading ? 'Đang cập nhật...' : 'Làm mới trạng thái'}
           </button>
         </div>
       )}
 
-      {errorMsg && (
-        <div className="gf-oms-msg-err">
-          {errorMsg}
-        </div>
-      )}
+      {errorMsg && <div className="gf-oms-msg-err">{errorMsg}</div>}
 
       {order && (
         <div className="gf-oms-card">
-          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'baseline', gap: 10 }}>
+          <div className="gf-oms-card-head">
             <div>
-              <strong style={{ fontSize: 16 }}>
+              <strong className="gf-oms-card-title">
                 Đơn hàng #{order.orderId} · {formatVnd(order.total)}
               </strong>
-              <div style={{ fontSize: 12.5, color: '#656462', marginTop: 2 }}>
+              <div className="gf-oms-card-sub">
                 {order.customerName || 'Sinh viên ĐHQG-HCM'} {order.createdAt ? `· ${order.createdAt}` : ''}
               </div>
             </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+            <div className="gf-oms-badge-row">
               <span className="gf-oms-badge">{STATUS_VI[order.status] || order.status}</span>
               {order.installment?.status && (
                 <span className="gf-oms-badge is-crimson">
@@ -166,16 +148,11 @@ export function OmsLookupPanel({
             </div>
           </div>
 
-          <div
-            className="gf-oms-track"
-            role="progressbar"
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={progressPct}
-            aria-label="Tiến độ xử lý đơn hàng"
-          >
-            <div className="gf-oms-fill" style={{ width: `${progressPct}%` }} />
-          </div>
+          <OmsProgressStepper
+            status={order.status}
+            statusLabel={STATUS_VI[order.status] || order.status}
+            compact={compact}
+          />
 
           {compact ? (
             <div className="gf-oms-compact-foot">
@@ -183,34 +160,14 @@ export function OmsLookupPanel({
                 Tiến độ hiện tại: <strong>{OMS_STEPS[activeIdx]?.label || STATUS_VI[order.status] || order.status}</strong>
                 {order.installment?.monthly_amount ? ` · Góp ${formatVnd(order.installment.monthly_amount)}/th` : ''}
               </span>
-              <button
-                type="button"
-                className="gf-oms-link-cta"
-                onClick={() => navigateToPage('tracking')}
-              >
-                Mở 7 bước, Hóa đơn VAT &amp; Bảo hành Serial &rarr;
+              <button type="button" className="gf-oms-link-cta" onClick={() => navigateToPage('tracking')}>
+                Mở 7 bước, Hóa đơn VAT &amp; Bảo hành Serial
               </button>
             </div>
           ) : (
             <>
-              <div className="gf-oms-steps" role="list" aria-label="Tiến độ xử lý đơn hàng">
-                {OMS_STEPS.map((st, idx) => {
-                  const isDone = activeIdx >= 0 && idx < activeIdx;
-                  const isActive = idx === activeIdx;
-                  return (
-                    <div
-                      key={st.key}
-                      role="listitem"
-                      className={`gf-oms-step ${isDone ? 'is-done' : ''} ${isActive ? 'is-active' : ''}`}
-                    >
-                      {st.label}
-                    </div>
-                  );
-                })}
-              </div>
-
               {order.installment && (
-                <div style={{ fontSize: 13, color: '#2B2A29', display: 'flex', flexWrap: 'wrap', gap: '4px 16px' }}>
+                <div className="gf-oms-inst-summary">
                   <span>Trả góp: <strong>{STATUS_VI[order.installment.status] || order.installment.status}</strong></span>
                   {order.installment.monthly_amount ? (
                     <span>Mỗi tháng: <strong>{formatVnd(order.installment.monthly_amount)}/th</strong></span>

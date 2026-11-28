@@ -58,14 +58,16 @@ export function CatalogSection({ hideCategoryTabs = false }: { hideCategoryTabs?
   return (
     <section id="gf-catalog" className="tc-sec gf-cat-sec" aria-labelledby="gf-catalog-heading">
       <div className="tc-wrap">
-        <div className="gf-cat-head">
+        <div className={`gf-cat-head ${hideCategoryTabs ? 'is-compact' : ''}`}>
           <div>
             <h2 id="gf-catalog-heading" className="tc-h2">
-              Danh mục Sản phẩm &amp; Bộ lọc Thông số
+              {hideCategoryTabs ? 'Bộ lọc & Danh sách Thiết bị' : 'Danh mục Sản phẩm & Bộ lọc Thông số'}
             </h2>
-            <p className="gf-cat-sub">
-              Tìm đúng máy theo nhu cầu học tập, CPU, RAM, GPU, ổ cứng SSD &amp; mức ngân sách phù hợp.
-            </p>
+            {!hideCategoryTabs && (
+              <p className="gf-cat-sub">
+                Tìm đúng máy theo nhu cầu học tập, CPU, RAM, GPU, ổ cứng SSD &amp; mức ngân sách phù hợp.
+              </p>
+            )}
           </div>
           <div className="gf-cat-toolbar">
             <div className="gf-drawer-triggers">

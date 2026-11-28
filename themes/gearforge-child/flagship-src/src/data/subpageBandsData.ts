@@ -37,7 +37,7 @@ export const SHOP_BRANCH_CARDS = [
 export const SHOP_MEDIA_DATA = {
   kicker: 'TRẢI NGHIỆM KHO THỰC TẾ',
   heading: 'Từ Kho Kiểm Định Đến Bàn Học ĐHQG',
-  desc: 'Mỗi thiết bị trong kho 520+ cấu hình đều được mở hộp kiểm tra ngoại quan, stress-test GPU/CPU liên tục 30 phút và đồng bộ số Serial lên hệ thống bảo hành điện tử.',
+  desc: 'Mỗi thiết bị trong kho 590+ cấu hình đều được mở hộp kiểm tra ngoại quan, stress-test GPU/CPU liên tục 30 phút và đồng bộ số Serial lên hệ thống bảo hành điện tử.',
   videoSrc: VIBE_VIDEOS.shopShowcase,
   posterSrc: VIBE_VIDEOS.posterShopShowcase,
   facts: [

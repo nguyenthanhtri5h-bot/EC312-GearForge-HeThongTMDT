@@ -44,7 +44,7 @@ export function RiotEcosystemStrip() {
 
       <div className="gf-riot-eco-wide">
         <div className="gf-riot-eco-grid">
-          {cards.slice(0, 4).map((card) => (
+          {cards.map((card) => (
             <button
               key={card.id}
               type="button"
@@ -79,19 +79,19 @@ export function RiotStudentSplit() {
     <section id="tra-gop-sv" className="gf-riot-split" aria-labelledby="riot-split-h">
       <div className="gf-riot-split-inner">
         <div className="gf-riot-split-copy">
-          <h2 id="riot-split-h" className="gf-riot-split-h2">Trả Góp 0% Sinh Viên!</h2>
+          <h2 id="riot-split-h" className="gf-riot-split-h2">Trả Góp 0% Sinh Viên ĐHQG</h2>
           <p className="gf-riot-split-lead">
-            Hãy đồng hành cùng GearForge để trang bị cấu hình chuẩn ĐHQG và giao KTX trong 2 giờ
+            Duyệt hồ sơ điện tử qua email .edu.vn, không giữ giấy tờ gốc — giao tận KTX Khu A &amp; B trong 2 giờ.
           </p>
 
           <div className="gf-riot-stat-pair">
             <div className="gf-riot-stat-box">
               <strong>0%</strong>
-              <span>Lãi suất qua thẻ SV</span>
+              <span>Lãi suất 3 kỳ · .edu.vn</span>
             </div>
             <div className="gf-riot-stat-box">
-              <strong>2</strong>
-              <span>Giờ giao hỏa tốc KTX</span>
+              <strong>2 giờ</strong>
+              <span>Giao hỏa tốc KTX ĐHQG</span>
             </div>
           </div>
 

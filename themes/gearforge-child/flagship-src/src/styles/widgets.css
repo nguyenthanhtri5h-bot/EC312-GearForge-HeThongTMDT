@@ -138,6 +138,6 @@
 @media (max-width: 767px) {
   .tc-dd { display: none; }
   .notis { display: none; }
-  .mc-bubble { width: 44px; height: 44px; right: 12px; bottom: 76px; }
-  .mc-panel { right: 12px; left: 12px; width: auto; bottom: 128px; max-height: calc(100vh - 144px); }
+  .mc-bubble { width: 46px; height: 46px; right: 12px; bottom: calc(78px + env(safe-area-inset-bottom)); }
+  .mc-panel { right: 12px; left: 12px; width: auto; bottom: calc(132px + env(safe-area-inset-bottom)); max-height: calc(100vh - 150px); }
 }

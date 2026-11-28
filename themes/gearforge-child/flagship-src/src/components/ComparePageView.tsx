@@ -42,8 +42,20 @@ const SPEC_ROWS: SpecRowDef[] = [
 ];
 
 export function ComparePageView() {
-  const { compareItems, toggleCompare, clearCompare, addToCart, openDrawer, navigateToPage } = useGearForgeStore();
+  const { boot, products, compareItems, toggleCompare, clearCompare, addToCart, openDrawer, navigateToPage } = useGearForgeStore();
   const [diffOnly, setDiffOnly] = useState(false);
+
+  const handleQuickDemoCompare = async () => {
+    const pool = [...products, ...(boot.products || [])];
+    const laptops = pool.filter((p) => p.categorySlug.includes('laptop') && p.stockStatus === 'instock');
+    const picks = (laptops.length >= 2 ? laptops : pool).slice(0, 2);
+    for (const item of picks) {
+      await toggleCompare(item.id);
+    }
+  };
+
+  const prices = compareItems.map(parsePrice).filter((n) => n > 0);
+  const minPrice = prices.length > 1 ? Math.min(...prices) : 0;
 
   return (
     <main className="tc gf-tool-page" id="tc-compare">
@@ -56,39 +68,31 @@ export function ComparePageView() {
       />
 
       <div className="tc-wrap">
-
         {compareItems.length === 0 ? (
-          <div style={{ padding: '44px 28px', background: '#0B0B0D', color: '#F1F0EC', borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 24 }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 18, maxWidth: 620 }}>
+          <div className="gf-cmp-empty">
+            <div className="gf-cmp-empty-copy">
               <CrestIcon size={36} />
               <div>
-                <h2 style={{ margin: '0 0 8px', fontFamily: 'var(--gf-font-display)', fontSize: 22, fontWeight: 800, color: '#FFFFFF' }}>
-                  Khay So Sánh Cấu Hình Đang Trống (0/3)
-                </h2>
-                <p style={{ margin: '0 0 10px', fontSize: 14.5, lineHeight: 1.55, color: 'rgba(241,240,236,0.78)' }}>
-                  Chọn tối đa 3 Laptop Gaming, Ultrabook hoặc PC AI cùng nhóm trong Kho Sản Phẩm để đối chiếu từng thông số CPU, TGP RTX, màn hình DCI-P3 và khoản góp 0%/tháng.
+                <h2>Khay So Sánh Cấu Hình Đang Trống (0/3)</h2>
+                <p>
+                  Chọn tối đa 3 Laptop Gaming, Ultrabook hoặc PC AI cùng nhóm trong Kho Sản Phẩm để đối chiếu từng thông số CPU, GPU RTX, màn hình và khoản góp 0%/tháng.
                 </p>
               </div>
             </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-              <button type="button" className="gf-tool-btn-primary" onClick={() => navigateToPage('shop')}>
-                Mở Kho Sản Phẩm &rarr;
+            <div className="gf-cmp-empty-actions">
+              <button type="button" className="gf-tool-btn-primary" onClick={() => void handleQuickDemoCompare()}>
+                So sánh nhanh 2 laptop nổi bật
               </button>
-              <button type="button" className="gf-tool-link-btn" style={{ color: '#FFFFFF', borderBottomColor: '#D13639' }} onClick={() => navigateToPage('ecosystem')}>
-                Gợi ý máy theo ngành học
+              <button type="button" className="gf-tool-link-btn is-light" onClick={() => navigateToPage('shop')}>
+                Mở Kho Sản Phẩm
               </button>
             </div>
           </div>
         ) : (
           <>
             <div className="gf-cmp-toolbar">
-              <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 13.5, fontWeight: 700, cursor: 'pointer', color: '#0A0A0A' }}>
-                <input
-                  type="checkbox"
-                  checked={diffOnly}
-                  onChange={(e) => setDiffOnly(e.target.checked)}
-                  style={{ width: 18, height: 18, accentColor: '#D13639' }}
-                />
+              <label className="gf-cmp-diff-toggle">
+                <input type="checkbox" checked={diffOnly} onChange={(e) => setDiffOnly(e.target.checked)} />
                 <span>Chỉ hiện điểm khác biệt</span>
               </label>
               <button type="button" className="gf-tool-link-btn" onClick={() => void clearCompare()}>
@@ -96,7 +100,7 @@ export function ComparePageView() {
               </button>
             </div>
 
-            <div style={{ overflowX: 'auto' }}>
+            <div className="gf-cmp-scroll">
               <table className="gf-cmp-matrix">
                 <thead>
                   <tr>
@@ -106,7 +110,7 @@ export function ComparePageView() {
                         <div className="gf-cmp-col-head">
                           <img src={it.image} alt={it.name} />
                           <a href={it.permalink || '#'}>{it.name}</a>
-                          <button type="button" className="gf-tool-link-btn" style={{ alignSelf: 'flex-start' }} onClick={() => void toggleCompare(it.id)}>
+                          <button type="button" className="gf-tool-link-btn is-sm" onClick={() => void toggleCompare(it.id)}>
                             Bỏ khỏi so sánh
                           </button>
                         </div>
@@ -119,21 +123,19 @@ export function ComparePageView() {
                     const vals = compareItems.map((it) => row.getValue(it));
                     const hasDiff = new Set(vals).size > 1;
                     if (diffOnly && !hasDiff) return null;
+                    const isPriceRow = row.label.startsWith('Giá') || row.label.startsWith('Trả góp');
                     return (
                       <tr key={row.label} className={hasDiff ? 'is-diff' : ''}>
                         <th>{row.label}</th>
-                        {vals.map((val, idx) => (
-                          <td
-                            key={idx}
-                            style={
-                              row.label.startsWith('Giá') || row.label.startsWith('Trả góp')
-                                ? { fontFamily: "'JetBrains Mono', monospace", fontWeight: 800, color: '#D13639' }
-                                : undefined
-                            }
-                          >
-                            {val}
-                          </td>
-                        ))}
+                        {vals.map((val, idx) => {
+                          const isBest = row.label === 'Giá bán' && minPrice > 0 && parsePrice(compareItems[idx]) === minPrice;
+                          return (
+                            <td key={idx} className={isPriceRow ? 'gf-cmp-price-cell' : undefined}>
+                              <span>{val}</span>
+                              {isBest && <span className="gf-cmp-best-pill">Giá tốt nhất</span>}
+                            </td>
+                          );
+                        })}
                       </tr>
                     );
                   })}
@@ -141,12 +143,12 @@ export function ComparePageView() {
                     <th>Thao tác</th>
                     {compareItems.map((it) => (
                       <td key={it.id}>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
-                          <button type="button" className="gf-tool-btn-primary" style={{ minHeight: 38, padding: '0 14px', fontSize: 12 }} onClick={() => void addToCart(it.id, 1)}>
+                        <div className="gf-cmp-row-actions">
+                          <button type="button" className="gf-tool-btn-primary is-compact" onClick={() => void addToCart(it.id, 1)}>
                             Thêm vào giỏ
                           </button>
                           <button type="button" className="gf-tool-link-btn" onClick={() => openDrawer('installment', it.id)}>
-                            Trả góp 0% &rarr;
+                            Trả góp 0%
                           </button>
                         </div>
                       </td>

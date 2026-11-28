@@ -1,4 +1,6 @@
-import { vibeUrl } from './vibeMedia';
+import { VIBE_PORTFOLIO_CARDS, vibeUrl } from './vibeMedia';
+
+const hw = VIBE_PORTFOLIO_CARDS.hardware;
 
 export interface SwitcherArtworkItem {
   id: string;
@@ -13,7 +15,7 @@ export const SWITCHER_ARTWORK: Record<string, SwitcherArtworkItem> = {
   all: {
     id: 'all',
     label: 'TẤT CẢ KHO MÁY ĐHQG',
-    kicker: 'HỆ THỐNG KHO 520+ CẤU HÌNH',
+    kicker: 'HỆ THỐNG KHO 590+ CẤU HÌNH',
     title: 'Kho Máy Chính Hãng ĐHQG-HCM',
     desc: 'Tất cả Laptop Gaming RTX, Ultrabook OLED, PC AI và Gaming Gear lọc theo khoa, giá và trả góp 0%.',
     img: vibeUrl('sw-catalog-hub.jpg'),
@@ -21,18 +23,18 @@ export const SWITCHER_ARTWORK: Record<string, SwitcherArtworkItem> = {
   gaming: {
     id: 'gaming',
     label: 'LAPTOP GAMING RTX 40/50',
-    kicker: 'HIỆU NĂNG GPU RỜI ĐỒ ÁN & ESPORTS',
+    kicker: 'RTX 4050/4060 · MÀN 165HZ+',
     title: 'Laptop Gaming RTX 40/50 Series',
     desc: 'ROG Strix, Lenovo Legion, MSI Katana test stress 30 phút đạt chuẩn FPS & CUDA trước khi xuất kho.',
-    img: vibeUrl('sw-laptop-gaming.jpg'),
+    img: hw.laptopRogRgb,
   },
   ultrabook: {
     id: 'ultrabook',
     label: 'ULTRABOOK & ĐỒ HỌA OLED',
-    kicker: 'CHUẨN MÀU DCI-P3 · PIN 11 GIỜ',
+    kicker: 'MỎNG NHẸ · PIN 11 GIỜ',
     title: 'Ultrabook Mỏng Nhẹ & OLED Studio',
     desc: 'MacBook, ThinkPad, Zenbook OLED độ lệch màu Delta E < 2 cho sinh viên KTPM, Media Club & thiết kế.',
-    img: vibeUrl('sw-ultrabook-oled.jpg'),
+    img: hw.laptopUltrabook,
   },
   pc: {
     id: 'pc',
@@ -40,7 +42,7 @@ export const SWITCHER_ARTWORK: Record<string, SwitcherArtworkItem> = {
     kicker: 'CUSTOM RTX BUILD · TẢN NƯỚC AIO',
     title: 'Workstation AI & Render CAD',
     desc: 'Cấu hình PC tối ưu PyTorch, SolidWorks, Blender với nguồn 80+ Gold và bảo hành từng linh kiện theo Serial.',
-    img: vibeUrl('sw-pc-workstation.jpg'),
+    img: hw.pcWatercool,
   },
   gear: {
     id: 'gear',
@@ -48,7 +50,7 @@ export const SWITCHER_ARTWORK: Record<string, SwitcherArtworkItem> = {
     kicker: 'PHÍM CƠ · CHUỘT ESPORTS · MÀN 240HZ',
     title: 'Linh Kiện & Combo Gaming Gear',
     desc: 'Phím cơ gasket êm phòng KTX, chuột không dây siêu nhẹ, tai nghe 2.4GHz và RAM/SSD NVMe nâng cấp lấy liền.',
-    img: vibeUrl('sw-gear-combo.jpg'),
+    img: hw.gearPeripherals,
   },
   ecosystem: {
     id: 'ecosystem',
@@ -95,8 +97,8 @@ export const SWITCHER_ARTWORK: Record<string, SwitcherArtworkItem> = {
     label: 'GÓC MÁY SINH VIÊN ĐHQG',
     kicker: 'BÀN GIAO THỰC TẾ KTX KHU A/B',
     title: 'Không Gian Học & Gaming Thực Tế',
-    desc: 'Khám phá hàng chục góc máy sinh viên UIT, Bách Khoa, KHTN đã bàn giao trọn bộ kèm setup tối giản gọn dây.',
-    img: vibeUrl('sw-gallery-sv.jpg'),
+    desc: 'Khám phá góc máy sinh viên UIT, Bách Khoa, KHTN đã bàn giao trọn bộ kèm setup tối giản gọn dây.',
+    img: hw.campusUitAi,
   },
   galleryLab: {
     id: 'galleryLab',
@@ -104,7 +106,7 @@ export const SWITCHER_ARTWORK: Record<string, SwitcherArtworkItem> = {
     kicker: 'WORKSTATION · MÀN OLED CHUẨN MÀU',
     title: 'Góc Studio Dựng Phim & AI Research',
     desc: 'Dual-monitor OLED 240Hz + PC RTX build tản nhiệt êm cho CLB Media, Lab AI và nhóm đồ án tốt nghiệp.',
-    img: vibeUrl('sw-gallery-lab.jpg'),
+    img: hw.galleryEsportsDesk,
   },
   serialRma: {
     id: 'serialRma',
@@ -133,7 +135,7 @@ export const SWITCHER_ARTWORK: Record<string, SwitcherArtworkItem> = {
   aiAdvisor: {
     id: 'aiAdvisor',
     label: 'TRỢ LÝ AI TƯ VẤN CẤU HÌNH',
-    kicker: 'HỖ TRỢ 8H–22H · CHỌN MÁY TRONG 10S',
+    kicker: 'TƯ VẤN AI 24/7 · CHỌN MÁY TRONG 10S',
     title: 'Trợ Lý AI Gợi Ý Laptop & PC',
     desc: 'Đặt câu hỏi theo ngân sách hoặc phần mềm (PyTorch, SolidWorks, Figma) để nhận cấu hình tối ưu nhất.',
     img: vibeUrl('sw-ai-advisor.jpg'),

@@ -3,6 +3,29 @@
   --gf-font-display: 'Barlow', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --gf-font-condensed: 'Barlow Semi Condensed', 'Barlow', 'Inter', system-ui, sans-serif;
   --gf-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+
+  --gf-obsidian: #0A0A0A;
+  --gf-obsidian-elev: #141416;
+  --gf-cream: #F1F0EC;
+  --gf-surface: #FFFFFF;
+  --gf-surface-muted: #E5E3DF;
+  --gf-hairline: #D3D1CF;
+  --gf-crimson: #D13639;
+  --gf-crimson-hover: #EB0029;
+  --gf-ink: #0A0A0A;
+  --gf-ink-muted: #656462;
+  --gf-success: #047857;
+  --gf-warning: #B45309;
+  --gf-danger: #B91C1C;
+}
+
+:where(button, a, input, select, textarea):focus-visible {
+  outline: 2px solid var(--gf-crimson);
+  outline-offset: 2px;
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 *,

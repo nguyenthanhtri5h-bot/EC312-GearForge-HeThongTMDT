@@ -1,4 +1,6 @@
-import { vibeUrl } from './vibeMedia';
+import { VIBE_PORTFOLIO_CARDS, vibeUrl } from './vibeMedia';
+
+const hw = VIBE_PORTFOLIO_CARDS.hardware;
 
 export interface MegaPreviewItem {
   id: string;
@@ -11,31 +13,31 @@ export interface MegaPreviewItem {
 export const MEGA_PREVIEW_ITEMS: Record<string, MegaPreviewItem> = {
   all: {
     id: 'all',
-    tag: 'KHO 520+ MẪU CHÍNH HÃNG',
+    tag: 'KHO 590+ MẪU CHÍNH HÃNG',
     title: 'Tất Cả Kho Máy ĐHQG-HCM',
     desc: 'Lọc theo ngành học, GPU RTX 40/50, màn OLED và mức trả góp 0% .edu.vn.',
     img: vibeUrl('mega-all.jpg'),
   },
   gaming: {
     id: 'gaming',
-    tag: 'RTX 4060 / 4070 / 5070',
+    tag: 'RTX 4050 / 4060 / 5070',
     title: 'Laptop Gaming & AI Di Động',
     desc: 'Tản nhiệt buồng hơi, stress-test 30 phút đạt chuẩn FPS & CUDA trước khi giao.',
-    img: vibeUrl('mega-gaming.jpg'),
+    img: hw.laptopRogRgb,
   },
   ultrabook: {
     id: 'ultrabook',
     tag: 'PIN 11H · CHUẨN MÀU OLED',
     title: 'Ultrabook & Đồ Họa Sáng Tạo',
     desc: 'Mỏng nhẹ dưới 1.4kg mang lên giảng đường UIT, Bách Khoa, KHTN cả ngày.',
-    img: vibeUrl('mega-ultrabook.jpg'),
+    img: hw.laptopUltrabook,
   },
   pc: {
     id: 'pc',
     tag: 'WORKSTATION CUSTOM',
     title: 'PC AI & Render 3D Theo Đơn',
     desc: 'Linh kiện chính hãng nguyên seal, cân đối nguồn Airflow và xuất hóa đơn VAT.',
-    img: vibeUrl('mega-pc.jpg'),
+    img: hw.pcWatercool,
   },
   linhKien: {
     id: 'linhKien',
@@ -49,7 +51,7 @@ export const MEGA_PREVIEW_ITEMS: Record<string, MegaPreviewItem> = {
     tag: 'OLED 240HZ · GASKET RGB',
     title: 'Gaming Gear & Màn Hình Studio',
     desc: 'Phím cơ silent cho phòng KTX, chuột không dây ultralight và màn OLED 2K/4K.',
-    img: vibeUrl('mega-gear.jpg'),
+    img: hw.gearPeripherals,
   },
   ecosystem: {
     id: 'ecosystem',

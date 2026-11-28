@@ -19,12 +19,13 @@ interface SetupShowcase {
 
 const hw = VIBE_PORTFOLIO_CARDS.hardware;
 const SETUPS: SetupShowcase[] = [
-  { id: 'ai-uit', tag: 'AI & Deep Learning', campus: 'UIT · Khoa KHMT', title: 'ROG Strix G16 AI Lab Rig', specs: 'Core i7-13650HX · RTX 4060 · 32GB', img: hw.galAiUit, cat: 'laptop-gaming', quote: 'Chạy PyTorch & model vision mượt, trả góp 0% qua thẻ SV.' },
-  { id: 'watercool-bk', tag: 'Custom PC RTX', campus: 'Bách Khoa · Cơ Điện Tử', title: 'Workstation CAD & Robotics', specs: 'i7-14700K · RTX 4070 Ti · 64GB', img: hw.galBkCad, cat: 'pc-workstation', quote: 'Kiểm tra SolidWorks ổn định 24h trước khi giao KTX.' },
-  { id: 'creator-media', tag: 'Creator OLED', campus: 'Media Club UIT', title: 'OLED 240Hz Studio Rig', specs: '27" QHD OLED · DCI-P3 99% · M4', img: hw.galCreatorOled, cat: 'gear', quote: 'Dựng video 4K chuẩn màu điện ảnh, bảo hành theo số Serial.' },
-  { id: 'ktx-desk', tag: 'KTX Compact', campus: 'KTX Khu B ĐHQG', title: 'Mini-ITX Dorm PC Setup', specs: 'Ryzen 5 5600G · Mesh ITX · 2TB', img: hw.galKtxMini, cat: 'pc-workstation', quote: 'Gọn bàn học ký túc xá, giao trong 2 giờ.' },
-  { id: 'rog-dev', tag: 'KTPM & Dev', campus: 'UIT · Kỹ Thuật Phần Mềm', title: 'Gaming Laptop ROG RGB Dev', specs: 'Core Ultra 9 · RTX 4070 · 32GB', img: hw.galDevRog, cat: 'laptop-gaming', quote: 'Docker + IDE + Android Studio mở song song không giật.' },
-  { id: 'gear-pro', tag: 'Gaming Gear', campus: 'CLB Esports Làng ĐH', title: 'Combo Phím Cơ & Audio Hub', specs: 'Custom Gasket RGB · Headset 2.4G', img: hw.galEsportsGear, cat: 'gear', quote: 'Combo phím chuột tai nghe êm chuẩn phòng KTX & đấu giải.' },
+  { id: 'ai-uit', tag: 'AI & Deep Learning', campus: 'UIT · Khoa KHMT', title: 'Góc Lab AI & Lập Trình — ROG Strix G16', specs: 'Core i7-13650HX · RTX 4060 · 32GB', img: hw.campusUitAi, cat: 'laptop-gaming', quote: 'Chạy PyTorch và model vision mượt mà, duyệt trả góp 0% qua thẻ sinh viên.' },
+  { id: 'watercool-bk', tag: 'Custom PC RTX', campus: 'Bách Khoa · Cơ Điện Tử', title: 'Workstation CAD & Cơ Điện Tử', specs: 'i7-14700K · RTX 4070 Ti · 64GB', img: hw.campusBkCad, cat: 'pc-workstation', quote: 'Kiểm định SolidWorks ổn định 24h trước khi kỹ thuật viên giao tới KTX.' },
+  { id: 'ktx-desk', tag: 'KTX Compact', campus: 'KTX Khu B ĐHQG', title: 'Mini-ITX Gọn Bàn KTX Khu B', specs: 'Ryzen 5 5600G · Mesh ITX · 2TB', img: hw.pcMiniItx, cat: 'pc-workstation', quote: 'Tối ưu bàn học ký túc xá 1m², đi dây gọn gàng và giao nhanh trong 2 giờ.' },
+  { id: 'esports-dual', tag: 'KTPM & Dev', campus: 'UIT · Kỹ Thuật Phần Mềm', title: 'Dual-Monitor Học Tập & Esports', specs: 'Core Ultra 9 · RTX 4070 · 32GB', img: hw.galleryEsportsDesk, cat: 'laptop-gaming', quote: 'Mở song song Docker, IDE và giả lập Android không giật lag.' },
+  { id: 'oled-studio', tag: 'Creator OLED', campus: 'Media Club UIT', title: 'Màn Hình OLED 240Hz Dựng Phim 4K', specs: '27" QHD OLED · DCI-P3 99% · M4', img: hw.monitorOled, cat: 'gear', quote: 'Chuẩn màu điện ảnh cho dựng phim 4K, bảo hành điện tử theo Serial.' },
+  { id: 'gear-pro', tag: 'Gaming Gear', campus: 'CLB Esports Làng ĐH', title: 'Combo Phím Cơ Gasket & Chuột Pro', specs: 'Custom Gasket RGB · Headset 2.4G', img: hw.gearPeripherals, cat: 'gear', quote: 'Switch êm ái không ồn phòng KTX, chuột không dây siêu nhẹ chuẩn đấu giải.' },
+  { id: 'concept-creator', tag: 'Creator OLED', campus: 'Concept 2026 · Creator Studio', title: 'Concept Studio 2D · Creator ĐHQG', specs: 'MacBook Pro M4 · Dual OLED · Dock TB4', img: hw.galCreatorOled, cat: 'laptop-ultrabook', quote: 'Không gian thiết kế 2D tối giản dành riêng cho sinh viên Đồ họa & Truyền thông.' },
 ];
 
 const TAGS = ['Tất cả', 'AI & Deep Learning', 'Custom PC RTX', 'Creator OLED', 'KTX Compact', 'KTPM & Dev', 'Gaming Gear'];

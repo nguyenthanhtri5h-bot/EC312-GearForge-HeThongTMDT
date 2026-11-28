@@ -2,6 +2,7 @@ import { useRef, useState, type FormEvent } from 'react';
 import { submitTwoStepInstallment, type InstallmentSubmitOutcome } from '../../hooks/installmentSubmitApi';
 import { useGearForgeStore } from '../../hooks/useGearForgeStore';
 import type { GearForgeProduct } from '../../types/gearforge';
+import { EkycUploadField } from './EkycUploadField';
 
 interface Props {
   product: GearForgeProduct;
@@ -139,38 +140,22 @@ export function InstallmentForm({ product, downPct, months }: Props) {
       </div>
 
       <div className="gf-form-grid-2">
-        <div className="gf-field-col">
-          <label htmlFor="gf-ekyc-cccd-file" className="gf-field-label">Ảnh CCCD (JPG/PNG/PDF) *</label>
-          <div className="gf-tool-file-row">
-            <input
-              id="gf-ekyc-cccd-file"
-              name="cccd_file"
-              type="file"
-              accept=".jpg,.jpeg,.png,.pdf"
-              className="gf-tool-file-native"
-              onChange={(e) => setCccdFile(e.target.files?.[0] || null)}
-              required
-            />
-            <label htmlFor="gf-ekyc-cccd-file" className="gf-tool-file-btn">Chọn ảnh CCCD</label>
-            <span className="gf-tool-file-name">{cccdFile ? cccdFile.name : 'Chưa chọn tệp'}</span>
-          </div>
-        </div>
-        <div className="gf-field-col">
-          <label htmlFor="gf-ekyc-sv-file" className="gf-field-label">Ảnh Thẻ Sinh viên (JPG/PNG/PDF) *</label>
-          <div className="gf-tool-file-row">
-            <input
-              id="gf-ekyc-sv-file"
-              name="student_card_file"
-              type="file"
-              accept=".jpg,.jpeg,.png,.pdf"
-              className="gf-tool-file-native"
-              onChange={(e) => setSvCardFile(e.target.files?.[0] || null)}
-              required
-            />
-            <label htmlFor="gf-ekyc-sv-file" className="gf-tool-file-btn">Chọn ảnh Thẻ SV</label>
-            <span className="gf-tool-file-name">{svCardFile ? svCardFile.name : 'Chưa chọn tệp'}</span>
-          </div>
-        </div>
+        <EkycUploadField
+          id="gf-ekyc-cccd-file"
+          name="cccd_file"
+          label="Ảnh CCCD (JPG/PNG/PDF) *"
+          btnLabel="Chọn ảnh CCCD"
+          file={cccdFile}
+          onChange={setCccdFile}
+        />
+        <EkycUploadField
+          id="gf-ekyc-sv-file"
+          name="student_card_file"
+          label="Ảnh Thẻ Sinh viên (JPG/PNG/PDF) *"
+          btnLabel="Chọn ảnh Thẻ SV"
+          file={svCardFile}
+          onChange={setSvCardFile}
+        />
       </div>
 
       <label className="gf-nd13-box" htmlFor="gf-consent-nd13">

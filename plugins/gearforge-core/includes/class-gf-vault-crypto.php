@@ -90,6 +90,10 @@ class GF_Vault_Crypto {
         }
 
         @chmod($full_path, 0600);
+        if (PHP_SAPI === 'cli' && function_exists('posix_geteuid') && posix_geteuid() === 0) {
+            @chown($full_path, 'www-data');
+            @chgrp($full_path, 'www-data');
+        }
         return $filename;
     }
 
@@ -110,6 +114,10 @@ class GF_Vault_Crypto {
 
         if (!$vault_real || !$target || strpos($target, $vault_real) !== 0 || !is_file($target)) {
             return new WP_Error('gf_vault_not_found', 'Không tìm thấy tệp hồ sơ trong vùng bảo mật.');
+        }
+
+        if (!is_readable($target)) {
+            return new WP_Error('gf_vault_unreadable', 'Không có quyền đọc tệp hồ sơ trong vùng bảo mật.');
         }
 
         $envelope = json_decode((string) file_get_contents($target), true);

@@ -75,7 +75,7 @@ const TRENDING_TAGS = [
 ];
 
 export function CommandSearchModal() {
-  const { searchOpen, setSearchOpen, boot, products, navigateToPage, setQuickViewProduct } = useGearForgeStore();
+  const { searchOpen, setSearchOpen, setChatOpen, boot, products, navigateToPage, setQuickViewProduct } = useGearForgeStore();
   const [term, setTerm] = useState('');
 
   useEffect(() => {
@@ -166,9 +166,19 @@ export function CommandSearchModal() {
                     setSearchOpen(false);
                     navigateToPage('shop', { search: q.trim(), page: 1 });
                   }}
-                  style={{ background: 'none', border: 0, color: '#D13639', fontWeight: 700, textDecoration: 'underline', cursor: 'pointer' }}
+                  style={{ background: 'none', border: 0, color: '#D13639', fontWeight: 700, textDecoration: 'underline', cursor: 'pointer', marginRight: 12 }}
                 >
                   Tìm toàn bộ trong Kho sản phẩm →
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchOpen(false);
+                    setChatOpen(true);
+                  }}
+                  style={{ background: '#0A0A0A', color: '#FFFFFF', border: 0, borderRadius: 999, padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+                >
+                  Hỏi GearForge AI tư vấn
                 </button>
               </div>
             ) : matches.map((m) => (

@@ -12,6 +12,7 @@ import { InstallmentPageView } from './components/InstallmentPageView';
 import { OmsTrackingPageView } from './components/OmsTrackingPageView';
 import { RiotDealsBento } from './components/riot/RiotDealsBento';
 import { RiotEcosystemStrip, RiotStudentSplit } from './components/riot/RiotEcosystemAndSplit';
+import { RiotFeaturedShelf } from './components/riot/RiotFeaturedShelf';
 import { RiotProductsShowcase } from './components/riot/RiotProductsShowcase';
 import { SetupGalleryPageView } from './components/SetupGalleryPageView';
 import { ShopPageView } from './components/ShopPageView';
@@ -25,6 +26,7 @@ function ShowcaseMain() {
       <HeroSection />
       <RiotDealsBento />
       <RiotProductsShowcase />
+      <RiotFeaturedShelf />
       <RiotEcosystemStrip />
       <RiotStudentSplit />
     </main>

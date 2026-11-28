@@ -52,6 +52,7 @@ export function HeroSection() {
         <h1 id="tc-h1" className="gf-hero-title">
           Laptop RTX, Custom PC AI &amp; Esports Gear Sinh Viên
         </h1>
+        <p className="gf-hero-proof">Trả góp 0% .edu.vn · Giao KTX 2 giờ · Bảo hành Serial</p>
         <div className="gf-hero-bottom-bar">
           <button
             type="button"
@@ -60,14 +61,16 @@ export function HeroSection() {
             title="Xem Trailer toàn màn hình"
             onClick={() => setVideoModalSrc(VIBE_VIDEOS.heroRiotCinematic)}
           >
-            &#9654;
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M8 5v14l11-7z" />
+            </svg>
           </button>
           <button
             type="button"
             className="gf-hero-cta-primary"
             onClick={() => navigateToPage('shop')}
           >
-            Khám phá Kho Máy ĐHQG →
+            Khám phá Kho Máy ĐHQG
           </button>
           <button
             type="button"

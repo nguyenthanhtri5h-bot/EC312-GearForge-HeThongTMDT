@@ -276,6 +276,15 @@
   background: #EB0029;
 }
 
+@media (hover: none), (max-width: 767px) {
+  .xg-qv-float {
+    opacity: 1;
+    transform: translateY(0);
+    min-height: 32px;
+    padding: 0 10px;
+  }
+}
+
 .xg-disc-badge {
   position: absolute;
   top: 8px;
@@ -491,7 +500,8 @@
 }
 
 @media (max-width: 767px) {
-  body { padding-bottom: 62px; }
+  body { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
+  .tc .gf-prod-actions .gf-act-btn { min-height: 44px; font-size: 12px; }
   .xg-quick-grid { display: flex; overflow-x: auto; gap: 10px; padding-bottom: 6px; scrollbar-width: none; }
   .xg-quick-tile { flex: 0 0 92px; }
   .xg-brand-tabs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; width: 100%; max-width: 100%; }

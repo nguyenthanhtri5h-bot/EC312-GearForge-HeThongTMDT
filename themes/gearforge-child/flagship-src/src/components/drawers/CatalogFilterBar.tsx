@@ -25,8 +25,6 @@ const BRAND_NEED_CHIPS: BrandChip[] = [
   { id: 'acer', label: 'ACER', search: 'Acer' },
   { id: 'hp', label: 'HP', search: 'HP' },
   { id: 'macbook', label: 'MacBook', search: 'MacBook' },
-  { id: 'rtx4060', label: 'RTX 4060', gpu: 'RTX 4060' },
-  { id: 'linhkien', label: 'Linh kiện', category: 'linh-kien' },
 ];
 
 interface Props {

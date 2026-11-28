@@ -10,7 +10,7 @@ export function OmsSandboxBox({
   onOrderRefresh: (orderId: number) => Promise<void>;
 }) {
   const { boot } = useGearForgeStore();
-  const [provider, setProvider] = useState<'vnpay' | 'momo' | 'fundiin'>('vnpay');
+  const [provider, setProvider] = useState<'vnpay' | 'vnpay_portal' | 'momo' | 'fundiin'>('vnpay');
   const [busy, setBusy] = useState(false);
   const [statusMsg, setStatusMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
@@ -83,20 +83,24 @@ export function OmsSandboxBox({
   };
 
   return (
-    <div style={{ padding: 12, borderRadius: 8, background: '#FEF2F2', border: '1px solid #FECACA', display: 'grid', gap: 8 }}>
-      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-        <strong style={{ fontSize: 13, color: '#7F1D1D' }}>
-          {isDownpayment ? 'Thanh toán tiền trả trước qua Sandbox 3DS' : 'Thanh toán đơn hàng qua Sandbox 3DS'}
-        </strong>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
+    <div className="gf-sandbox-card">
+      <div className="gf-sandbox-head">
+        <div>
+          <span className="gf-sandbox-badge">Cổng thanh toán Sandbox</span>
+          <strong className="gf-sandbox-title">
+            {isDownpayment ? 'Thanh toán tiền trả trước qua Sandbox 3DS / VNPay' : 'Thanh toán đơn hàng qua Sandbox 3DS / VNPay'}
+          </strong>
+        </div>
+        <div className="gf-sandbox-controls">
           <select
             aria-label="Chọn cổng thanh toán Sandbox"
             className="gf-oms-input"
             style={{ minHeight: 34, padding: '0 10px', fontSize: 12, width: 'auto' }}
             value={provider}
-            onChange={(e) => setProvider(e.target.value as 'vnpay' | 'momo' | 'fundiin')}
+            onChange={(e) => setProvider(e.target.value as 'vnpay' | 'vnpay_portal' | 'momo' | 'fundiin')}
           >
-            <option value="vnpay">VNPay 3DS</option>
+            <option value="vnpay">VNPay 3DS (OTP 123456)</option>
+            <option value="vnpay_portal">VNPay Sandbox Portal (sandbox.vnpayment.vn)</option>
             <option value="momo">MoMo Sandbox</option>
             <option value="fundiin">Fundiin BNPL</option>
           </select>

@@ -94,6 +94,14 @@ export function InstallmentPageView() {
                   </option>
                 ))}
               </select>
+              <div className="gf-inst-device-card">
+                <img src={selectedProduct.image} alt={selectedProduct.name} />
+                <div>
+                  <span className="gf-inst-device-cat">{selectedProduct.category}</span>
+                  <strong>{selectedProduct.name}</strong>
+                  <span className="gf-inst-device-price">{formatVnd(selectedProduct.price)}</span>
+                </div>
+              </div>
             </div>
 
             <div className="gf-tool-field-block">
@@ -128,6 +136,11 @@ export function InstallmentPageView() {
                   </button>
                 ))}
               </div>
+            </div>
+
+            <div className="gf-inst-kpi-banner" aria-live="polite">
+              <span>Ước tính góp mỗi tháng ({months} kỳ · {ratePct === 0 ? '0% lãi' : `${ratePct}%/th`})</span>
+              <strong>{formatVnd(monthlyAmount)}/tháng</strong>
             </div>
 
             <div className="gf-tool-facts" aria-live="polite" style={{ opacity: calculating ? 0.72 : 1 }}>

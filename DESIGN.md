@@ -1,21 +1,22 @@
-# GearForge Precision Commerce 2026 — MONA Flagship Design System (`DESIGN.md`)
+# GearForge Flagship Design System (`DESIGN.md` — Riot Obsidian × Warm Cream × Crimson)
 
-> **Single Source of Truth cho Role 3 (`role3-ui-frontend`) — EC312 GearForge (Nhóm 7)**  
-> Kiến trúc mục tiêu: **Blocksy Parent Theme + Blocksy Companion (Free)** + **`gearforge-child`** + **`gearforge-core` (4 Custom GAPs)** + **`figma-prototype` (6 Frame bắt buộc)**.  
-> Ngôn ngữ thị giác: **MONA Media High-Energy Tech Flagship** (`mona.media`) kết hợp chuẩn `ui-ux-pro-max`, `anti-ai-slop-ui`, `frontend-design` và Buy/Customize EC312.
+> **Single Source of Truth cho Role 3 (`role3-ui-frontend` / `integrate/riot-xgear-h1`) — EC312 GearForge (Nhóm 7)**  
+> Kiến trúc mục tiêu: **React 19 Flagship SPA (`themes/gearforge-child/flagship-src`)** + **Blocksy Child Theme (`themes/gearforge-child`)** + **`gearforge-core` (Role 1/2/4 Modules)** + **GearForge AI Advisor**.  
+> Ngôn ngữ thị giác: **Riot Obsidian (`#0A0A0A`) / Warm Cream (`#F1F0EC`) / Riot Crimson (`#D13639`, `#EB0029`)** kết hợp chuẩn `anti-ai-slop-ui` và `frontend-design`.
 
 ---
 
 ## 1. Visual Direction & Anti-AI-Slop Rules
 
-GearForge chuyển sang diện mạo **MONA Media High-Energy Tech Flagship**: nền sáng Lavender-White (`#F8F7FF`) thoáng mắt, **Frosted Light Glass Header** (`rgba(255, 255, 255, 0.90)`), **Mesh Gradient Hero Stage** đa sắc tím-hồng-cam tiết chế đúng điểm nhấn, 8 ảnh studio phần cứng tách nền riêng biệt và Product Card hành động 1 hàng gọn mắt.
-
-### 5 Quy tắc Bất di bất dịch (Pre-Ship Gate)
-1. **1 Màu nhấn chính (`#6D28D9` Electric Royal Violet) + Dải nhấn MONA tiết chế:** Toàn bộ CTA nút bấm chính, tab active, thanh tiến độ OMS và focus ring dùng `#6D28D9` (hover `#5B21B6`). Dải gradient `--gf-mona-grad` (`#6D28D9 → #C026D3 → #EA580C`) chỉ dùng có chọn lọc tại Logo mark, cụm highlight Hero (`span.gf-text-grad`) và nút CTA Hero chính. Trạng thái nghiệp vụ giữ màu ngữ nghĩa WCAG AA (`Success #047857`, `Warning #B45309`, `Danger #B91C1C`).
-2. **Xóa sạch nhãn rác & tem lặp:** Không gắn tem tĩnh `HOT`, `MỚI`, `VIP`, `ƯU ĐÃI SV` lên mọi card; không dùng emoji làm icon UI; không thêm mũi tên `→` vào đuôi nút. Badge `-X%` chỉ hiện khi `sale_price < regular_price`.
-3. **Bố cục Thoáng, Sidebar Chống Kéo Dài & Card Action 1 Hàng:** Filter sidebar cố định chiều cao dưới lưới sản phẩm (nhóm HUSKY dạng pill gọn + block CPU/RAM/GPU cuộn `max-height: 150px`), đồng thời chuyển bottom action của Product Card sang **1 hàng ngang** (`Thêm vào giỏ` + `+ So sánh`) qua CSS Grid 2 cột.
-4. **8 Ảnh Studio Phần Cứng Riêng Biệt (`16:10`, nền `#F3F0FF`/`#F3F4F6`):** Định tuyến 8 tài nguyên studio khác nhau (`laptop-ultrabook.jpg`, `laptop-gaming.jpg`, `laptop-creator.jpg`, `laptop-katana.jpg`, `pc-workstation.jpg`, `pc-minimal.jpg`, `pc-watercool.jpg`, `gear-bundle.svg`) kết hợp xen kẽ Laptop & PC ngay từ Trang 1 để không lặp lại cùng 1 ảnh trên các card liền kề.
-5. **Copywriting trung thực & Tương phản WCAG AA (`>= 4.5:1`):** Động từ rõ hành động (*"Thêm vào giỏ"*, *"+ So sánh"*, *"Tính trả góp"*, *"Nộp hồ sơ Trả góp Sinh viên"*, *"Đặt hàng ngay"*).
+1. **1 Màu nhấn chính (`#D13639` Riot Crimson, hover `#EB0029`)**: Toàn bộ CTA nút bấm chính, tab active, thanh tiến độ OMS và `:focus-visible` dùng Crimson. Không dùng gradient tím/cầu vồng hay nhiều màu nhấn cạnh tranh. Trạng thái nghiệp vụ giữ màu ngữ nghĩa WCAG AA (`Success #047857`, `Warning #B45309`, `Danger #B91C1C`).
+2. **Xóa sạch nhãn rác & tem lặp**: Không gắn `HOT`, `MỚI`, `VIP`, `TIN TỨC` lên thẻ sản phẩm; không lặp thông tin giữa hover và footer card; không gắn nhầm thông số laptop (`512GB SSD`, `GPU Onboard`) cho Gaming Gear / Linh kiện.
+3. **Typography tiếng Việt & Số học `tabular-nums`**: Font `'Barlow'`, `'Inter'`, `'JetBrains Mono'`. Tiêu đề in hoa tiếng Việt giữ `line-height >= 1.18` để không chạm dấu mũ (`ĐỒ HỌA`, `TRẢ GÓP`, `ĐƠN HÀNG`). Giá VND và tiền góp dùng `font-variant-numeric: tabular-nums`.
+4. **Hợp đồng Tokens (`src/styles/tokens.css`)**:
+   - `--gf-obsidian: #0A0A0A`, `--gf-obsidian-elev: #141416`
+   - `--gf-cream: #F1F0EC`, `--gf-surface: #FFFFFF`, `--gf-surface-muted: #E5E3DF`, `--gf-hairline: #D3D1CF`
+   - `--gf-crimson: #D13639`, `--gf-crimson-hover: #EB0029`
+   - `--gf-ink: #0A0A0A`, `--gf-ink-muted: #656462`
+   - `--gf-success: #047857`, `--gf-warning: #B45309`, `--gf-danger: #B91C1C`
 
 ---
 

@@ -46,7 +46,7 @@ export function ShopPageView() {
   }, [fetchCatalog, filters.category, products.length, totalPages]);
 
   return (
-    <main className="tc" id="tc-shop" style={{ paddingTop: 0, background: '#F1F0EC', color: '#0A0A0A' }}>
+    <main className="tc gf-shop-page" id="tc-shop">
       <RiotSubpageHero
         crumbLabel="Trang chủ / Kho Sản Phẩm"
         title="Kho Cấu Hình ĐHQG"
@@ -60,26 +60,17 @@ export function ShopPageView() {
           </button>
         }
       >
-        <div className="gf-shop-tabs">
+        <div className="gf-shop-tabs" role="tablist" aria-label="Danh mục chính">
           {SHOP_TABS.map((t) => {
             const isOn = (filters.category || '') === t.slug;
             return (
               <button
                 key={t.label}
                 type="button"
+                role="tab"
+                aria-selected={isOn}
+                className={`gf-shop-tab ${isOn ? 'is-active' : ''}`}
                 onClick={() => void fetchCatalog({ category: t.slug, page: 1 })}
-                style={{
-                  background: 'none',
-                  border: 0,
-                  minHeight: 44,
-                  padding: '8px 0',
-                  borderBottom: isOn ? '2px solid #D13639' : '2px solid transparent',
-                  color: isOn ? '#FFFFFF' : '#A1A1AA',
-                  fontSize: 12,
-                  fontWeight: 800,
-                  letterSpacing: '0.08em',
-                  cursor: 'pointer',
-                }}
               >
                 {t.label}
               </button>
@@ -88,7 +79,7 @@ export function ShopPageView() {
         </div>
       </RiotSubpageHero>
 
-      <div style={{ background: '#F1F0EC', paddingBlock: 12 }}>
+      <div className="gf-shop-body">
         <CatalogSection hideCategoryTabs />
       </div>
 

@@ -121,18 +121,23 @@ foreach ($category_map as $csv_cat => $spec) {
 }
 
 $global_attr_map = [
-    'CPU'           => ['cpu', 'CPU'],
-    'RAM'           => ['ram', 'RAM'],
-    'GPU'           => ['gpu', 'GPU'],
-    'Ổ cứng'        => ['o-cung', 'Ổ cứng'],
-    'SSD'           => ['o-cung', 'Ổ cứng'],
-    'Màn hình'      => ['man-hinh', 'Màn hình'],
-    'Nhu cầu'       => ['nhu-cau', 'Nhu cầu'],
-    'Thương hiệu'   => ['thuong-hieu', 'Thương hiệu'],
-    'Hãng sản xuất' => ['thuong-hieu', 'Thương hiệu'],
-    'Kết nối'       => ['ket-noi', 'Kết nối'],
-    'Khối lượng'    => ['trong-luong', 'Trọng lượng'],
-    'Trọng lượng'   => ['trong-luong', 'Trọng lượng'],
+    'CPU'                    => ['cpu', 'CPU'],
+    'Vi xử lý (CPU)'         => ['cpu', 'CPU'],
+    'RAM'                    => ['ram', 'RAM'],
+    'Dung lượng RAM'         => ['ram', 'RAM'],
+    'GPU'                    => ['gpu', 'GPU'],
+    'Card đồ họa (GPU)'      => ['gpu', 'GPU'],
+    'Ổ cứng'                 => ['o-cung', 'Ổ cứng'],
+    'SSD'                    => ['o-cung', 'Ổ cứng'],
+    'Dung lượng Ổ cứng / SSD'=> ['o-cung', 'Ổ cứng'],
+    'Màn hình'               => ['man-hinh', 'Màn hình'],
+    'Kích thước màn hình'    => ['man-hinh', 'Màn hình'],
+    'Nhu cầu'                => ['nhu-cau', 'Nhu cầu'],
+    'Thương hiệu'            => ['thuong-hieu', 'Thương hiệu'],
+    'Hãng sản xuất'          => ['thuong-hieu', 'Thương hiệu'],
+    'Kết nối'                => ['ket-noi', 'Kết nối'],
+    'Khối lượng'             => ['trong-luong', 'Trọng lượng'],
+    'Trọng lượng'            => ['trong-luong', 'Trọng lượng'],
 ];
 
 $tax_cache = [];
@@ -335,9 +340,24 @@ while (($row = fgetcsv($handle)) !== false) {
     }
 
     if ($img_raw !== '') {
-        $first_img = trim(explode(',', $img_raw)[0]);
-        if (filter_var($first_img, FILTER_VALIDATE_URL)) {
-            update_post_meta($product_id, '_gf_external_image_url', esc_url_raw($first_img));
+        $raw_imgs   = array_values(array_filter(array_map('trim', explode(',', $img_raw))));
+        $valid_imgs = [];
+        foreach ($raw_imgs as $cand_img) {
+            if (filter_var($cand_img, FILTER_VALIDATE_URL)) {
+                $clean_url = esc_url_raw($cand_img);
+                if ($clean_url !== '' && !in_array($clean_url, $valid_imgs, true)) {
+                    $valid_imgs[] = $clean_url;
+                }
+            }
+        }
+        if (!empty($valid_imgs)) {
+            update_post_meta($product_id, '_gf_external_image_url', $valid_imgs[0]);
+            $gallery_extra = array_slice($valid_imgs, 1, 5);
+            if (!empty($gallery_extra)) {
+                update_post_meta($product_id, '_gf_external_gallery_urls', wp_json_encode($gallery_extra));
+            } else {
+                delete_post_meta($product_id, '_gf_external_gallery_urls');
+            }
         }
     }
 

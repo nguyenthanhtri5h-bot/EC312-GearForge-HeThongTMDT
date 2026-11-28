@@ -471,6 +471,137 @@ try {
         && $vn_clean === 'Don hang Dieu khien GearForge',
         'Invoice PDF uses MST 0318202607, configurable 8% VAT, safe 10% fallback on empty option, and clean Vietnamese transliteration'
     );
+
+    // FIX-17: Raw JSON-safe PDF download URL must not contain HTML-escaped &amp;
+    $pdf_dl_url = GF_Invoice_PDF::get_download_url($order_id);
+    gf_assert(
+        strpos($pdf_dl_url, '&amp;') === false
+        && strpos($pdf_dl_url, 'action=gf_download_invoice_pdf') !== false
+        && strpos($pdf_dl_url, '&_wpnonce=') !== false,
+        'FIX-17: GF_Invoice_PDF::get_download_url() emits raw & query params safe for JSON/SPA links'
+    );
+
+    // FIX-18: Serial Meta Box must not emit nested <form> or required attribute inside WooCommerce HPOS <form id="order">
+    ob_start();
+    GF_Serial_Manager::render_serial_metabox(wc_get_order($order_id));
+    $metabox_html = (string) ob_get_clean();
+    gf_assert(
+        stripos($metabox_html, '<form') === false
+        && strpos($metabox_html, 'id="gf_assign_serial_btn"') !== false
+        && strpos($metabox_html, 'id="gf_serial_input"') !== false
+        && !preg_match('/<input[^>]*id="gf_serial_input"[^>]*\brequired\b/i', $metabox_html),
+        'FIX-18: GF_Serial_Manager::render_serial_metabox() avoids nested <form> and required input inside HPOS order form'
+    );
+
+    // FIX-19: Official VNPay Sandbox 2.1.0 checkout URL, HMAC-SHA512 Return/IPN verification, and fallback
+    $prev_vnp_en  = get_option('gf_vnpay_enabled', null);
+    $prev_vnp_tmn = get_option('gf_vnpay_tmn_code', null);
+    $prev_vnp_sec = get_option('gf_vnpay_hash_secret', null);
+    try {
+        $real_laptops = wc_get_products(['limit' => 1, 'status' => 'publish', 'category' => ['laptop']]);
+        if (!empty($real_laptops)) {
+            $vnp_prod = $real_laptops[0];
+        } else {
+            $vnp_prod = new WC_Product_Simple();
+            $vnp_prod->set_name('GearForge VNPay Test Laptop');
+            $vnp_prod->set_regular_price('15000000');
+            $vnp_prod->set_virtual(false);
+            $vnp_prod->save();
+            $created_product_ids[] = $vnp_prod->get_id();
+        }
+        $vnp_order = wc_create_order(['customer_id' => $student->ID, 'status' => 'pending']);
+        $vnp_order->add_product($vnp_prod, 1);
+        $vnp_order->calculate_totals();
+        $vnp_order->save();
+        $vnp_oid = $vnp_order->get_id();
+        $created_order_ids[] = $vnp_oid;
+
+        // Without keys -> vnpay_portal rejects clearly while legacy `vnpay` keeps working
+        update_option('gf_vnpay_enabled', '1');
+        update_option('gf_vnpay_tmn_code', '');
+        update_option('gf_vnpay_hash_secret', '');
+        $unconfigured_portal = GF_Payment_Sandbox::create_sandbox_payment_session($vnp_oid, 'vnpay_portal', 'full');
+        $legacy_3ds_url      = GF_Payment_Sandbox::create_sandbox_payment_session($vnp_oid, 'vnpay', 'full');
+        gf_assert(
+            is_wp_error($unconfigured_portal)
+            && $unconfigured_portal->get_error_code() === 'gf_vnpay_not_configured'
+            && is_string($legacy_3ds_url)
+            && strpos($legacy_3ds_url, 'gf_sandbox_3ds=1') !== false,
+            'FIX-19: vnpay_portal requires keys while legacy vnpay 3DS emulator stays independent'
+        );
+
+        // With keys -> vnpay_portal routes to sandbox.vnpayment.vn while legacy `vnpay` STILL routes to ?gf_sandbox_3ds=1
+        $test_tmn = 'GFTEST01';
+        $test_sec = 'TESTVNPAYSECRETKEY1234567890ABCDEF';
+        update_option('gf_vnpay_tmn_code', $test_tmn);
+        update_option('gf_vnpay_hash_secret', $test_sec);
+
+        $legacy_still_3ds = GF_Payment_Sandbox::create_sandbox_payment_session($vnp_oid, 'vnpay', 'full');
+        $vnp_url = GF_Payment_Sandbox::create_sandbox_payment_session($vnp_oid, 'vnpay_portal', 'full');
+        $vnp_q   = [];
+        parse_str((string) parse_url((string) $vnp_url, PHP_URL_QUERY), $vnp_q);
+        gf_assert(
+            is_string($legacy_still_3ds)
+            && strpos($legacy_still_3ds, 'gf_sandbox_3ds=1') !== false
+            && is_string($vnp_url)
+            && strpos($vnp_url, 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?') === 0
+            && (int) ($vnp_q['vnp_Amount'] ?? 0) === ((int) round((float) $vnp_order->get_total()) * 100)
+            && GF_VNPay_Sandbox::verify_vnpay_signature($vnp_q) === true,
+            'FIX-19: Separate vnpay_portal channel signs vpcpay.html URL while legacy vnpay 3DS remains unchanged'
+        );
+
+        // Tampered VNPay IPN -> RspCode 97
+        $ipn_base = [
+            'vnp_TmnCode'           => $test_tmn,
+            'vnp_Amount'            => (string) ((int) round((float) $vnp_order->get_total()) * 100),
+            'vnp_BankCode'          => 'NCB',
+            'vnp_OrderInfo'         => 'Test IPN',
+            'vnp_PayDate'           => '20261128145500',
+            'vnp_ResponseCode'      => '00',
+            'vnp_TransactionNo'     => '14550001',
+            'vnp_TransactionStatus' => '00',
+            'vnp_TxnRef'            => (string) ($vnp_q['vnp_TxnRef'] ?? ''),
+        ];
+        $tampered_req = new WP_REST_Request('GET', '/gearforge/v1/vnpay-ipn');
+        foreach ($ipn_base as $k => $v) {
+            $tampered_req->set_param($k, $v);
+        }
+        $tampered_req->set_param('vnp_SecureHash', '0000badhash');
+        $tampered_res = GF_VNPay_Sandbox::handle_ipn_callback($tampered_req);
+        gf_assert(
+            ($tampered_res->get_data()['RspCode'] ?? '') === '97',
+            'FIX-19: VNPay IPN rejects invalid HMAC-SHA512 signature with RspCode 97'
+        );
+
+        // Valid signed VNPay IPN -> RspCode 00 & marks order paid; second IPN -> RspCode 02
+        ksort($ipn_base);
+        $hash_parts = [];
+        foreach ($ipn_base as $k => $v) {
+            $hash_parts[] = urlencode($k) . '=' . urlencode($v);
+        }
+        $valid_hash = hash_hmac('sha512', implode('&', $hash_parts), $test_sec);
+
+        $valid_req = new WP_REST_Request('GET', '/gearforge/v1/vnpay-ipn');
+        foreach ($ipn_base as $k => $v) {
+            $valid_req->set_param($k, $v);
+        }
+        $valid_req->set_param('vnp_SecureHash', $valid_hash);
+        $valid_res = GF_VNPay_Sandbox::handle_ipn_callback($valid_req);
+        $dup_res   = GF_VNPay_Sandbox::handle_ipn_callback($valid_req);
+        $reloaded_vnp = wc_get_order($vnp_oid);
+        gf_assert(
+            ($valid_res->get_data()['RspCode'] ?? '') === '00'
+            && ($dup_res->get_data()['RspCode'] ?? '') === '02'
+            && $reloaded_vnp
+            && $reloaded_vnp->is_paid()
+            && $reloaded_vnp->get_meta('_gf_transaction_ref') === '14550001',
+            'FIX-19: VNPay IPN finalizes order with RspCode 00 and returns RspCode 02 on duplicate callback'
+        );
+    } finally {
+        $prev_vnp_en === null ? delete_option('gf_vnpay_enabled') : update_option('gf_vnpay_enabled', $prev_vnp_en);
+        $prev_vnp_tmn === null ? delete_option('gf_vnpay_tmn_code') : update_option('gf_vnpay_tmn_code', $prev_vnp_tmn);
+        $prev_vnp_sec === null ? delete_option('gf_vnpay_hash_secret') : update_option('gf_vnpay_hash_secret', $prev_vnp_sec);
+    }
 } finally {
     global $wpdb;
     if (!empty($test_phone)) {
