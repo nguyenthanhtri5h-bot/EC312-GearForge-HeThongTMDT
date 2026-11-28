@@ -14,6 +14,7 @@ class GF_Admin_Pages {
         add_action('admin_post_gf_review_action', [self::class, 'handle_review_action']);
         add_action('admin_post_gf_view_vault_doc', [self::class, 'handle_view_vault_doc']);
         add_action('admin_post_gf_rma_action', [self::class, 'handle_rma_action']);
+        add_action('admin_post_gf_save_vnpay_settings', [self::class, 'handle_save_vnpay_settings']);
     }
 
     public static function register_menus(): void {
@@ -36,6 +37,15 @@ class GF_Admin_Pages {
             $cap,
             'gf-rma',
             [self::class, 'render_rma_page']
+        );
+
+        add_submenu_page(
+            'gf-installments',
+            'Cấu hình VNPay Sandbox',
+            'Cấu hình VNPay',
+            'manage_options',
+            'gf-vnpay-settings',
+            [self::class, 'render_vnpay_settings_page']
         );
     }
 
@@ -389,6 +399,74 @@ class GF_Admin_Pages {
             echo '<p style="margin-top:12px;"><a class="button" href="' . esc_url($next_url) . '">Trang tiếp theo (Keyset &lt; #' . $next_last_id . ') &rarr;</a></p>';
         }
         echo '</div>';
+    }
+
+    public static function handle_save_vnpay_settings(): void {
+        if (!current_user_can('manage_options')) {
+            wp_die('403 Forbidden', '403 Forbidden', ['response' => 403]);
+        }
+        check_admin_referer('gf_save_vnpay_settings');
+
+        $enabled = isset($_POST['gf_vnpay_enabled']) ? '1' : '0';
+        $tmn     = sanitize_text_field(wp_unslash($_POST['gf_vnpay_tmn_code'] ?? ''));
+        $secret  = sanitize_text_field(wp_unslash($_POST['gf_vnpay_hash_secret'] ?? ''));
+
+        update_option('gf_vnpay_enabled', $enabled);
+        update_option('gf_vnpay_tmn_code', $tmn);
+        if ($secret !== '') {
+            update_option('gf_vnpay_hash_secret', $secret);
+        } elseif (!empty($_POST['gf_vnpay_clear_secret'])) {
+            delete_option('gf_vnpay_hash_secret');
+        }
+
+        wp_safe_redirect(add_query_arg('gf_saved', '1', admin_url('admin.php?page=gf-vnpay-settings')));
+        exit;
+    }
+
+    public static function render_vnpay_settings_page(): void {
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+        $cfg        = class_exists('GF_VNPay_Sandbox') ? GF_VNPay_Sandbox::get_config() : ['enabled' => false, 'tmn_code' => '', 'hash_secret' => '', 'source' => 'none'];
+        $active     = class_exists('GF_VNPay_Sandbox') && GF_VNPay_Sandbox::is_configured();
+        $return_url = class_exists('GF_VNPay_Sandbox') ? GF_VNPay_Sandbox::get_return_url() : home_url('/?gf_vnpay_return=1');
+        $ipn_url    = class_exists('GF_VNPay_Sandbox') ? GF_VNPay_Sandbox::get_ipn_url() : rest_url('gearforge/v1/vnpay-ipn');
+        $masked_sec = $cfg['hash_secret'] !== '' ? substr($cfg['hash_secret'], 0, 4) . '••••••••' . substr($cfg['hash_secret'], -4) : '';
+        $saved      = isset($_GET['gf_saved']) && $_GET['gf_saved'] === '1';
+
+        echo '<div class="wrap"><h1>Cấu hình VNPay Sandbox 2.1.0 (GearForge)</h1>';
+        if ($saved) {
+            echo '<div class="notice notice-success is-dismissible"><p>Đã lưu cấu hình VNPay Sandbox.</p></div>';
+        }
+        $status_msg = $active
+            ? 'Đang kích hoạt VNPay Sandbox thật (sandbox.vnpayment.vn) — nguồn: ' . strtoupper($cfg['source'])
+            : 'Chưa đủ khóa TmnCode/HashSecret — đang tự động dùng Sandbox 3DS nội bộ (OTP 123456) làm fallback.';
+        echo '<div class="notice ' . ($active ? 'notice-info' : 'notice-warning') . '"><p><strong>Trạng thái:</strong> ' . esc_html($status_msg) . '</p></div>';
+
+        echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '" style="max-width:720px;background:#fff;padding:20px;border:1px solid #ccd0d4;border-radius:6px;">';
+        echo '<input type="hidden" name="action" value="gf_save_vnpay_settings" />';
+        wp_nonce_field('gf_save_vnpay_settings');
+        echo '<table class="form-table">';
+        echo '<tr><th>Kích hoạt VNPay Sandbox thật</th><td><label><input type="checkbox" name="gf_vnpay_enabled" value="1" ' . checked($cfg['enabled'], true, false) . ' /> Định tuyến cổng <code>vnpay</code> sang <code>sandbox.vnpayment.vn</code> (cả cọc trả góp &amp; đơn trả thẳng)</label></td></tr>';
+        echo '<tr><th><label for="gf_vnpay_tmn_code">vnp_TmnCode</label></th><td><input id="gf_vnpay_tmn_code" type="text" name="gf_vnpay_tmn_code" value="' . esc_attr($cfg['tmn_code']) . '" class="regular-text" placeholder="VD: 2QXUI4J4" /></td></tr>';
+        echo '<tr><th><label for="gf_vnpay_hash_secret">vnp_HashSecret</label></th><td><input id="gf_vnpay_hash_secret" type="password" name="gf_vnpay_hash_secret" value="" class="regular-text" placeholder="' . esc_attr($masked_sec ? "Đã lưu ({$masked_sec}) — để trống để giữ nguyên" : 'Nhập chuỗi HashSecret') . '" /> ';
+        if ($masked_sec !== '') {
+            echo '<label style="margin-left:8px;"><input type="checkbox" name="gf_vnpay_clear_secret" value="1" /> Xóa secret</label>';
+        }
+        echo '</td></tr>';
+        echo '<tr><th>Return URL (dán vào VNPay)</th><td><input type="text" readonly class="large-text code" value="' . esc_attr($return_url) . '" onclick="this.select();" /></td></tr>';
+        echo '<tr><th>IPN URL (dùng khi có HTTPS/VPS)</th><td><input type="text" readonly class="large-text code" value="' . esc_attr($ipn_url) . '" onclick="this.select();" /></td></tr>';
+        echo '</table>';
+        echo '<p><button type="submit" class="button button-primary">Lưu cấu hình VNPay</button></p>';
+        echo '</form>';
+
+        echo '<div style="max-width:720px;margin-top:16px;padding:16px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:6px;">';
+        echo '<h3 style="margin-top:0;">Thông tin đăng ký &amp; Thẻ test VNPay Sandbox (Hợp pháp cho đồ án)</h3>';
+        echo '<ul style="margin:0;padding-left:18px;line-height:1.6;">';
+        echo '<li>Đăng ký tài khoản Sandbox miễn phí (không cần GPKD): <a href="https://sandbox.vnpayment.vn/devreg/" target="_blank" rel="noopener">https://sandbox.vnpayment.vn/devreg/</a></li>';
+        echo '<li>Thẻ ATM test nội địa (NCB): Số thẻ <code>9704198526191432198</code> · Chủ thẻ <code>NGUYEN VAN A</code> · Ngày phát hành <code>07/15</code> · OTP <code>123456</code>.</li>';
+        echo '<li>Trên <code>localhost</code>: hệ thống xác thực chữ ký <code>HMAC-SHA512</code> trên Return URL + đối soát <code>QueryDR</code> khi khả dụng; khi đưa lên VPS HTTPS, VNPay gọi thêm <code>vnpay-ipn</code> tự động.</li>';
+        echo '</ul></div></div>';
     }
 }
 

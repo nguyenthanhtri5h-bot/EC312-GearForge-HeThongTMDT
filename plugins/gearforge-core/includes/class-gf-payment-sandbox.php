@@ -153,6 +153,11 @@ class GF_Payment_Sandbox {
             return $amount;
         }
 
+        // Route `vnpay` through official VNPay Sandbox 2.1.0 when TmnCode/HashSecret are configured.
+        if ($provider === 'vnpay' && class_exists('GF_VNPay_Sandbox') && GF_VNPay_Sandbox::is_configured()) {
+            return GF_VNPay_Sandbox::build_checkout_url($order_id, (int) $amount, $mode);
+        }
+
         $exp       = time() + self::SESSION_TTL_SEC;
         $nonce_sig = self::compute_hmac_signature('3ds', $order_id, $amount, $provider, $mode, $exp);
 
@@ -198,7 +203,7 @@ class GF_Payment_Sandbox {
             $txn_ref = $order ? (string) $order->get_meta('_gf_transaction_ref') : '';
             header('Content-Type: text/html; charset=utf-8');
             echo '<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><title>Đã thanh toán thành công</title></head>';
-            echo '<body style="font-family:sans-serif;max-width:480px;margin:48px auto;padding:24px;border:1px solid #28a745;border-radius:8px;background:#f4fbf6;">';
+            echo '<body style="font-family:\'Inter\',system-ui,sans-serif;max-width:480px;margin:48px auto;padding:24px;border:1px solid #28a745;border-radius:8px;background:#f4fbf6;">';
             echo '<h2 style="color:#1e7e34;">Đơn hàng #' . $order_id . ' đã thanh toán thành công!</h2>';
             echo '<p>Hệ thống đã nhận xác nhận giao dịch qua kênh đối soát IPN (Mã GD: <code>' . esc_html($txn_ref ?: 'N/A') . '</code>).</p>';
             echo '<p>Phiên thanh toán này đã được khóa tự động để đảm bảo bạn <strong>không bị trừ tiền lần 2</strong>.</p>';
@@ -244,7 +249,7 @@ class GF_Payment_Sandbox {
 
         header('Content-Type: text/html; charset=utf-8');
         echo '<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><title>GearForge Sandbox 3D-Secure</title></head>';
-        echo '<body style="font-family:sans-serif;max-width:460px;margin:48px auto;padding:24px;border:1px solid #ddd;border-radius:8px;">';
+        echo '<body style="font-family:\'Inter\',system-ui,sans-serif;max-width:460px;margin:48px auto;padding:24px;border:1px solid #ddd;border-radius:8px;">';
         echo '<h2>Cổng Thanh toán Sandbox (' . esc_html(strtoupper($provider)) . ' 3D-Secure)</h2>';
         echo '<p>Đơn hàng: <strong>#' . $order_id . '</strong> | Chế độ: <code>' . esc_html($mode) . '</code></p>';
         echo '<p>Số tiền thanh toán: <strong style="color:#d9534f;">' . number_format($amount) . ' VNĐ</strong></p>';
@@ -318,6 +323,14 @@ class GF_Payment_Sandbox {
             ? $saved_mode
             : (($app && !in_array($app['status'], ['REJECTED', 'BLACKLISTED'], true)) ? 'downpayment' : 'full');
         $is_paid    = self::is_order_already_paid($order_id);
+        if (!$is_paid && class_exists('GF_VNPay_Sandbox') && GF_VNPay_Sandbox::is_configured()) {
+            if (GF_VNPay_Sandbox::reconcile_order($order_id)) {
+                $is_paid = true;
+                $order   = wc_get_order($order_id);
+                $txn_ref = $order ? (string) $order->get_meta('_gf_transaction_ref') : '';
+                $app     = class_exists('GF_Installment_Review') ? GF_Installment_Review::get_application_by_order($order_id) : null;
+            }
+        }
 
         return rest_ensure_response([
             'order_id'           => $order_id,

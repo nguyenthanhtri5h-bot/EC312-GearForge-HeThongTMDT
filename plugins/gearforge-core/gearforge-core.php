@@ -85,6 +85,7 @@ add_action('plugins_loaded', static function (): void {
         'includes/class-gf-installment-calc.php',
         'includes/class-gf-vault-crypto.php',
         'includes/class-gf-installment-review.php',
+        'includes/class-gf-vnpay-sandbox.php',
         'includes/class-gf-payment-sandbox.php',
         'includes/class-gf-serial-manager.php',
         'includes/class-gf-invoice-pdf.php',

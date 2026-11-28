@@ -10,10 +10,10 @@
 
 | Hạng mục | Đường dẫn xem nhanh | Mô tả nội dung |
 | :--- | :--- | :--- |
-| **Mã nguồn Plugin (`gearforge-core`)** | [plugins/gearforge-core/](plugins/gearforge-core/) | 9 class PHP xử lý trả góp SV 3–6–12 tháng, mã hóa AES-256-CBC, duyệt 2 lớp, Sandbox 3DS, S/N xuất kho, Hóa đơn PDF T-VAN và Đổi trả / Bảo hành (RMA). |
+| **Mã nguồn Plugin (`gearforge-core`)** | [plugins/gearforge-core/](plugins/gearforge-core/) | 10 class PHP xử lý trả góp SV 3–6–12 tháng, mã hóa AES-256-CBC, duyệt 2 lớp, Sandbox 3DS + VNPay Sandbox 2.1.0, S/N xuất kho, Hóa đơn PDF T-VAN và Đổi trả / Bảo hành (RMA). |
 | **Bộ 6 Sơ đồ UML & ERD** | [2. Quy ước và Sơ đồ UML/role4_diagrams/](<2. Quy ước và Sơ đồ UML/role4_diagrams/>) | Gồm mã nguồn `.mmd` và ảnh `.png`: ERD (5 bảng `wp_gf_*`), Activity `UC-10..12`, Sequence `UC-10/11`, Sequence `UC-12`, Sequence `RMA` và Class Diagram Backend. |
 | **Báo cáo Nháp Role 4 (Word & MD)** | [Nháp Role 4 - Lê Lưu Luân.docx](<3. Khung báo cáo đồ án EC312/Nháp Role 4 - Lê Lưu Luân.docx>) | Trình bày đầy đủ Mục 3.7 (`UC-10 ★`), Mục 4.2 (ERD & Data Dictionary), Mục 5.1/5.2.3–5.2.5 (ảnh Demo thực tế) và Mục 6.3. |
-| **Nhật ký Kỹ thuật & Bảo mật** | [Nhật ký Kỹ thuật và Bảo mật Role 4.docx](<3. Khung báo cáo đồ án EC312/Nhật ký Kỹ thuật và Bảo mật Role 4.docx>) | Ghi nhận chi tiết 18 điểm tối ưu bảo mật, hiệu năng & đồng bộ tích hợp nhóm (`FIX-01..FIX-18`) kèm nguyên nhân và cách xử lý. |
+| **Nhật ký Kỹ thuật & Bảo mật** | [Nhật ký Kỹ thuật và Bảo mật Role 4.docx](<3. Khung báo cáo đồ án EC312/Nhật ký Kỹ thuật và Bảo mật Role 4.docx>) | Ghi nhận chi tiết 19 điểm tối ưu bảo mật, hiệu năng & đồng bộ tích hợp nhóm (`FIX-01..FIX-19`) kèm nguyên nhân và cách xử lý. |
 | **Ảnh minh chứng & PDF mẫu** | [Ảnh minh chứng Role 4/](<3. Khung báo cáo đồ án EC312/Ảnh minh chứng Role 4/>) | Ảnh chụp REST API, WP Admin duyệt 2 lớp, Sandbox 3DS, Meta Box S/N, WP Admin RMA, phpMyAdmin 5 bảng `wp_gf_*` và file Hóa đơn PDF mẫu `GearForge-Invoice-20.pdf`. |
 | **Tài liệu hướng dẫn gốc** | [Hướng dẫn Role 4 - Backend Database và Trả góp.md](<Hướng dẫn Role 4 - Backend Database và Trả góp.md>) | Đề cương phân công ban đầu của Role 4. |
 
@@ -32,7 +32,7 @@
   * `GET /wp-json/gearforge/v1/payment-sandbox/query/{order_id}` — Đối soát chủ động `QueryDR` chống thanh toán trùng khi rớt mạng.
   * `POST /wp-json/gearforge/v1/rma-request` — Gửi yêu cầu Đổi trả / Bảo hành (RMA) gắn `serial_number` và kiểm tra hạn 15 ngày.
   * `GET /wp-json/gearforge/v1/rma-status/{order_id}` — Tra cứu danh sách và trạng thái yêu cầu RMA của đơn hàng *(có chống IDOR)*.
-* **Kiểm thử hồi quy CLI (`plugins/gearforge-core/tests/verify-role4.php`):** Chạy qua Docker `docker exec gearforge_wp php /var/www/html/wp-content/plugins/gearforge-core/tests/verify-role4.php` (38 assertions E2E).
+* **Kiểm thử hồi quy CLI (`plugins/gearforge-core/tests/verify-role4.php`):** Chạy qua Docker `docker exec gearforge_wp php /var/www/html/wp-content/plugins/gearforge-core/tests/verify-role4.php` (42 assertions E2E).
 
 ---
 
