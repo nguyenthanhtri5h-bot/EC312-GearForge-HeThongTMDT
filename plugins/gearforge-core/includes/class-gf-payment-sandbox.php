@@ -16,7 +16,7 @@ class GF_Payment_Sandbox {
 
     private const SANDBOX_OTP       = '123456';
     private const SESSION_TTL_SEC   = 900; // 15 minutes
-    private const SUPPORTED_GATEWAY = ['vnpay', 'momo', 'fundiin'];
+    private const SUPPORTED_GATEWAY = ['vnpay', 'momo', 'fundiin', 'vnpay_portal'];
 
     public static function init(): void {
         add_action('rest_api_init', [self::class, 'register_routes']);
@@ -127,7 +127,7 @@ class GF_Payment_Sandbox {
         $provider = strtolower($provider);
         $mode     = strtolower($mode);
         if (!in_array($provider, self::SUPPORTED_GATEWAY, true)) {
-            return new WP_Error('gf_unsupported_gateway', 'Cổng thanh toán Sandbox chỉ hỗ trợ vnpay, momo hoặc fundiin.');
+            return new WP_Error('gf_unsupported_gateway', 'Cổng thanh toán chỉ hỗ trợ vnpay, momo, fundiin hoặc vnpay_portal.');
         }
 
         if (!in_array($mode, ['downpayment', 'full'], true)) {
@@ -153,8 +153,11 @@ class GF_Payment_Sandbox {
             return $amount;
         }
 
-        // Route `vnpay` through official VNPay Sandbox 2.1.0 when TmnCode/HashSecret are configured.
-        if ($provider === 'vnpay' && class_exists('GF_VNPay_Sandbox') && GF_VNPay_Sandbox::is_configured()) {
+        // Dedicated VNPay Sandbox 2.1.0 portal channel (separated from local 3DS `vnpay`).
+        if ($provider === 'vnpay_portal') {
+            if (!class_exists('GF_VNPay_Sandbox')) {
+                return new WP_Error('gf_vnpay_missing', 'Module VNPay Sandbox Portal chưa được nạp.');
+            }
             return GF_VNPay_Sandbox::build_checkout_url($order_id, (int) $amount, $mode);
         }
 

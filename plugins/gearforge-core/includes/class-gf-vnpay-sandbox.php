@@ -19,10 +19,58 @@ class GF_VNPay_Sandbox {
     private const OPTION_ENABLED  = 'gf_vnpay_enabled';
     private const OPTION_TMN_CODE = 'gf_vnpay_tmn_code';
     private const OPTION_SECRET   = 'gf_vnpay_hash_secret';
+    private const OPTION_PAY_URL  = 'gf_vnpay_pay_url';
+    private const OPTION_API_URL  = 'gf_vnpay_api_url';
 
     public static function init(): void {
         add_action('rest_api_init', [self::class, 'register_routes']);
         add_action('template_redirect', [self::class, 'handle_return_redirect']);
+        add_action('wp_footer', [self::class, 'inject_oms_gateway_option']);
+        add_filter('woocommerce_payment_gateways', [self::class, 'register_wc_gateway']);
+    }
+
+    public static function register_wc_gateway(array $gateways): array {
+        if (class_exists('WC_Payment_Gateway')) {
+            self::define_wc_gateway_class();
+            if (class_exists('GF_Gateway_VNPay_WC') && !in_array('GF_Gateway_VNPay_WC', $gateways, true)) {
+                $gateways[] = 'GF_Gateway_VNPay_WC';
+            }
+        }
+        return $gateways;
+    }
+
+    /**
+     * Inject `vnpay_portal` option into the OMS Sandbox selector without modifying theme files.
+     */
+    public static function inject_oms_gateway_option(): void {
+        if (is_admin()) {
+            return;
+        }
+        $configured = self::is_configured();
+        $label      = $configured
+            ? 'VNPay Sandbox Portal (sandbox.vnpayment.vn)'
+            : 'VNPay Sandbox Portal (chưa nhập TmnCode)';
+        ?>
+        <script>
+        (function() {
+            var optValue = 'vnpay_portal';
+            var optLabel = <?php echo wp_json_encode($label); ?>;
+            function attachOption() {
+                var sel = document.querySelector('select[aria-label="Chọn cổng thanh toán Sandbox"]');
+                if (!sel || sel.querySelector('option[value="' + optValue + '"]')) return;
+                var opt = document.createElement('option');
+                opt.value = optValue;
+                opt.textContent = optLabel;
+                sel.appendChild(opt);
+            }
+            attachOption();
+            if (typeof MutationObserver === 'function' && document.body) {
+                var obs = new MutationObserver(attachOption);
+                obs.observe(document.body, { childList: true, subtree: true });
+            }
+        })();
+        </script>
+        <?php
     }
 
     public static function register_routes(): void {
@@ -39,11 +87,13 @@ class GF_VNPay_Sandbox {
      * @return array{enabled:bool,tmn_code:string,hash_secret:string,pay_url:string,api_url:string,source:string}
      */
     public static function get_config(): array {
-        $env_tmn    = trim((string) getenv('GF_VNPAY_TMN_CODE'));
-        $env_secret = trim((string) getenv('GF_VNPAY_HASH_SECRET'));
-        $opt_tmn    = trim((string) get_option(self::OPTION_TMN_CODE, ''));
-        $opt_secret = trim((string) get_option(self::OPTION_SECRET, ''));
-        $enabled    = (string) get_option(self::OPTION_ENABLED, '1') !== '0';
+        $env_tmn     = trim((string) getenv('GF_VNPAY_TMN_CODE'));
+        $env_secret  = trim((string) getenv('GF_VNPAY_HASH_SECRET'));
+        $opt_tmn     = trim((string) get_option(self::OPTION_TMN_CODE, ''));
+        $opt_secret  = trim((string) get_option(self::OPTION_SECRET, ''));
+        $opt_pay_url = trim((string) get_option(self::OPTION_PAY_URL, ''));
+        $opt_api_url = trim((string) get_option(self::OPTION_API_URL, ''));
+        $enabled     = (string) get_option(self::OPTION_ENABLED, '1') !== '0';
 
         $source = 'none';
         if ($env_tmn !== '' && $env_secret !== '') {
@@ -56,8 +106,8 @@ class GF_VNPay_Sandbox {
             'enabled'     => $enabled,
             'tmn_code'    => $env_tmn !== '' ? $env_tmn : $opt_tmn,
             'hash_secret' => $env_secret !== '' ? $env_secret : $opt_secret,
-            'pay_url'     => trim((string) getenv('GF_VNPAY_PAY_URL')) ?: self::DEFAULT_PAY_URL,
-            'api_url'     => trim((string) getenv('GF_VNPAY_API_URL')) ?: self::DEFAULT_API_URL,
+            'pay_url'     => trim((string) getenv('GF_VNPAY_PAY_URL')) ?: ($opt_pay_url !== '' ? $opt_pay_url : self::DEFAULT_PAY_URL),
+            'api_url'     => trim((string) getenv('GF_VNPAY_API_URL')) ?: ($opt_api_url !== '' ? $opt_api_url : self::DEFAULT_API_URL),
             'source'      => $source,
         ];
     }
@@ -216,7 +266,7 @@ class GF_VNPay_Sandbox {
         $vnp_txn_no = sanitize_text_field((string) ($params['vnp_TransactionNo'] ?? $txn_ref));
 
         if ($resp_code === '00' && ($txn_status === '' || $txn_status === '00')) {
-            $res = GF_Payment_Sandbox::finalize_verified_payment($order_id, $paid_amount, 'vnpay', $mode, $vnp_txn_no ?: $txn_ref);
+            $res = GF_Payment_Sandbox::finalize_verified_payment($order_id, $paid_amount, 'vnpay_portal', $mode, $vnp_txn_no ?: $txn_ref);
             if (is_wp_error($res)) {
                 return new WP_REST_Response(['RspCode' => '99', 'Message' => $res->get_error_message()], 200);
             }
@@ -273,7 +323,7 @@ class GF_VNPay_Sandbox {
                 self::render_return_status_page($order_id, false, 'VNPay QueryDR không xác nhận giao dịch thành công (' . ($qdr['message'] ?? '') . ').');
             }
 
-            $res = GF_Payment_Sandbox::finalize_verified_payment($order_id, $vnp_amount, 'vnpay', $mode, $vnp_txn_no ?: $txn_ref);
+            $res = GF_Payment_Sandbox::finalize_verified_payment($order_id, $vnp_amount, 'vnpay_portal', $mode, $vnp_txn_no ?: $txn_ref);
             if (!is_wp_error($res) || $res->get_error_code() === 'gf_already_paid') {
                 wp_safe_redirect($tracking_url);
                 exit;
@@ -403,8 +453,86 @@ class GF_VNPay_Sandbox {
             $amount = self::resolve_expected_amount($order_id, $mode);
         }
 
-        $res = GF_Payment_Sandbox::finalize_verified_payment($order_id, $amount, 'vnpay', $mode, $vnp_txn_no ?: $txn_ref);
+        $res = GF_Payment_Sandbox::finalize_verified_payment($order_id, $amount, 'vnpay_portal', $mode, $vnp_txn_no ?: $txn_ref);
         return $res === true;
+    }
+
+    /**
+     * Define a separate WooCommerce Payment Gateway for VNPay Sandbox Portal
+     * so the legacy internal 3DS Sandbox gateway remains untouched.
+     */
+    private static function define_wc_gateway_class(): void {
+        if (class_exists('GF_Gateway_VNPay_WC') || !class_exists('WC_Payment_Gateway')) {
+            return;
+        }
+        eval(<<<'PHP'
+class GF_Gateway_VNPay_WC extends WC_Payment_Gateway {
+    public function __construct() {
+        $this->id                 = 'gearforge_vnpay_sandbox';
+        $this->method_title       = 'VNPay Sandbox Portal (sandbox.vnpayment.vn)';
+        $this->method_description = 'Cổng VNPay Sandbox 2.1.0 tách riêng (chuyển hướng sang sandbox.vnpayment.vn, dùng thẻ test NCB & OTP 123456).';
+        $this->has_fields         = true;
+
+        $this->init_form_fields();
+        $this->init_settings();
+
+        $this->title       = $this->get_option('title', 'VNPay Sandbox Portal (Thẻ ATM NCB / VNPay-QR Test)');
+        $this->description = $this->get_option('description', 'Chuyển hướng sang cổng thanh toán thử nghiệm chính thức của VNPay (không trừ tiền thật).');
+        $this->enabled     = $this->get_option('enabled', 'yes');
+
+        add_action('woocommerce_update_options_payment_gateways_' . $this->id, [$this, 'process_admin_options']);
+    }
+
+    public function init_form_fields(): void {
+        $this->form_fields = [
+            'enabled' => [
+                'title'   => 'Kích hoạt',
+                'type'    => 'checkbox',
+                'label'   => 'Bật cổng VNPay Sandbox Portal (tách riêng với Sandbox 3DS nội bộ)',
+                'default' => 'yes',
+            ],
+            'title' => [
+                'title'   => 'Tiêu đề hiển thị',
+                'type'    => 'text',
+                'default' => 'VNPay Sandbox Portal (Thẻ ATM NCB / VNPay-QR Test)',
+            ],
+        ];
+    }
+
+    public function payment_fields(): void {
+        if ($this->description) {
+            echo '<p>' . esc_html($this->description) . '</p>';
+        }
+        if (!GF_VNPay_Sandbox::is_configured()) {
+            echo '<p style="color:#b45309;font-size:12px;"><em>Lưu ý: Chưa cấu hình vnp_TmnCode / vnp_HashSecret trong WP Admin &rarr; Trả góp SV &rarr; Cấu hình VNPay.</em></p>';
+        }
+    }
+
+    public function process_payment($order_id): array {
+        $order = wc_get_order($order_id);
+        if (!$order) {
+            return ['result' => 'fail'];
+        }
+        $session = GF_Payment_Sandbox::create_sandbox_payment_session((int) $order_id, 'vnpay_portal', 'full');
+        if (is_wp_error($session)) {
+            if (function_exists('wc_add_notice')) {
+                wc_add_notice($session->get_error_message(), 'error');
+            }
+            return ['result' => 'fail'];
+        }
+        $order->update_meta_data('_gf_sandbox_provider', 'VNPAY_PORTAL');
+        $order->update_status('pending', 'Chờ thanh toán qua VNPay Sandbox Portal (2.1.0).');
+        $order->save();
+        if (function_exists('WC') && WC()->cart) {
+            WC()->cart->empty_cart();
+        }
+        return [
+            'result'   => 'success',
+            'redirect' => $session,
+        ];
+    }
+}
+PHP);
     }
 
     private static function sign_params(array $params, string $secret): array {

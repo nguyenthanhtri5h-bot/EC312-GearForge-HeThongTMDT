@@ -410,9 +410,21 @@ class GF_Admin_Pages {
         $enabled = isset($_POST['gf_vnpay_enabled']) ? '1' : '0';
         $tmn     = sanitize_text_field(wp_unslash($_POST['gf_vnpay_tmn_code'] ?? ''));
         $secret  = sanitize_text_field(wp_unslash($_POST['gf_vnpay_hash_secret'] ?? ''));
+        $pay_url = esc_url_raw(trim((string) wp_unslash($_POST['gf_vnpay_pay_url'] ?? '')));
+        $api_url = esc_url_raw(trim((string) wp_unslash($_POST['gf_vnpay_api_url'] ?? '')));
 
         update_option('gf_vnpay_enabled', $enabled);
         update_option('gf_vnpay_tmn_code', $tmn);
+        if ($pay_url !== '') {
+            update_option('gf_vnpay_pay_url', $pay_url);
+        } else {
+            delete_option('gf_vnpay_pay_url');
+        }
+        if ($api_url !== '') {
+            update_option('gf_vnpay_api_url', $api_url);
+        } else {
+            delete_option('gf_vnpay_api_url');
+        }
         if ($secret !== '') {
             update_option('gf_vnpay_hash_secret', $secret);
         } elseif (!empty($_POST['gf_vnpay_clear_secret'])) {
@@ -427,33 +439,35 @@ class GF_Admin_Pages {
         if (!current_user_can('manage_options')) {
             return;
         }
-        $cfg        = class_exists('GF_VNPay_Sandbox') ? GF_VNPay_Sandbox::get_config() : ['enabled' => false, 'tmn_code' => '', 'hash_secret' => '', 'source' => 'none'];
+        $cfg        = class_exists('GF_VNPay_Sandbox') ? GF_VNPay_Sandbox::get_config() : ['enabled' => false, 'tmn_code' => '', 'hash_secret' => '', 'pay_url' => '', 'api_url' => '', 'source' => 'none'];
         $active     = class_exists('GF_VNPay_Sandbox') && GF_VNPay_Sandbox::is_configured();
         $return_url = class_exists('GF_VNPay_Sandbox') ? GF_VNPay_Sandbox::get_return_url() : home_url('/?gf_vnpay_return=1');
         $ipn_url    = class_exists('GF_VNPay_Sandbox') ? GF_VNPay_Sandbox::get_ipn_url() : rest_url('gearforge/v1/vnpay-ipn');
         $masked_sec = $cfg['hash_secret'] !== '' ? substr($cfg['hash_secret'], 0, 4) . '••••••••' . substr($cfg['hash_secret'], -4) : '';
         $saved      = isset($_GET['gf_saved']) && $_GET['gf_saved'] === '1';
 
-        echo '<div class="wrap"><h1>Cấu hình VNPay Sandbox 2.1.0 (GearForge)</h1>';
+        echo '<div class="wrap"><h1>Cấu hình VNPay Sandbox Portal 2.1.0 (Kênh tách riêng)</h1>';
         if ($saved) {
             echo '<div class="notice notice-success is-dismissible"><p>Đã lưu cấu hình VNPay Sandbox.</p></div>';
         }
         $status_msg = $active
-            ? 'Đang kích hoạt VNPay Sandbox thật (sandbox.vnpayment.vn) — nguồn: ' . strtoupper($cfg['source'])
-            : 'Chưa đủ khóa TmnCode/HashSecret — đang tự động dùng Sandbox 3DS nội bộ (OTP 123456) làm fallback.';
+            ? 'Kênh riêng vnpay_portal (VNPay Sandbox Portal) đã sẵn sàng — nguồn: ' . strtoupper($cfg['source']) . '. Sandbox 3DS nội bộ cũ (VNPay 3DS / MoMo / Fundiin) vẫn giữ nguyên độc lập.'
+            : 'Kênh riêng vnpay_portal chưa đủ khóa TmnCode/HashSecret. Sandbox 3DS nội bộ cũ (VNPay 3DS / MoMo / Fundiin, OTP 123456) vẫn hoạt động bình thường.';
         echo '<div class="notice ' . ($active ? 'notice-info' : 'notice-warning') . '"><p><strong>Trạng thái:</strong> ' . esc_html($status_msg) . '</p></div>';
 
-        echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '" style="max-width:720px;background:#fff;padding:20px;border:1px solid #ccd0d4;border-radius:6px;">';
+        echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '" style="max-width:740px;background:#fff;padding:20px;border:1px solid #ccd0d4;border-radius:6px;">';
         echo '<input type="hidden" name="action" value="gf_save_vnpay_settings" />';
         wp_nonce_field('gf_save_vnpay_settings');
         echo '<table class="form-table">';
-        echo '<tr><th>Kích hoạt VNPay Sandbox thật</th><td><label><input type="checkbox" name="gf_vnpay_enabled" value="1" ' . checked($cfg['enabled'], true, false) . ' /> Định tuyến cổng <code>vnpay</code> sang <code>sandbox.vnpayment.vn</code> (cả cọc trả góp &amp; đơn trả thẳng)</label></td></tr>';
+        echo '<tr><th>Kích hoạt cổng riêng</th><td><label><input type="checkbox" name="gf_vnpay_enabled" value="1" ' . checked($cfg['enabled'], true, false) . ' /> Bật kênh <code>vnpay_portal</code> &amp; WooCommerce Gateway <code>gearforge_vnpay_sandbox</code> (không ghi đè Sandbox 3DS cũ)</label></td></tr>';
         echo '<tr><th><label for="gf_vnpay_tmn_code">vnp_TmnCode</label></th><td><input id="gf_vnpay_tmn_code" type="text" name="gf_vnpay_tmn_code" value="' . esc_attr($cfg['tmn_code']) . '" class="regular-text" placeholder="VD: 2QXUI4J4" /></td></tr>';
         echo '<tr><th><label for="gf_vnpay_hash_secret">vnp_HashSecret</label></th><td><input id="gf_vnpay_hash_secret" type="password" name="gf_vnpay_hash_secret" value="" class="regular-text" placeholder="' . esc_attr($masked_sec ? "Đã lưu ({$masked_sec}) — để trống để giữ nguyên" : 'Nhập chuỗi HashSecret') . '" /> ';
         if ($masked_sec !== '') {
             echo '<label style="margin-left:8px;"><input type="checkbox" name="gf_vnpay_clear_secret" value="1" /> Xóa secret</label>';
         }
         echo '</td></tr>';
+        echo '<tr><th><label for="gf_vnpay_pay_url">Payment URL (vpcpay)</label></th><td><input id="gf_vnpay_pay_url" type="url" name="gf_vnpay_pay_url" value="' . esc_attr($cfg['pay_url']) . '" class="large-text code" placeholder="https://sandbox.vnpayment.vn/paymentv2/vpcpay.html" /></td></tr>';
+        echo '<tr><th><label for="gf_vnpay_api_url">QueryDR API URL</label></th><td><input id="gf_vnpay_api_url" type="url" name="gf_vnpay_api_url" value="' . esc_attr($cfg['api_url']) . '" class="large-text code" placeholder="https://sandbox.vnpayment.vn/merchant_webapi/api/transaction" /></td></tr>';
         echo '<tr><th>Return URL (dán vào VNPay)</th><td><input type="text" readonly class="large-text code" value="' . esc_attr($return_url) . '" onclick="this.select();" /></td></tr>';
         echo '<tr><th>IPN URL (dùng khi có HTTPS/VPS)</th><td><input type="text" readonly class="large-text code" value="' . esc_attr($ipn_url) . '" onclick="this.select();" /></td></tr>';
         echo '</table>';

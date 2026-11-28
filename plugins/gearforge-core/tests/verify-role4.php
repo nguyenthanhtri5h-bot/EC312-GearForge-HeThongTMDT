@@ -516,31 +516,38 @@ try {
         $vnp_oid = $vnp_order->get_id();
         $created_order_ids[] = $vnp_oid;
 
-        // Without keys -> fallback to local ?gf_sandbox_3ds=1
+        // Without keys -> vnpay_portal rejects clearly while legacy `vnpay` keeps working
         update_option('gf_vnpay_enabled', '1');
         update_option('gf_vnpay_tmn_code', '');
         update_option('gf_vnpay_hash_secret', '');
-        $fallback_url = GF_Payment_Sandbox::create_sandbox_payment_session($vnp_oid, 'vnpay', 'full');
+        $unconfigured_portal = GF_Payment_Sandbox::create_sandbox_payment_session($vnp_oid, 'vnpay_portal', 'full');
+        $legacy_3ds_url      = GF_Payment_Sandbox::create_sandbox_payment_session($vnp_oid, 'vnpay', 'full');
         gf_assert(
-            is_string($fallback_url) && strpos($fallback_url, 'gf_sandbox_3ds=1') !== false,
-            'FIX-19: VNPay falls back to local 3DS emulator when TmnCode/HashSecret are unset'
+            is_wp_error($unconfigured_portal)
+            && $unconfigured_portal->get_error_code() === 'gf_vnpay_not_configured'
+            && is_string($legacy_3ds_url)
+            && strpos($legacy_3ds_url, 'gf_sandbox_3ds=1') !== false,
+            'FIX-19: vnpay_portal requires keys while legacy vnpay 3DS emulator stays independent'
         );
 
-        // With keys -> routes to sandbox.vnpayment.vn/paymentv2/vpcpay.html with HMAC-SHA512
+        // With keys -> vnpay_portal routes to sandbox.vnpayment.vn while legacy `vnpay` STILL routes to ?gf_sandbox_3ds=1
         $test_tmn = 'GFTEST01';
         $test_sec = 'TESTVNPAYSECRETKEY1234567890ABCDEF';
         update_option('gf_vnpay_tmn_code', $test_tmn);
         update_option('gf_vnpay_hash_secret', $test_sec);
 
-        $vnp_url = GF_Payment_Sandbox::create_sandbox_payment_session($vnp_oid, 'vnpay', 'full');
+        $legacy_still_3ds = GF_Payment_Sandbox::create_sandbox_payment_session($vnp_oid, 'vnpay', 'full');
+        $vnp_url = GF_Payment_Sandbox::create_sandbox_payment_session($vnp_oid, 'vnpay_portal', 'full');
         $vnp_q   = [];
         parse_str((string) parse_url((string) $vnp_url, PHP_URL_QUERY), $vnp_q);
         gf_assert(
-            is_string($vnp_url)
+            is_string($legacy_still_3ds)
+            && strpos($legacy_still_3ds, 'gf_sandbox_3ds=1') !== false
+            && is_string($vnp_url)
             && strpos($vnp_url, 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?') === 0
             && (int) ($vnp_q['vnp_Amount'] ?? 0) === ((int) round((float) $vnp_order->get_total()) * 100)
             && GF_VNPay_Sandbox::verify_vnpay_signature($vnp_q) === true,
-            'FIX-19: VNPay Sandbox 2.1.0 builds signed vpcpay.html URL for full payment mode'
+            'FIX-19: Separate vnpay_portal channel signs vpcpay.html URL while legacy vnpay 3DS remains unchanged'
         );
 
         // Tampered VNPay IPN -> RspCode 97
