@@ -6,21 +6,26 @@ sequenceDiagram
     participant PDF as GF_Invoice_PDF
     actor SV as StudentCustomer
 
-    Admin->>UI: Thử đổi trạng thái đơn Laptop sang SHIPPING
+    Admin->>UI: Chuyển trạng thái đơn sang SHIPPING / DELIVERED / COMPLETED
     UI->>Hook: Trigger woocommerce_order_status_changed
-    Hook->>DB: Kiểm tra COUNT(serial_number) theo (order_id, order_item_id)
-    alt Chưa gắn đủ Serial Number
-        DB-->>Hook: Trả về 0 (Thiếu S/N)
-        Hook->>UI: Hoàn nguyên trạng thái cũ & hiện cảnh báo đỏ (TC-15)
-    else Đã đủ S/N hoặc Admin tiến hành gắn mới
-        Admin->>UI: Nhập mã S/N duy nhất (VD: SN-GF-2026-ROG001)
-        UI->>Hook: POST admin-post.php?action=gf_assign_serial (Nonce + RBAC)
-        Hook->>DB: INSERT wp_gf_order_serials (UNIQUE uk_gf_serial_number)
-        DB-->>Hook: Lưu thành công -> cập nhật SERIAL_ASSIGNED
-        Admin->>UI: Chuyển đơn sang SHIPPING -> DELIVERED
-        Hook-->>UI: Cho phép xuất kho thành công
+    Hook->>Hook: Kiểm tra requires_serial_number() từng item
+    alt Sản phẩm là Gear / Linh kiện miễn S/N (cpu, ram, vga, ban-phim, chuot...)
+        Hook-->>UI: Bỏ qua yêu cầu S/N & cho phép chuyển trạng thái
+    else Sản phẩm Laptop / PC bắt buộc S/N
+        Hook->>DB: Kiểm tra COUNT(serial_number) theo (order_id, order_item_id)
+        alt Chưa gắn đủ Serial Number
+            DB-->>Hook: Trả về thiếu S/N
+            Hook->>UI: Hoàn nguyên trạng thái cũ & hiện cảnh báo đỏ (TC-15)
+        else Admin gắn S/N mới hoặc đã đủ S/N
+            Admin->>UI: Nhập mã S/N (regex ^[A-Z0-9][A-Z0-9._-]{3,63}$)
+            UI->>Hook: POST admin-post.php?action=gf_assign_serial (Nonce + RBAC)
+            Hook->>DB: INSERT wp_gf_order_serials (UNIQUE uk_gf_serial_number)
+            DB-->>Hook: Lưu thành công -> cập nhật SERIAL_ASSIGNED
+            Admin->>UI: Chuyển SHIPPING -> DELIVERED (gf-delivered) -> COMPLETED
+            Hook-->>UI: Cho phép xuất kho thành công
+        end
     end
 
-    SV->>PDF: Yêu cầu tải Hóa đơn PDF (Nonce + Anti-IDOR)
-    PDF->>DB: Lấy thông tin Order, Serial Number & Trạng thái Trả góp
-    PDF-->>SV: Xuất file %PDF-1.4 chuẩn T-VAN (MST, S/N, VAT 10%)
+    SV->>PDF: Tải Hóa đơn PDF (Nonce + Anti-IDOR + Rate Limit)
+    PDF->>DB: Lấy Order, Serial Number, MST 0318202607 & gf_vat_rate (8% / 10%)
+    PDF-->>SV: Xuất %PDF-1.4 chuẩn T-VAN (đa trang >42 dòng, CSP sandbox)

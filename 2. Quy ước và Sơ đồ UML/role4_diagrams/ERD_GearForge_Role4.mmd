@@ -16,9 +16,9 @@ erDiagram
         bigint ID PK
         varchar user_login
         varchar user_email
-        varchar student_edu_email
-        tinyint is_edu_verified
-        varchar role_code
+        varchar student_edu_email "via wp_usermeta"
+        tinyint is_edu_verified "via wp_usermeta"
+        varchar role_code "via wp_usermeta"
     }
 
     wp_posts {
@@ -76,6 +76,8 @@ erDiagram
         datetime l1_verified_at
         datetime l2_verified_at
         text reject_reason
+        datetime created_at
+        datetime updated_at
     }
 
     wp_gf_order_serials {
@@ -112,4 +114,5 @@ erDiagram
         bigint reviewed_by FK
         datetime reviewed_at
         datetime created_at
+        datetime updated_at
     }

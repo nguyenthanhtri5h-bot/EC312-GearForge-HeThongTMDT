@@ -1,13 +1,17 @@
 flowchart TD
-    Start(["Sinh viên chọn Laptop/PC & Gói góp 3/6/12 tháng"]) --> Calc["Gọi REST installment-calc tính trả trước & góp/tháng"]
-    Calc --> Submit["Điền MSSV, .edu.vn, Upload CCCD/Thẻ SV + Tick Consent NĐ 13/2023"]
-    Submit --> Encrypt["FraudGuard Check -> Mã hóa AES-256-CBC -> Trạng thái SUBMITTED"]
-    Encrypt --> L1{"Reviewer Duyệt Lớp 1 (Ảnh CCCD & Thẻ SV)?"}
-    L1 -- "Từ chối / Giả mạo" --> Reject["Cập nhật REJECTED / BLACKLISTED & Hủy đơn"] --> EndNode(["Kết thúc"])
-    L1 -- "Đạt (L1_DOCS_VERIFIED)" --> L2{"Reviewer Duyệt Lớp 2 (SĐT & .edu.vn)?"}
+    Start(["Sinh viên chọn sản phẩm & Gói góp 3/6/12 tháng"]) --> Calc["Gọi REST installment-calc tính trả trước & góp/tháng"]
+    Calc --> Submit["Điền MSSV, .edu.vn, SĐT, Upload CCCD/Thẻ SV + Consent NĐ 13/2023"]
+    Submit --> Guard{"Rate Limit (429) /<br/>Blacklist (403)?"}
+    Guard -- "Vi phạm" --> Blocked["Từ chối HTTP 429 / 403"] --> EndNode(["Kết thúc"])
+    Guard -- "Hợp lệ" --> Encrypt["Mã hóa Vault v2 (AES-256-CBC + HMAC) -> SUBMITTED & gf-installment"]
+    Encrypt --> L1{"Duyệt Lớp 1<br/>(CCCD & Thẻ SV)?"}
+    L1 -- "Từ chối / Giả mạo" --> Reject["Cập nhật REJECTED / BLACKLISTED & Hủy đơn"] --> EndNode
+    L1 -- "Đạt (L1_DOCS_VERIFIED)" --> L2{"Duyệt Lớp 2<br/>(SĐT & .edu.vn)?"}
     L2 -- "Không đạt" --> Reject
-    L2 -- "Đạt (APPROVED_WAITING_DOWNPAYMENT)" --> Pay3DS["Sinh viên trả trước qua Sandbox 3DS (OTP 123456)"]
-    Pay3DS --> Paid["IPN HMAC hợp lệ -> ACTIVE_INSTALLMENT & PROCESSING"]
-    Paid --> CheckSN{"Admin thử chuyển SHIPPING: Đã gắn S/N?"}
-    CheckSN -- "Chưa có S/N" --> BlockSN["Hook chặn chuyển trạng thái & báo lỗi đỏ"] --> AssignSN["Nhập S/N duy nhất vào wp_gf_order_serials (SERIAL_ASSIGNED)"] --> CheckSN
-    CheckSN -- "Đã đủ S/N" --> Ship["Chuyển SHIPPING -> DELIVERED -> Xuất Hóa đơn PDF T-VAN"] --> EndNode
+    L2 -- "Đạt (APPROVED_WAITING_DOWNPAYMENT)" --> Pay3DS["POST /payment-sandbox/session -> 3DS OTP 123456 (khóa 5 lần sai)"]
+    Pay3DS --> Paid["IPN HMAC / QueryDR -> ACTIVE_INSTALLMENT & PROCESSING"]
+    Paid --> CheckCat{"Cần S/N?<br/>(Laptop/PC vs Gear)"}
+    CheckCat -- "Gear / Linh kiện (Miễn S/N)" --> Ship
+    CheckCat -- "Laptop / PC (Bắt buộc)" --> CheckSN{"Đủ S/N trước<br/>SHIPPING / DELIVERED?"}
+    CheckSN -- "Chưa đủ S/N" --> BlockSN["Hook chặn chuyển trạng thái & hoàn nguyên"] --> AssignSN["Nhập S/N duy nhất vào wp_gf_order_serials (SERIAL_ASSIGNED)"] --> CheckSN
+    CheckSN -- "Đã đủ S/N" --> Ship["Chuyển SHIPPING -> DELIVERED -> PDF T-VAN (MST 0318202607, VAT 8%-10%)"] --> EndNode

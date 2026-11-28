@@ -1,4 +1,11 @@
 classDiagram
+    class GF_Core {
+        +activate() void
+        +declare_hpos_compatibility() void
+        +bootstrap() void
+        +gf_core_check_rate_limit(string scope, int limit, int window_sec) bool
+    }
+
     class GF_Activator {
         +activate() void
         +ensure_rma_table() void
@@ -17,7 +24,8 @@ classDiagram
         +encrypt_and_store_upload(array file) string
         +encrypt_bytes(string plaintext, string mime) string
         +decrypt_file(string filename) array
-        -get_encryption_key() string
+        +delete_stored_file(string filename) void
+        -derive_subkey(string master_key, string purpose) string
     }
 
     class GF_Installment_Review {
@@ -27,13 +35,16 @@ classDiagram
         +review_layer_2(int app_id, int reviewer_id) bool
         +reject_application(int app_id, int reviewer_id, string reason, bool blacklist) bool
         +hash_cccd(string cccd_number) string
+        -normalize_phone(string phone) string
         -atomic_transition(int app_id, string expected, string next) bool
     }
 
     class GF_Payment_Sandbox {
+        +handle_create_session_rest(WP_REST_Request req) WP_REST_Response
         +create_sandbox_payment_session(int order_id, string provider, string mode) string
         +handle_ipn_callback(WP_REST_Request req) WP_REST_Response
         +handle_query_dr(WP_REST_Request req) WP_REST_Response
+        +handle_oms_status_request(WP_REST_Request req) WP_REST_Response
         +finalize_verified_payment(int order_id, int amount, string provider, string mode, string txn_ref) bool
         +verify_hmac_signature(string context, int order_id, int amount, string provider, string mode, int exp, string sig) bool
         +is_order_already_paid(int order_id) bool
@@ -44,12 +55,14 @@ classDiagram
         +enforce_serial_before_shipping(int order_id, string old, string next, WC_Order order) void
         +has_all_required_serials(WC_Order order) bool
         +get_order_serials(int order_id) array
+        -requires_serial_number(int product_id) bool
     }
 
     class GF_Invoice_PDF {
         +generate_tvan_invoice_pdf(int order_id) string
         +handle_download_request() void
         +inject_serial_into_wpo_pdf(string type, array item, WC_Order order) void
+        -get_vat_rate() float
     }
 
     class GF_Admin_Pages {
@@ -69,7 +82,11 @@ classDiagram
         +complete_request(int rma_id, int reviewer_id, string note) bool
     }
 
-    GF_Installment_Review --> GF_Vault_Crypto : mã hóa ảnh CCCD/Thẻ SV
+    GF_Core --> GF_Activator : kích hoạt & tạo 5 bảng
+    GF_Core ..> GF_Installment_Review : nạp & rate-limit
+    GF_Core ..> GF_Payment_Sandbox : nạp & rate-limit
+    GF_Core ..> GF_RMA_Manager : nạp & rate-limit
+    GF_Installment_Review --> GF_Vault_Crypto : mã hóa/xóa ảnh CCCD & Thẻ SV
     GF_Installment_Review ..> GF_Installment_Calc : sử dụng kết quả tính góp
     GF_Payment_Sandbox --> GF_Installment_Review : chuyển ACTIVE_INSTALLMENT
     GF_Invoice_PDF --> GF_Serial_Manager : truy vấn danh sách S/N

@@ -8,10 +8,10 @@ sequenceDiagram
 
     SV->>UI: Gửi yêu cầu Đổi trả / Bảo hành (order_id, type, S/N, reason)
     UI->>RMA: POST /wp-json/gearforge/v1/rma-request
-    RMA->>WC: Kiểm tra chủ đơn (anti-IDOR) & trạng thái đã giao (completed/shipping)
-    RMA->>DB: Đối chiếu S/N thuộc đơn hàng & hạn 15 ngày (RETURN/EXCHANGE)
+    RMA->>WC: Kiểm tra chủ đơn (anti-IDOR) & trạng thái (gf-shipping / gf-delivered / completed)
+    RMA->>DB: Bắt buộc S/N (nếu đơn có S/N) & check hạn 15 ngày từ date_completed
     alt Không hợp lệ hoặc trùng RMA đang mở
-        RMA-->>UI: Trả lỗi 400 / 403 / 409
+        RMA-->>UI: Trả lỗi 400 / 403 / 409 / 429
     else Hợp lệ
         RMA->>DB: Tạo bản ghi wp_gf_rma_requests (status = REQUESTED)
         RMA->>WC: Ghi Order Note tiếp nhận RMA
@@ -19,7 +19,7 @@ sequenceDiagram
     end
 
     Admin->>DB: Duyệt tiếp nhận (REQUESTED -> APPROVED)
-    Admin->>DB: Hoàn tất xử lý (START TRANSACTION: APPROVED -> COMPLETED)
+    Admin->>DB: GET_LOCK("gf_rma_order_{id}") + START TRANSACTION (APPROVED -> COMPLETED)
     alt Loại yêu cầu là RETURN
         DB->>DB: Thu hồi S/N khỏi wp_gf_order_serials
         opt Đã thu hồi hết toàn bộ S/N của đơn
@@ -29,4 +29,4 @@ sequenceDiagram
     else EXCHANGE / WARRANTY
         DB->>WC: Ghi Order Note hoàn tất đổi máy / bảo hành
     end
-    DB-->>Admin: COMMIT Transaction & thông báo thành công
+    DB-->>Admin: COMMIT Transaction + RELEASE_LOCK & thông báo thành công

@@ -32,18 +32,22 @@
 
 ```mermaid
 flowchart TD
-    Start(["Sinh viên chọn Laptop/PC & Gói góp 3/6/12 tháng"]) --> Calc["Gọi REST installment-calc tính trả trước & góp/tháng"]
-    Calc --> Submit["Điền MSSV, .edu.vn, Upload CCCD/Thẻ SV + Tick Consent NĐ 13/2023"]
-    Submit --> Encrypt["FraudGuard Check -> Mã hóa AES-256-CBC -> Trạng thái SUBMITTED"]
-    Encrypt --> L1{"Reviewer Duyệt Lớp 1 (Ảnh CCCD & Thẻ SV)?"}
-    L1 -- "Từ chối / Giả mạo" --> Reject["Cập nhật REJECTED / BLACKLISTED & Hủy đơn"] --> EndNode(["Kết thúc"])
-    L1 -- "Đạt (L1_DOCS_VERIFIED)" --> L2{"Reviewer Duyệt Lớp 2 (SĐT & .edu.vn)?"}
+    Start(["Sinh viên chọn sản phẩm & Gói góp 3/6/12 tháng"]) --> Calc["Gọi REST installment-calc tính trả trước & góp/tháng"]
+    Calc --> Submit["Điền MSSV, .edu.vn, SĐT, Upload CCCD/Thẻ SV + Consent NĐ 13/2023"]
+    Submit --> Guard{"Rate Limit (429) /<br/>Blacklist (403)?"}
+    Guard -- "Vi phạm" --> Blocked["Từ chối HTTP 429 / 403"] --> EndNode(["Kết thúc"])
+    Guard -- "Hợp lệ" --> Encrypt["Mã hóa Vault v2 (AES-256-CBC + HMAC) -> SUBMITTED & gf-installment"]
+    Encrypt --> L1{"Duyệt Lớp 1<br/>(CCCD & Thẻ SV)?"}
+    L1 -- "Từ chối / Giả mạo" --> Reject["Cập nhật REJECTED / BLACKLISTED & Hủy đơn"] --> EndNode
+    L1 -- "Đạt (L1_DOCS_VERIFIED)" --> L2{"Duyệt Lớp 2<br/>(SĐT & .edu.vn)?"}
     L2 -- "Không đạt" --> Reject
-    L2 -- "Đạt (APPROVED_WAITING_DOWNPAYMENT)" --> Pay3DS["Sinh viên trả trước qua Sandbox 3DS (OTP 123456)"]
-    Pay3DS --> Paid["IPN HMAC hợp lệ -> ACTIVE_INSTALLMENT & PROCESSING"]
-    Paid --> CheckSN{"Admin thử chuyển SHIPPING: Đã gắn S/N?"}
-    CheckSN -- "Chưa có S/N" --> BlockSN["Hook chặn chuyển trạng thái & báo lỗi đỏ"] --> AssignSN["Nhập S/N duy nhất vào wp_gf_order_serials (SERIAL_ASSIGNED)"] --> CheckSN
-    CheckSN -- "Đã đủ S/N" --> Ship["Chuyển SHIPPING -> DELIVERED -> Xuất Hóa đơn PDF T-VAN"] --> EndNode
+    L2 -- "Đạt (APPROVED_WAITING_DOWNPAYMENT)" --> Pay3DS["POST /payment-sandbox/session -> 3DS OTP 123456 (khóa 5 lần sai)"]
+    Pay3DS --> Paid["IPN HMAC / QueryDR -> ACTIVE_INSTALLMENT & PROCESSING"]
+    Paid --> CheckCat{"Cần S/N?<br/>(Laptop/PC vs Gear)"}
+    CheckCat -- "Gear / Linh kiện (Miễn S/N)" --> Ship
+    CheckCat -- "Laptop / PC (Bắt buộc)" --> CheckSN{"Đủ S/N trước<br/>SHIPPING / DELIVERED?"}
+    CheckSN -- "Chưa đủ S/N" --> BlockSN["Hook chặn chuyển trạng thái & hoàn nguyên"] --> AssignSN["Nhập S/N duy nhất vào wp_gf_order_serials (SERIAL_ASSIGNED)"] --> CheckSN
+    CheckSN -- "Đã đủ S/N" --> Ship["Chuyển SHIPPING -> DELIVERED -> PDF T-VAN (MST 0318202607, VAT 8%-10%)"] --> EndNode
 ```
 
 ---
@@ -56,34 +60,37 @@ flowchart TD
 sequenceDiagram
     actor SV as StudentCustomer
     participant UI as Storefront & Consent UI
-    participant FG as FraudGuardMiddleware
-    participant Plugin as StudentInstallment Module
-    participant Vault as Encrypted ID Vault (AES-256)
+    participant Plugin as GF_Installment_Review
+    participant Vault as GF_Vault_Crypto (v2 AES-256)
     participant DB as MySQL (wp_gf_installment_applications)
     actor Rev as InstallmentReviewer
-    participant GW as PaymentGateway Sandbox (3DS)
+    participant GW as GF_Payment_Sandbox (3DS + QueryDR)
 
     SV->>UI: Chọn máy, kỳ hạn (3/6/12 tháng) & tick Consent NĐ 13/2023
-    SV->>UI: Upload ảnh CCCD + Thẻ sinh viên
-    UI->>FG: POST /wp-json/gearforge/v1/installment-apply (order_id, Files)
-    FG->>DB: GET_LOCK & kiểm tra chủ đơn, trạng thái (pending/on-hold), Blacklist
-    alt Vi phạm Rate Limit hoặc nằm trong Blacklist
-        FG-->>UI: Trả lỗi 429 / 403 Từ chối tiếp nhận
+    SV->>UI: Upload ảnh CCCD + Thẻ SV, nhập SĐT & .edu.vn
+    UI->>Plugin: POST /wp-json/gearforge/v1/installment-apply
+    Plugin->>DB: Rate Limit + GET_LOCK + Check chủ đơn & Blacklist (IP/PHONE/USER/CCCD)
+    alt Vi phạm Rate Limit hoặc Blacklist
+        Plugin-->>UI: Trả lỗi HTTP 429 / 403 Từ chối tiếp nhận
     else Hợp lệ
-        FG->>Plugin: Chuyển tiếp xử lý hồ sơ
-        Plugin->>Vault: Mã hóa AES-256-CBC & lưu tệp ngoài webroot
-        Plugin->>DB: Tạo bản ghi trạng thái SUBMITTED
-        Plugin-->>UI: Hiển thị mã hồ sơ & thông báo chờ duyệt 2 lớp
+        Plugin->>Vault: Mã hóa Vault v2 (tách subkey Enc/MAC) ngoài webroot
+        Plugin->>DB: Tạo hồ sơ SUBMITTED & chuyển đơn sang wc-gf-installment
+        Note over Plugin,Vault: Nếu lỗi DB tự động delete_stored_file() tránh file mồ côi
+        Plugin-->>UI: Trả 201 Created (mã hồ sơ chờ duyệt 2 lớp)
 
         Rev->>DB: Duyệt Lớp 1 - Giải mã kiểm tra CCCD & Thẻ SV
-        DB-->>Rev: Cập nhật L1_DOCS_VERIFIED
-        Rev->>SV: Duyệt Lớp 2 - Xác nhận SĐT & Email .edu.vn
-        Rev->>DB: Cập nhật APPROVED_WAITING_DOWNPAYMENT
-        DB-->>SV: Gửi thông báo thanh toán khoản trả trước
-
-        SV->>GW: Thanh toán tiền trả trước (3D-Secure Sandbox)
-        GW-->>Plugin: Callback IPN xác nhận giao dịch hợp lệ (HMAC)
-        Plugin->>DB: Chuyển trạng thái ACTIVE_INSTALLMENT & PROCESSING
+        alt Hồ sơ không hợp lệ / giả mạo
+            Rev->>DB: Cập nhật REJECTED hoặc BLACKLISTED & hủy đơn
+        else Lớp 1 đạt (L1_DOCS_VERIFIED)
+            Rev->>DB: Duyệt Lớp 2 (SĐT & .edu.vn) -> APPROVED_WAITING_DOWNPAYMENT
+            UI->>GW: POST /wp-json/gearforge/v1/payment-sandbox/session
+            GW->>DB: Kiểm tra is_order_already_paid() chống Double Charge
+            GW-->>SV: Trả signed 3DS checkout_url (TTL 15 phút)
+            SV->>GW: Nhập OTP 123456 (khóa 15 phút nếu sai 5 lần)
+            GW->>DB: Verify HMAC IPN (hoặc GET /payment-sandbox/query/{id} QueryDR)
+            GW->>DB: ACTIVE_INSTALLMENT & payment_complete() -> PROCESSING
+            GW-->>UI: Redirect /tra-cuu-don-hang/?order_id=...&gf_paid=1
+        end
     end
 ```
 
@@ -102,24 +109,29 @@ sequenceDiagram
     participant PDF as GF_Invoice_PDF
     actor SV as StudentCustomer
 
-    Admin->>UI: Thử đổi trạng thái đơn Laptop sang SHIPPING
+    Admin->>UI: Chuyển trạng thái đơn sang SHIPPING / DELIVERED / COMPLETED
     UI->>Hook: Trigger woocommerce_order_status_changed
-    Hook->>DB: Kiểm tra COUNT(serial_number) theo (order_id, order_item_id)
-    alt Chưa gắn đủ Serial Number
-        DB-->>Hook: Trả về 0 (Thiếu S/N)
-        Hook->>UI: Hoàn nguyên trạng thái cũ & hiện cảnh báo đỏ (TC-15)
-    else Đã đủ S/N hoặc Admin tiến hành gắn mới
-        Admin->>UI: Nhập mã S/N duy nhất (VD: SN-GF-2026-ROG001)
-        UI->>Hook: POST admin-post.php?action=gf_assign_serial (Nonce + RBAC)
-        Hook->>DB: INSERT wp_gf_order_serials (UNIQUE uk_gf_serial_number)
-        DB-->>Hook: Lưu thành công -> cập nhật SERIAL_ASSIGNED
-        Admin->>UI: Chuyển đơn sang SHIPPING -> DELIVERED
-        Hook-->>UI: Cho phép xuất kho thành công
+    Hook->>Hook: Kiểm tra requires_serial_number() từng item
+    alt Sản phẩm là Gear / Linh kiện miễn S/N (cpu, ram, vga, ban-phim, chuot...)
+        Hook-->>UI: Bỏ qua yêu cầu S/N & cho phép chuyển trạng thái
+    else Sản phẩm Laptop / PC bắt buộc S/N
+        Hook->>DB: Kiểm tra COUNT(serial_number) theo (order_id, order_item_id)
+        alt Chưa gắn đủ Serial Number
+            DB-->>Hook: Trả về thiếu S/N
+            Hook->>UI: Hoàn nguyên trạng thái cũ & hiện cảnh báo đỏ (TC-15)
+        else Admin gắn S/N mới hoặc đã đủ S/N
+            Admin->>UI: Nhập mã S/N (regex ^[A-Z0-9][A-Z0-9._-]{3,63}$)
+            UI->>Hook: POST admin-post.php?action=gf_assign_serial (Nonce + RBAC)
+            Hook->>DB: INSERT wp_gf_order_serials (UNIQUE uk_gf_serial_number)
+            DB-->>Hook: Lưu thành công -> cập nhật SERIAL_ASSIGNED
+            Admin->>UI: Chuyển SHIPPING -> DELIVERED (gf-delivered) -> COMPLETED
+            Hook-->>UI: Cho phép xuất kho thành công
+        end
     end
 
-    SV->>PDF: Yêu cầu tải Hóa đơn PDF (Nonce + Anti-IDOR)
-    PDF->>DB: Lấy thông tin Order, Serial Number & Trạng thái Trả góp
-    PDF-->>SV: Xuất file %PDF-1.4 chuẩn T-VAN (MST, S/N, VAT 10%)
+    SV->>PDF: Tải Hóa đơn PDF (Nonce + Anti-IDOR + Rate Limit)
+    PDF->>DB: Lấy Order, Serial Number, MST 0318202607 & gf_vat_rate (8% / 10%)
+    PDF-->>SV: Xuất %PDF-1.4 chuẩn T-VAN (đa trang >42 dòng, CSP sandbox)
 ```
 
 ---
@@ -139,10 +151,10 @@ sequenceDiagram
 
     SV->>UI: Gửi yêu cầu Đổi trả / Bảo hành (order_id, type, S/N, reason)
     UI->>RMA: POST /wp-json/gearforge/v1/rma-request
-    RMA->>WC: Kiểm tra chủ đơn (anti-IDOR) & trạng thái đã giao (completed/shipping)
-    RMA->>DB: Đối chiếu S/N thuộc đơn hàng & hạn 15 ngày (RETURN/EXCHANGE)
+    RMA->>WC: Kiểm tra chủ đơn (anti-IDOR) & trạng thái (gf-shipping / gf-delivered / completed)
+    RMA->>DB: Bắt buộc S/N (nếu đơn có S/N) & check hạn 15 ngày từ date_completed
     alt Không hợp lệ hoặc trùng RMA đang mở
-        RMA-->>UI: Trả lỗi 400 / 403 / 409
+        RMA-->>UI: Trả lỗi 400 / 403 / 409 / 429
     else Hợp lệ
         RMA->>DB: Tạo bản ghi wp_gf_rma_requests (status = REQUESTED)
         RMA->>WC: Ghi Order Note tiếp nhận RMA
@@ -150,7 +162,7 @@ sequenceDiagram
     end
 
     Admin->>DB: Duyệt tiếp nhận (REQUESTED -> APPROVED)
-    Admin->>DB: Hoàn tất xử lý (START TRANSACTION: APPROVED -> COMPLETED)
+    Admin->>DB: GET_LOCK("gf_rma_order_{id}") + START TRANSACTION (APPROVED -> COMPLETED)
     alt Loại yêu cầu là RETURN
         DB->>DB: Thu hồi S/N khỏi wp_gf_order_serials
         opt Đã thu hồi hết toàn bộ S/N của đơn
@@ -160,7 +172,7 @@ sequenceDiagram
     else EXCHANGE / WARRANTY
         DB->>WC: Ghi Order Note hoàn tất đổi máy / bảo hành
     end
-    DB-->>Admin: COMMIT Transaction & thông báo thành công
+    DB-->>Admin: COMMIT Transaction + RELEASE_LOCK & thông báo thành công
 ```
 
 ---
@@ -199,9 +211,9 @@ erDiagram
         bigint ID PK
         varchar user_login
         varchar user_email
-        varchar student_edu_email
-        tinyint is_edu_verified
-        varchar role_code
+        varchar student_edu_email "via wp_usermeta"
+        tinyint is_edu_verified "via wp_usermeta"
+        varchar role_code "via wp_usermeta"
     }
 
     wp_posts {
@@ -259,6 +271,8 @@ erDiagram
         datetime l1_verified_at
         datetime l2_verified_at
         text reject_reason
+        datetime created_at
+        datetime updated_at
     }
 
     wp_gf_order_serials {
@@ -295,6 +309,7 @@ erDiagram
         bigint reviewed_by FK
         datetime reviewed_at
         datetime created_at
+        datetime updated_at
     }
 ```
 
@@ -502,6 +517,13 @@ CREATE TABLE IF NOT EXISTS wp_gf_rma_requests (
 
 ```mermaid
 classDiagram
+    class GF_Core {
+        +activate() void
+        +declare_hpos_compatibility() void
+        +bootstrap() void
+        +gf_core_check_rate_limit(string scope, int limit, int window_sec) bool
+    }
+
     class GF_Activator {
         +activate() void
         +ensure_rma_table() void
@@ -509,17 +531,21 @@ classDiagram
         -seed_installment_plans() void
         -ensure_vault_directory() void
     }
+
     class GF_Installment_Calc {
         +calculate(float price, float down_pct, int months) array
         +get_plan_by_months(int months) array
         +handle_calc_request(WP_REST_Request req) WP_REST_Response
     }
+
     class GF_Vault_Crypto {
         +encrypt_and_store_upload(array file) string
         +encrypt_bytes(string plaintext, string mime) string
         +decrypt_file(string filename) array
-        -get_encryption_key() string
+        +delete_stored_file(string filename) void
+        -derive_subkey(string master_key, string purpose) string
     }
+
     class GF_Installment_Review {
         +handle_apply_rest(WP_REST_Request req) WP_REST_Response
         +submit_application(array data, array cccd, array card) int
@@ -527,27 +553,36 @@ classDiagram
         +review_layer_2(int app_id, int reviewer_id) bool
         +reject_application(int app_id, int reviewer_id, string reason, bool blacklist) bool
         +hash_cccd(string cccd_number) string
+        -normalize_phone(string phone) string
         -atomic_transition(int app_id, string expected, string next) bool
     }
+
     class GF_Payment_Sandbox {
+        +handle_create_session_rest(WP_REST_Request req) WP_REST_Response
         +create_sandbox_payment_session(int order_id, string provider, string mode) string
         +handle_ipn_callback(WP_REST_Request req) WP_REST_Response
         +handle_query_dr(WP_REST_Request req) WP_REST_Response
+        +handle_oms_status_request(WP_REST_Request req) WP_REST_Response
         +finalize_verified_payment(int order_id, int amount, string provider, string mode, string txn_ref) bool
         +verify_hmac_signature(string context, int order_id, int amount, string provider, string mode, int exp, string sig) bool
         +is_order_already_paid(int order_id) bool
     }
+
     class GF_Serial_Manager {
         +assign_serial(int order_id, int item_id, int product_id, string serial, int by) int
         +enforce_serial_before_shipping(int order_id, string old, string next, WC_Order order) void
         +has_all_required_serials(WC_Order order) bool
         +get_order_serials(int order_id) array
+        -requires_serial_number(int product_id) bool
     }
+
     class GF_Invoice_PDF {
         +generate_tvan_invoice_pdf(int order_id) string
         +handle_download_request() void
         +inject_serial_into_wpo_pdf(string type, array item, WC_Order order) void
+        -get_vat_rate() float
     }
+
     class GF_Admin_Pages {
         +render_installments_page() void
         +render_rma_page() void
@@ -555,6 +590,7 @@ classDiagram
         +handle_rma_action() void
         +handle_view_vault_doc() void
     }
+
     class GF_RMA_Manager {
         +handle_submit_rest(WP_REST_Request req) WP_REST_Response
         +handle_status_rest(WP_REST_Request req) WP_REST_Response
@@ -563,7 +599,12 @@ classDiagram
         +reject_request(int rma_id, int reviewer_id, string note) bool
         +complete_request(int rma_id, int reviewer_id, string note) bool
     }
-    GF_Installment_Review --> GF_Vault_Crypto : mã hóa ảnh CCCD/Thẻ SV
+
+    GF_Core --> GF_Activator : kích hoạt & tạo 5 bảng
+    GF_Core ..> GF_Installment_Review : nạp & rate-limit
+    GF_Core ..> GF_Payment_Sandbox : nạp & rate-limit
+    GF_Core ..> GF_RMA_Manager : nạp & rate-limit
+    GF_Installment_Review --> GF_Vault_Crypto : mã hóa/xóa ảnh CCCD & Thẻ SV
     GF_Installment_Review ..> GF_Installment_Calc : sử dụng kết quả tính góp
     GF_Payment_Sandbox --> GF_Installment_Review : chuyển ACTIVE_INSTALLMENT
     GF_Invoice_PDF --> GF_Serial_Manager : truy vấn danh sách S/N

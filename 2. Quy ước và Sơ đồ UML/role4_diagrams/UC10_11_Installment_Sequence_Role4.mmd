@@ -1,32 +1,35 @@
 sequenceDiagram
     actor SV as StudentCustomer
     participant UI as Storefront & Consent UI
-    participant FG as FraudGuardMiddleware
-    participant Plugin as StudentInstallment Module
-    participant Vault as Encrypted ID Vault (AES-256)
+    participant Plugin as GF_Installment_Review
+    participant Vault as GF_Vault_Crypto (v2 AES-256)
     participant DB as MySQL (wp_gf_installment_applications)
     actor Rev as InstallmentReviewer
-    participant GW as PaymentGateway Sandbox (3DS)
+    participant GW as GF_Payment_Sandbox (3DS + QueryDR)
 
     SV->>UI: Chọn máy, kỳ hạn (3/6/12 tháng) & tick Consent NĐ 13/2023
-    SV->>UI: Upload ảnh CCCD + Thẻ sinh viên
-    UI->>FG: POST /wp-json/gearforge/v1/installment-apply (order_id, Files)
-    FG->>DB: GET_LOCK & kiểm tra chủ đơn, trạng thái (pending/on-hold), Blacklist
-    alt Vi phạm Rate Limit hoặc nằm trong Blacklist
-        FG-->>UI: Trả lỗi 429 / 403 Từ chối tiếp nhận
+    SV->>UI: Upload ảnh CCCD + Thẻ SV, nhập SĐT & .edu.vn
+    UI->>Plugin: POST /wp-json/gearforge/v1/installment-apply
+    Plugin->>DB: Rate Limit + GET_LOCK + Check chủ đơn & Blacklist (IP/PHONE/USER/CCCD)
+    alt Vi phạm Rate Limit hoặc Blacklist
+        Plugin-->>UI: Trả lỗi HTTP 429 / 403 Từ chối tiếp nhận
     else Hợp lệ
-        FG->>Plugin: Chuyển tiếp xử lý hồ sơ
-        Plugin->>Vault: Mã hóa AES-256-CBC & lưu tệp ngoài webroot
-        Plugin->>DB: Tạo bản ghi trạng thái SUBMITTED
-        Plugin-->>UI: Hiển thị mã hồ sơ & thông báo chờ duyệt 2 lớp
+        Plugin->>Vault: Mã hóa Vault v2 (tách subkey Enc/MAC) ngoài webroot
+        Plugin->>DB: Tạo hồ sơ SUBMITTED & chuyển đơn sang wc-gf-installment
+        Note over Plugin,Vault: Nếu lỗi DB tự động delete_stored_file() tránh file mồ côi
+        Plugin-->>UI: Trả 201 Created (mã hồ sơ chờ duyệt 2 lớp)
 
         Rev->>DB: Duyệt Lớp 1 - Giải mã kiểm tra CCCD & Thẻ SV
-        DB-->>Rev: Cập nhật L1_DOCS_VERIFIED
-        Rev->>SV: Duyệt Lớp 2 - Xác nhận SĐT & Email .edu.vn
-        Rev->>DB: Cập nhật APPROVED_WAITING_DOWNPAYMENT
-        DB-->>SV: Gửi thông báo thanh toán khoản trả trước
-
-        SV->>GW: Thanh toán tiền trả trước (3D-Secure Sandbox)
-        GW-->>Plugin: Callback IPN xác nhận giao dịch hợp lệ (HMAC)
-        Plugin->>DB: Chuyển trạng thái ACTIVE_INSTALLMENT & PROCESSING
+        alt Hồ sơ không hợp lệ / giả mạo
+            Rev->>DB: Cập nhật REJECTED hoặc BLACKLISTED & hủy đơn
+        else Lớp 1 đạt (L1_DOCS_VERIFIED)
+            Rev->>DB: Duyệt Lớp 2 (SĐT & .edu.vn) -> APPROVED_WAITING_DOWNPAYMENT
+            UI->>GW: POST /wp-json/gearforge/v1/payment-sandbox/session
+            GW->>DB: Kiểm tra is_order_already_paid() chống Double Charge
+            GW-->>SV: Trả signed 3DS checkout_url (TTL 15 phút)
+            SV->>GW: Nhập OTP 123456 (khóa 15 phút nếu sai 5 lần)
+            GW->>DB: Verify HMAC IPN (hoặc GET /payment-sandbox/query/{id} QueryDR)
+            GW->>DB: ACTIVE_INSTALLMENT & payment_complete() -> PROCESSING
+            GW-->>UI: Redirect /tra-cuu-don-hang/?order_id=...&gf_paid=1
+        end
     end
